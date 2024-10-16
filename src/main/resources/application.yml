@@ -1,0 +1,61 @@
+spring:
+  application:
+    name: EcommerceBackend
+  data:
+    redis:
+      host: localhost
+      port: 6380
+      password: ecommerce-redis-p@ss
+      timeout: 60000
+      client-type: lettuce
+
+
+  datasource:
+    first:
+      url: jdbc:postgresql://localhost:5437/User
+      username: SECURITY
+      password: SECURITY
+    second:
+      url: jdbc:postgresql://localhost:5433/EvoProduct
+      username: ROOT
+      password: 1234
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: memmedlisedat033@gmail.com
+    password: ghfs orqj yyyf envz
+    properties:
+      mail.transport.protocol: smtp
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.debug: true
+
+security:
+  key: "jvdIc8VZQrh6T17RAywe6e/3u7wQ/WEXIUuLD1FWYo01yQcjjmjOBfwY/KeHu5cBaNMeJI0pZIMOwNCQuVnMvQ=="
+refresh-token:
+  expiration: 2592000000
+
+access-token:
+  expiration: 600000
+
+verification-code:
+  expiration: 300000
+
+activation-token:
+  expiration: 864000000
+
+cloudinary:
+  cloud:
+    name: dxwnhu7af
+    api-key: 842273197433114
+    api-secret: Pk4pPw0keRWoNMLMeaNPnWJlFQQ
+
+server:
+  port: 8081
