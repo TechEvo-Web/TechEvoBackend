@@ -49,7 +49,7 @@ verification-code:
   expiration: 300000
 
 activation-token:
-  expiration: 864000000
+  expiration: 86400000
 
 cloudinary:
   cloud:

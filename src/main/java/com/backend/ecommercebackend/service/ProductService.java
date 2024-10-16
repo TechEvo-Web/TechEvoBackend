@@ -13,6 +13,4 @@ public interface ProductService {
      List<ProductResponse> getAllProduct();
      ProductResponse updateProduct(Long id, ProductRequest request, List<MultipartFile> imageFile) throws IOException;
      void deleteProduct(Long id);
-     ProductResponse rateProduct(Long id, float newRating);
-
 }
