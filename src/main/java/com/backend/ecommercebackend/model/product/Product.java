@@ -33,13 +33,7 @@ public class Product {
     double price;
 
     @Column(nullable = false)
-    float ratingSum = 0.0f;
-
-    @Column(nullable = false)
-    int totalRatings = 0;
-
-    @Column(nullable = false)
-    float rating = 0.0f;
+    float rating;
 
     @Column(columnDefinition = "jsonb", nullable = false)
     @JdbcTypeCode(SqlTypes.JSON)
