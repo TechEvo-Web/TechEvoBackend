@@ -9,8 +9,10 @@ import com.backend.ecommercebackend.repository.order.OrderRepository;
 import com.backend.ecommercebackend.repository.product.ProductRepository;
 import com.backend.ecommercebackend.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -29,9 +31,8 @@ public class OrderController {
     private final OrderItemRepository orderItemRepository;
 
     @PostMapping
-    public ResponseEntity<Order> addOrderItems( @RequestBody List<OrderItem> orderItems,@RequestBody Order order) {
-        Order createdOrder = orderService.processOrderItems(orderItems,order);
-
+    public ResponseEntity<Order> addOrderItems(@RequestBody Order order) {
+        Order createdOrder = orderService.processOrderItems(order);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
     }
     @DeleteMapping("/delete/{orderId}")
@@ -41,7 +42,7 @@ public class OrderController {
     }
 
 
-@GetMapping ("/orderItem/getOrderItemInfo/{orderItemId}")
+@GetMapping ("/orderItem/{orderItemId}")
     public Product getOrderItemInfo(@PathVariable Long orderItemId){
         orderService.getProductIdFromOrderItemId(orderItemId);
         return orderService.getProductIdFromOrderItemId(orderItemId);
