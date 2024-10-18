@@ -22,6 +22,17 @@ services:
      - '5433:5432'
     volumes:
      - productDataEvo:/var/lib/postgresql/data
+  order_service:
+    container_name: order
+    image: postgres:alpine
+    environment:
+      POSTGRES_USER: ORDER
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: Order
+    ports:
+      - '5436:5432'
+    volumes:
+      - orderData:/var/lib/postgresql/data
 
 
   redis:
@@ -39,3 +50,4 @@ volumes:
   securityData: {}
   redis_data: {}
   productDataEvo: {}
+  orderData: {}

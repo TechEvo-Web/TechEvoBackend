@@ -1,12 +1,10 @@
 package com.backend.ecommercebackend.service.impl;
 
-import com.backend.ecommercebackend.dto.request.CommentRequest;
 import com.backend.ecommercebackend.dto.request.ProductRequest;
 import com.backend.ecommercebackend.dto.response.ProductResponse;
 import com.backend.ecommercebackend.enums.Exceptions;
 import com.backend.ecommercebackend.exception.ApplicationException;
 import com.backend.ecommercebackend.mapper.ProductMapper;
-import com.backend.ecommercebackend.model.product.Comment;
 import com.backend.ecommercebackend.model.product.Product;
 import com.backend.ecommercebackend.repository.product.CommentRepository;
 import com.backend.ecommercebackend.repository.product.ProductRepository;
@@ -115,23 +113,6 @@ public class ProductServiceImpl implements ProductService {
         }
         commentRepository.deleteByProductId(id);
         repository.deleteById(id);
-    }
-
-
-    @Override
-    public ProductResponse rateProduct(Long productId, float rating) {
-        Product product = repository.findById(productId)
-                .orElseThrow(() -> new ApplicationException(Exceptions.NOT_FOUND_EXCEPTION));
-
-        product.setRatingSum(product.getRatingSum() + rating);
-        product.setTotalRatings(product.getTotalRatings() + 1);
-
-        float newAverageRating = product.getRatingSum() / product.getTotalRatings();
-        product.setRating(newAverageRating);
-
-        repository.save(product);
-
-        return mapper.EntityToProductDto(product);
     }
 
 }
