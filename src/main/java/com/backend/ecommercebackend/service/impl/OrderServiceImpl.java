@@ -3,10 +3,13 @@ package com.backend.ecommercebackend.service.impl;
 
 import com.backend.ecommercebackend.model.order.Order;
 import com.backend.ecommercebackend.model.order.OrderItem;
+import com.backend.ecommercebackend.model.product.Product;
 import com.backend.ecommercebackend.repository.order.OrderItemRepository;
 import com.backend.ecommercebackend.repository.order.OrderRepository;
+import com.backend.ecommercebackend.repository.product.ProductRepository;
 import com.backend.ecommercebackend.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,29 +21,24 @@ public class OrderServiceImpl implements OrderService {
 
     private final  OrderItemRepository orderItemRepository;
     private final OrderRepository orderRepository;
+    private final ProductRepository productRepository;
 
     @Override
-    public void processOrderItems(List<OrderItem> orderItems, Long orderId) {
+    public Order processOrderItems(List<OrderItem> orderItems,Order order) {
 
-        Order order = new Order();
-        order.setOrderId(orderId);
-        order.setDeliveryType("Yes");
+Order addedOrder = new Order();
+addedOrder.setDeliveryType(order.getDeliveryType());
+addedOrder.setTotalPrice(order.getTotalPrice());
 
-        int totalPrice = 0;
 
 
         List<OrderItem> savedOrderItems = new ArrayList<>();
 
         for (OrderItem oi : orderItems) {
             OrderItem orderItem = new OrderItem();
-            orderItem.setOrderId(orderId);
             orderItem.setProductId(oi.getProductId());
             orderItem.setQuantity(oi.getQuantity());
             orderItem.setPrice(oi.getPrice());
-
-
-            totalPrice += oi.getPrice() * oi.getQuantity();
-
 
             savedOrderItems.add(orderItem);
 
@@ -50,11 +48,20 @@ public class OrderServiceImpl implements OrderService {
 
 
         order.setOrderItems(savedOrderItems);
-        order.setTotalPrice(totalPrice);
+
 
 
         orderRepository.save(order);
+        return order;
     }
-
+    @Override
+public Product getProductIdFromOrderItemId(Long orderItemId) {
+        OrderItem orderItem = orderItemRepository.findById(orderItemId).get();
+        Long productId = orderItem.getProductId();
+        Product product = productRepository.findById(productId).get();
+        return product;
+    }
 }
+
+
 

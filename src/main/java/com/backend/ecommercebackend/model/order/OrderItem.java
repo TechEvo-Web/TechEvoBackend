@@ -16,6 +16,5 @@ public class OrderItem {
     Long id;
     int quantity;
     int price;
-    Long productId;
-    Long orderId;
+    Long productId; 
 }
