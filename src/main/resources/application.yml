@@ -19,7 +19,10 @@ spring:
       url: jdbc:postgresql://localhost:5433/EvoProduct
       username: ROOT
       password: 1234
-
+    third:
+      url: jdbc:postgresql://localhost:5436/Order
+      username: ORDER
+      password: 12345
   jpa:
     show-sql: true
     hibernate:
@@ -57,7 +60,7 @@ verification-code:
   expiration: 300000
 
 activation-token:
-  expiration: 864000000
+  expiration: 86400000
 
 cloudinary:
   cloud:
