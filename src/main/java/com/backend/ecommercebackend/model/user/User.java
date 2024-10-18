@@ -43,4 +43,6 @@ public class User {
     @Column(name = "updated_at", nullable = false)
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     LocalDateTime updatedAt;
+
+    private String googleId;
 }

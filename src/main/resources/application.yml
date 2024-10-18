@@ -37,6 +37,14 @@ spring:
       mail.smtp.starttls.enable: true
       mail.debug: true
 
+
+      security:
+        oauth2:
+          client:
+            registration:
+              google:
+                client-id: 523070151170-f80npg62nl1rapmi86m2f2c2efgthibi.apps.googleusercontent.com
+
 security:
   key: "jvdIc8VZQrh6T17RAywe6e/3u7wQ/WEXIUuLD1FWYo01yQcjjmjOBfwY/KeHu5cBaNMeJI0pZIMOwNCQuVnMvQ=="
 refresh-token:
