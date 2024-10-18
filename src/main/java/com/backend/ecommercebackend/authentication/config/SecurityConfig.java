@@ -99,6 +99,7 @@ public class SecurityConfig {
                          })
                  )
 
+
                  .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                  .authenticationProvider(authenticationProvider)
                  .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
