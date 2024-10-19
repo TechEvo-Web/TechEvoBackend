@@ -1,7 +1,6 @@
 package com.backend.ecommercebackend.service.impl;
 
 import com.backend.ecommercebackend.dto.request.CommentRequest;
-import com.backend.ecommercebackend.dto.request.RatingRequest;
 import com.backend.ecommercebackend.dto.response.CommentResponse;
 import com.backend.ecommercebackend.enums.Exceptions;
 import com.backend.ecommercebackend.exception.ApplicationException;
@@ -39,15 +38,10 @@ public class CommentServiceImpl implements CommentService {
         comment.setUpdatedAt(LocalDateTime.now());
         comment.setCommentOwner(commentOwner);
         comment.setProfileImg(user.getProfileImg());
-        if (commentRequest.getRating() > 0) {
-            float ratingResponse = ratingService.addRating(new RatingRequest(commentRequest.getProductId(),
-                    commentRequest.getRating()));
-            comment.setRating(ratingResponse);
-        }
-        else {
-            comment.setRating(product.getRating());
-        }
+        float ratingScore=ratingService.getRating(commentRequest,product,comment);
+        comment.setRating(ratingScore);
         repository.save(comment);
+        productRepository.save(product);
         return mapper.CommentEntityToDto(comment);
     }
 
