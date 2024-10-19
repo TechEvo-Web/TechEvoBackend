@@ -116,6 +116,5 @@ public class EmailServiceImpl implements EmailService {
 
   private String generateActivationLink(String activationToken) {
     return "http://localhost:5173/activate?token=" + activationToken;
-
   }
 }

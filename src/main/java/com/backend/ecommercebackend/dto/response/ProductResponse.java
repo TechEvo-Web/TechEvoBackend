@@ -1,14 +1,18 @@
 package com.backend.ecommercebackend.dto.response;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
+
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductResponse {
     Long id;
@@ -16,8 +20,9 @@ public class ProductResponse {
     String modelNumber;
     String description;
     double price;
+    double discountPrice;
     float rating;
     List<String>imageUrl;
     String categoryName;
-    List<Object> specifications;
+    Map<String,Object> specifications;
 }

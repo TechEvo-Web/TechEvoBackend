@@ -35,8 +35,8 @@ public class AuthenticationController {
     private CustomOauth2UserService customOauth2UserService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@ModelAttribute @Valid RegisterRequest request,@RequestParam("profileImg") MultipartFile imageFile){
-        return ResponseEntity.ok(service.register(request,imageFile));
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request){
+        return ResponseEntity.ok(service.register(request));
     }
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login (@Valid @RequestBody AuthRequest request){

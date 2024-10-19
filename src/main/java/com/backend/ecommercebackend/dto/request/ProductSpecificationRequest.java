@@ -12,4 +12,5 @@ import lombok.experimental.FieldDefaults;
 public class ProductSpecificationRequest {
      int categoryId;
      String specificationName;
+     Boolean isFilterSpecification;
 }
