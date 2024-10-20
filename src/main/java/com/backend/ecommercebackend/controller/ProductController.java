@@ -40,7 +40,10 @@ public class ProductController {
     public ResponseEntity<List<ProductResponse>> getProductsByCategory(@RequestParam String categoryName) {
         return ResponseEntity.ok(service.getProductsByCategoryName(categoryName));
     }
-
+    @GetMapping("/getFilters")
+    public ResponseEntity<Object> getFilters(@RequestParam String categoryName) {
+        return ResponseEntity.ok(service.getFiltersByCategoryName(categoryName));
+    }
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
         return ResponseEntity.ok(service.getProductById(id));
@@ -49,9 +52,8 @@ public class ProductController {
     @GetMapping("/getFilterProducts")
     public ResponseEntity<List<Product>> getFilteringProducts(@RequestParam(required = false) Float min,
                                                               @RequestParam(required = false) Float max,
-                                                              @RequestParam(required = false) String categoryName,
                                                               @RequestParam(required = false) Map<String, String> filterSpec){
-        return ResponseEntity.ok(service.getFilteringProducts(min,max,categoryName,filterSpec));
+        return ResponseEntity.ok(service.getFilteringProducts(min,max,filterSpec));
     }
 
     @PostMapping

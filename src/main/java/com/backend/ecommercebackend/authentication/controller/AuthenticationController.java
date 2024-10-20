@@ -30,7 +30,6 @@ import java.util.Map;
 public class AuthenticationController {
     private final AuthenticationServiceImpl service;
 
-
     @Autowired
     private CustomOauth2UserService customOauth2UserService;
 

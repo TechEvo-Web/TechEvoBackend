@@ -10,6 +10,7 @@ import com.backend.ecommercebackend.repository.product.CommentRepository;
 import com.backend.ecommercebackend.repository.product.ProductRepository;
 import com.backend.ecommercebackend.service.FileStorageService;
 import com.backend.ecommercebackend.service.ProductService;
+import com.backend.ecommercebackend.service.SpecificationService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -30,26 +32,25 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository repository;
     private final FileStorageService fileStorageService;
     private final CommentRepository commentRepository;
-    private final SpecificationServiceImpl specificationServiceImpl;
+    private final SpecificationService specificationService;
 
     @Override
     public ProductResponse addProduct(ProductRequest request, List<MultipartFile> imageFiles) {
         Product product = mapper.ProductDtoToEntity(request);
-        Map<String, Object> specifications = stringParseJson(request.getSpecifications());
+        Map<String, String> specifications = stringParseJson(request.getSpecifications());
         product.setSpecifications(specifications);
-
         List<String> imageUrls = new ArrayList<>();
         addImage(imageFiles, product, imageUrls);
         repository.save(product);
         return mapper.EntityToProductDto(product);
     }
 
-    private Map<String, Object> stringParseJson(String requestSpecifications) {
-        Map<String, Object> specifications = new HashMap<>();
+    private Map<String, String> stringParseJson(String requestSpecifications) {
+        Map<String, String> specifications = new HashMap<>();
         if (requestSpecifications != null) {
             try {
                 ObjectMapper objectMapper = new ObjectMapper();
-                specifications = objectMapper.readValue(requestSpecifications, new TypeReference<Map<String, Object>>() {
+                specifications = objectMapper.readValue(requestSpecifications, new TypeReference<Map<String, String>>() {
                 });
             } catch (JsonProcessingException e) {
                 throw new ApplicationException(Exceptions.INVALID_FORMAT_EXCEPTION);
@@ -63,7 +64,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = repository.findById(id).orElseThrow(() -> new ApplicationException(Exceptions.NOT_FOUND_EXCEPTION));
         mapper.updateProductFromProductDto(request, product);
         List<String> imageUrls = new ArrayList<>();
-        Map<String, Object> specifications = stringParseJson(request.getSpecifications());
+        Map<String, String> specifications = stringParseJson(request.getSpecifications());
         product.setSpecifications(specifications);
         for (String imageUrl : product.getImageUrl()) {
             if (imageUrl != null) {
@@ -125,30 +126,63 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> getFilteringProducts(Float min, Float max, String categoryName, Map<String, String> filterSpec) {
+    public List<Product> getFilteringProducts(Float min, Float max, Map<String, String> filterSpec) {
         List<Product> result = new ArrayList<>();
         List<Product> allProducts = repository.findAll();
+        List<Product> filter = new ArrayList<>();
         if (min != null && max != null) {
             result = allProducts.stream().filter(item -> item.getPrice() >= min && item.getPrice() < max).toList();
+        } else {
+            result = allProducts;
         }
-        if (Objects.nonNull(filterSpec)) {
-            List<Product> filter = new ArrayList<>();
+
+        if (!filterSpec.isEmpty()) {
+            boolean matches = true;
             for (Product product : result) {
-                List<String> filterSpecNames = specificationServiceImpl.getFilterSpecificationsByCategoryName(categoryName);
-                for (String specNames : filterSpecNames) {
-                    String value = product.getSpecifications().get(specNames).toString();
-                    if (value != null) {
-                        product.getSpecifications().entrySet().stream().map(item->{
-                            if(item.getKey().equals(specNames)) {
-                                filter.add(product);
-                            }
-                            return item;
-                        });
+                matches = true;
+                for (Map.Entry<String, String> entry : filterSpec.entrySet()) {
+                    String filterValue = entry.getValue().replace("\"", "").trim();
+                    String filterKey = entry.getKey();
+                    if (product.getSpecifications().containsKey(filterKey)) {
+                        String productValue = product.getSpecifications().get(filterKey);
+                        if (!Objects.equals(productValue, filterValue)) {
+                            matches = false;
+                        }
+                    } else {
+                        matches = false;
                     }
                 }
+                if (matches) {
+                    filter.add(product);
+                }
             }
+
             result = filter;
+            if (result.isEmpty()) {
+                return new ArrayList<>();
+            }
         }
         return result;
     }
+
+    @Override
+    public Object getFiltersByCategoryName(String categoryName) {
+        List<String> filterNames = specificationService.getFilterSpecificationsByCategoryName(categoryName);
+        List<ProductResponse> products = getProductsByCategoryName(categoryName);
+        Map<String, Set<String>> filters = new HashMap<>();
+        for (String filterName : filterNames) {
+            filters.put(filterName, new HashSet<>());
+        }
+        for (ProductResponse product : products) {
+            for (String filterName : filterNames) {
+                String filterValue = product.getSpecifications().get(filterName);
+                if (filterValue != null) {
+                    filters.get(filterName).add(filterValue);
+                }
+            }
+        }
+
+        return filters;
+    }
 }
+
