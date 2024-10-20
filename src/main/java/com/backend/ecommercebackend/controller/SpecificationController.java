@@ -20,6 +20,11 @@ public class SpecificationController {
         return ResponseEntity.ok(service.getAllSpecifications());
     }
 
+    @GetMapping("/getFilterSpecsByCategoryName")
+    public ResponseEntity<List<String>>getFilterSpecificationsByCategoryName(@RequestParam String categoryName) {
+        return ResponseEntity.ok(service.getFilterSpecificationsByCategoryName(categoryName));
+    }
+
     @PostMapping("/createSpec")
     public ResponseEntity<ProductSpecificationResponse> createSpecification(@RequestBody ProductSpecificationRequest specificationRequest) {
         final var createdSpecification = service.addSpecification(specificationRequest);

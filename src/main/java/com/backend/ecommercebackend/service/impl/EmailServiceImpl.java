@@ -115,7 +115,6 @@ public class EmailServiceImpl implements EmailService {
   }
 
   private String generateActivationLink(String activationToken) {
-    return "https://ff82f4df-f72b-4dec-84ca-487132aff620.mock.pstmn.io/api/v1/auth/activate?token=" + activationToken;
-
+    return "http://localhost:5173/activate?token=" + activationToken;
   }
 }
