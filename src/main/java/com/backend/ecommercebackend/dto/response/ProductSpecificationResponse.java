@@ -14,6 +14,7 @@ public class ProductSpecificationResponse {
     Long specificationId;
     String specificationName;
     int categoryId;
+    Boolean isFilterSpecification;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
 }

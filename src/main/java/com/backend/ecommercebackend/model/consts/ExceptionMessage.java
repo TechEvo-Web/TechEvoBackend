@@ -12,4 +12,5 @@ public class ExceptionMessage {
   public static final String IMAGE_STORAGE_EXCEPTION_MSG="Failed to store image";
   public static final String CREATE_DIRECTORY_ERROR_MSG =  "Could not create upload directory!";
   public static final String INVALID_FORMAT_EXCEPTION_MSG = "Invalid format";
+  public static final String INVALID_NUMBER_RANGE_MSG ="Invalid number range. Must be between 0 and 5" ;
 }

@@ -2,7 +2,6 @@ package com.backend.ecommercebackend.controller;
 
 import com.backend.ecommercebackend.dto.request.CommentRequest;
 import com.backend.ecommercebackend.dto.response.CommentResponse;
-import com.backend.ecommercebackend.model.product.Comment;
 import com.backend.ecommercebackend.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

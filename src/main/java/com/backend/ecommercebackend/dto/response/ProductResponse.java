@@ -1,11 +1,14 @@
 package com.backend.ecommercebackend.dto.response;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -15,11 +18,10 @@ public class ProductResponse {
     String name;
     String modelNumber;
     String description;
-    int price;
+    double price;
+    double discountPrice;
     float rating;
-    int ratingSum;
-    int totalRatings;
     List<String>imageUrl;
     String categoryName;
-    List<Object> specifications;
+    Map<String,String> specifications;
 }

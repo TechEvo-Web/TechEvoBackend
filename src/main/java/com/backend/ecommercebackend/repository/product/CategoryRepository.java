@@ -6,11 +6,17 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-public interface CategoryRepository extends JpaRepository<Category,Integer> {
+public interface CategoryRepository extends JpaRepository<Category, Integer> {
     @Query("""
-select p.specificationName from Category c inner join ProductSpecification p on p.categoryId=c.categoryId where c.categoryId=:categoryId
-""")
+            select p.specificationName from Category c inner join ProductSpecification p on p.categoryId=c.categoryId where c.categoryId=:categoryId
+            """)
     List<String> findSpecificationNameByCategoryId(int categoryId);
+
+    @Query("""
+            select c from Category c where c.categoryName=:categoryName
+            """)
+    Optional<Category> findByCategoryName(String categoryName);
 }

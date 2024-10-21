@@ -15,8 +15,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
@@ -68,18 +70,30 @@ public class EmailServiceImpl implements EmailService {
 
   @Override
   public void registerEmail(EmailRequest request) {
-      if (userRepository.findByEmail(request.getEmail()).isPresent()
-              || emailRepository.findByEmail(request.getEmail()).isPresent()) {
+    var existingEmail = emailRepository.findByEmail(request.getEmail());
+    if (existingEmail.isPresent()) {
+      UserEmail userEmail = existingEmail.get();
+      if (!userEmail.isVerified()) {
+        if (userEmail.getCreatedAt().isBefore(LocalDateTime.now().minusHours(24))) {
+          emailRepository.deleteByEmail(userEmail.getEmail());
+        } else {
+          sendActivationLink(userEmail.getEmail());
+          return;
+        }
+      } else {
         throw new ApplicationException(Exceptions.USER_ALREADY_EXIST);
       }
-      UserEmail userEmail = UserEmail.builder()
-              .email(request.getEmail())
-              .verified(false)
-              .createdAt(LocalDateTime.now())
-              .build();
-      sendActivationLink(userEmail.getEmail());
-
-      emailRepository.save(userEmail);
+    }
+    if (userRepository.findByEmail(request.getEmail()).isPresent()){
+      throw new ApplicationException(Exceptions.USER_ALREADY_EXIST);
+    }
+    UserEmail userEmail = UserEmail.builder()
+            .email(request.getEmail())
+            .verified(false)
+            .createdAt(LocalDateTime.now())
+            .build();
+    sendActivationLink(userEmail.getEmail());
+    emailRepository.save(userEmail);
   }
 
   @Override
@@ -115,7 +129,15 @@ public class EmailServiceImpl implements EmailService {
   }
 
   private String generateActivationLink(String activationToken) {
-    return "https://ff82f4df-f72b-4dec-84ca-487132aff620.mock.pstmn.io/api/v1/auth/activate?token=" + activationToken;
+    return "http://localhost:5173/activate?token=" + activationToken;
+  }
 
+  @Scheduled(fixedRate = 86400000)
+  public void removeUnverifiedEmailsAfterTokenExpiration() {
+    LocalDateTime cutoffTime = LocalDateTime.now().minusHours(24);
+    List<UserEmail> unverifiedEmails = emailRepository.findAllByVerifiedFalseAndCreatedAtBefore(cutoffTime);
+    for (UserEmail email : unverifiedEmails) {
+      emailRepository.deleteByEmail(email.getEmail());
+    }
   }
 }

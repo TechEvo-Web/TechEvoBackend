@@ -1,10 +1,12 @@
 package com.backend.ecommercebackend.service;
 import com.backend.ecommercebackend.dto.request.ProductRequest;
 import com.backend.ecommercebackend.dto.response.ProductResponse;
+import com.backend.ecommercebackend.model.product.Product;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public interface ProductService {
      ProductResponse addProduct(ProductRequest request, List<MultipartFile> imageFile);
@@ -13,6 +15,6 @@ public interface ProductService {
      List<ProductResponse> getAllProduct();
      ProductResponse updateProduct(Long id, ProductRequest request, List<MultipartFile> imageFile) throws IOException;
      void deleteProduct(Long id);
-     ProductResponse rateProduct(Long id, float newRating);
-
+     List<Product> getFilteringProducts(Float min, Float max, Map<String, String> filterSpec);
+     Object getFiltersByCategoryName(String categoryName);
 }

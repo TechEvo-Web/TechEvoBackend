@@ -1,15 +1,13 @@
 package com.backend.ecommercebackend.dto.request;
 
-import jakarta.persistence.Column;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.util.List;
+import java.util.Map;
+
 
 @Getter
 @Setter
@@ -17,8 +15,10 @@ import java.util.List;
 public class ProductRequest {
     String name;
     String modelNumber;
-    int price;
+    double price;
+    double discountPrice;
     String description;
     String categoryName;
-    List<Object> specifications;
+    float rating;
+    String specifications;
 }
