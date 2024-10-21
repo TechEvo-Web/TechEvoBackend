@@ -84,6 +84,9 @@ public class EmailServiceImpl implements EmailService {
         throw new ApplicationException(Exceptions.USER_ALREADY_EXIST);
       }
     }
+    if (userRepository.findByEmail(request.getEmail()).isPresent()){
+      throw new ApplicationException(Exceptions.USER_ALREADY_EXIST);
+    }
     UserEmail userEmail = UserEmail.builder()
             .email(request.getEmail())
             .verified(false)
