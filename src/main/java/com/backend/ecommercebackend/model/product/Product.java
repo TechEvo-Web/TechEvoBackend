@@ -7,13 +7,15 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="products")
+@Table(name = "products")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Product {
     @Id
@@ -33,22 +35,19 @@ public class Product {
     double price;
 
     @Column(nullable = false)
-    float ratingSum = 0.0f;
+    double discountPrice;
 
     @Column(nullable = false)
-    int totalRatings = 0;
-
-    @Column(nullable = false)
-    float rating = 0.0f;
+    float rating;
 
     @Column(columnDefinition = "jsonb", nullable = false)
     @JdbcTypeCode(SqlTypes.JSON)
     List<String> imageUrl;
 
-    @JoinColumn(nullable = false)
+    @Column(nullable = false)
     String categoryName;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb", nullable = false)
-    List<Object> specifications;
+    Map<String,String> specifications=new HashMap<>();
 }

@@ -9,4 +9,5 @@ public interface SpecificationService {
     ProductSpecificationResponse addSpecification(ProductSpecificationRequest specificationRequest);
     ProductSpecificationResponse updateSpecification(Long specificationId, ProductSpecificationRequest specificationRequest);
     void deleteSpecification(Long id, int categoryId);
+    List<String> getFilterSpecificationsByCategoryName(String categoryName);
 }

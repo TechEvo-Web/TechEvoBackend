@@ -4,11 +4,12 @@ import com.backend.ecommercebackend.dto.request.CommentRequest;
 import com.backend.ecommercebackend.dto.response.CommentResponse;
 import com.backend.ecommercebackend.enums.Exceptions;
 import com.backend.ecommercebackend.exception.ApplicationException;
-import com.backend.ecommercebackend.exception.GlobalExceptionHandler;
 import com.backend.ecommercebackend.mapper.CommentMapper;
 import com.backend.ecommercebackend.model.product.Comment;
+import com.backend.ecommercebackend.model.product.Product;
 import com.backend.ecommercebackend.model.user.User;
 import com.backend.ecommercebackend.repository.product.CommentRepository;
+import com.backend.ecommercebackend.repository.product.ProductRepository;
 import com.backend.ecommercebackend.repository.user.UserRepository;
 import com.backend.ecommercebackend.service.CommentService;
 import lombok.RequiredArgsConstructor;
@@ -24,17 +25,23 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository repository;
     private final CommentMapper mapper;
     private final UserRepository userRepository;
+    private final ProductRepository productRepository;
+    private final RatingServiceImpl ratingService;
 
     @Override
     public CommentResponse addComment(UserDetails userDetails,CommentRequest commentRequest) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(()->new ApplicationException(Exceptions.USER_NOT_FOUND));
+        Product product = productRepository.findById(commentRequest.getProductId()).orElseThrow(() -> new ApplicationException(Exceptions.NOT_FOUND_EXCEPTION));
         String commentOwner = String.format("%s %s",user.getFirstName(),user.getLastName());
         Comment comment = mapper.CommentDtoToComment(commentRequest);
         comment.setCreatedAt(LocalDateTime.now());
         comment.setUpdatedAt(LocalDateTime.now());
         comment.setCommentOwner(commentOwner);
         comment.setProfileImg(user.getProfileImg());
+        float ratingScore=ratingService.getRating(commentRequest,product,comment);
+        comment.setRating(ratingScore);
         repository.save(comment);
+        productRepository.save(product);
         return mapper.CommentEntityToDto(comment);
     }
 

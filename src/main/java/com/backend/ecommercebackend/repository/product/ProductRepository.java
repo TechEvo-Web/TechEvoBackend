@@ -1,6 +1,8 @@
 package com.backend.ecommercebackend.repository.product;
 
 import com.backend.ecommercebackend.model.product.Product;
+import jakarta.transaction.Transactional;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
