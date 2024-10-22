@@ -148,8 +148,6 @@ public class ProductServiceImpl implements ProductService {
                         if (!Objects.equals(productValue, filterValue)) {
                             matches = false;
                         }
-                    } else {
-                        matches = false;
                     }
                 }
                 if (matches) {
