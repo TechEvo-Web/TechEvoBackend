@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +31,10 @@ public class SpecificationServiceImpl implements SpecificationService {
     }
 
     @Override
+    public List<String> getSpecsByCategoryId(int id) {
+        return categoryRepository.findSpecificationNameByCategoryId(id);
+    }
+    @Override
     public ProductSpecificationResponse addSpecification(ProductSpecificationRequest specificationRequest) {
         ProductSpecification specification = mapper.SpecificationDtoToEntity(specificationRequest);
         repository.save(specification);
@@ -38,7 +43,7 @@ public class SpecificationServiceImpl implements SpecificationService {
         specificationDto.setSpecificationId(specification.getSpecificationId());
         specificationDto.setSpecificationName(specification.getSpecificationName());
         List<ProductSpecificationDto> specifications = category.getSpecifications();
-        if(specifications==null){
+        if (specifications == null) {
             specifications = new ArrayList<>();
         }
         specifications.add(specificationDto);
@@ -52,12 +57,12 @@ public class SpecificationServiceImpl implements SpecificationService {
         ProductSpecification specification = repository.findById(specificationId).orElseThrow(() -> new ApplicationException(Exceptions.NOT_FOUND_EXCEPTION));
         ProductSpecification save = mapper.updateSpecificationFromDto(specificationRequest, specification);
         Category category = categoryRepository.findById(specificationRequest.getCategoryId()).orElseThrow(() -> new ApplicationException(Exceptions.NOT_FOUND_EXCEPTION));
-        List<ProductSpecificationDto>specifications = category.getSpecifications();
-        if(specifications==null){
+        List<ProductSpecificationDto> specifications = category.getSpecifications();
+        if (specifications == null) {
             specifications = new ArrayList<>();
         }
         specifications.forEach(p -> {
-            if(p.getSpecificationId().equals(specification.getSpecificationId())) {
+            if (p.getSpecificationId().equals(specification.getSpecificationId())) {
                 p.setSpecificationName(save.getSpecificationName());
             }
         });
@@ -73,4 +78,19 @@ public class SpecificationServiceImpl implements SpecificationService {
         categoryRepository.save(category);
         repository.deleteById(id);
     }
+
+    @Override
+    public List<String> getFilterSpecificationsByCategoryName(String categoryName) {
+        Optional<Category> category = categoryRepository.findByCategoryName(categoryName);
+        List<ProductSpecification> specifications = repository.findByCategoryId(category.get().getCategoryId()).stream().toList();
+        List<String> filterSpecificationNames = new ArrayList<>();
+        for (ProductSpecification specification : specifications) {
+            if (specification.getIsFilterSpecification().equals(true)) {
+                filterSpecificationNames.add(specification.getSpecificationName());
+            }
+        }
+        return filterSpecificationNames;
+    }
+
+
 }

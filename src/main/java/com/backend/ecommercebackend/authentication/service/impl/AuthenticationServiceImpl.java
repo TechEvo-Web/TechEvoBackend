@@ -42,7 +42,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final EmailServiceImpl emailService;
 
     @Override
-    public AuthResponse register(RegisterRequest request, MultipartFile file) {
+    public AuthResponse register(RegisterRequest request) {
 
         if(!request.getConfirmPassword().equals(request.getPassword())){
             throw new ApplicationException(Exceptions.PASSWORD_MISMATCH_EXCEPTION);
@@ -61,12 +61,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setRole(Role.USER);
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
-        try {
-            String url = fileStorageService.storeImages(file,"profileImages");
-            user.setProfileImg(url);
-        }catch (IOException e){
-            throw new ApplicationException(Exceptions.IMAGE_STORAGE_EXCEPTION);
-        }
         repository.save(user);
 
         emailService.deleteStoredEmail(request.getEmail());

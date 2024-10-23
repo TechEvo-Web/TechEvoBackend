@@ -4,10 +4,13 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -28,8 +31,6 @@ public class User {
     String email;
     @Column(nullable = false)
     String password;
-
-    @Column(nullable = false)
     String profileImg;
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -43,4 +44,6 @@ public class User {
     @Column(name = "updated_at", nullable = false)
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     LocalDateTime updatedAt;
+
+    private String googleId;
 }
