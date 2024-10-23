@@ -10,7 +10,6 @@ import com.backend.ecommercebackend.repository.product.CommentRepository;
 import com.backend.ecommercebackend.repository.product.ProductRepository;
 import com.backend.ecommercebackend.service.FileStorageService;
 import com.backend.ecommercebackend.service.ProductService;
-import com.backend.ecommercebackend.service.SpecificationService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,8 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +29,6 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository repository;
     private final FileStorageService fileStorageService;
     private final CommentRepository commentRepository;
-    private final SpecificationService specificationService;
 
     @Override
     public ProductResponse addProduct(ProductRequest request, List<MultipartFile> imageFiles) {
@@ -100,7 +96,13 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductResponse> getProductsByCategoryName(String categoryName) {
+        if (categoryName == null || categoryName.trim().isEmpty()) {
+            throw new ApplicationException(Exceptions.NOT_FOUND_EXCEPTION, "Category name cannot be empty");
+        }
         List<Product> products = repository.findByCategoryName(categoryName);
+        if (products.isEmpty()) {
+            throw  new ApplicationException(Exceptions.NOT_FOUND_EXCEPTION,"No products found or wrong category name");
+        }
         return mapper.EntityListToProductDtoList(products);
     }
 
@@ -161,26 +163,6 @@ public class ProductServiceImpl implements ProductService {
             }
         }
         return result;
-    }
-
-    @Override
-    public Object getFiltersByCategoryName(String categoryName) {
-        List<String> filterNames = specificationService.getFilterSpecificationsByCategoryName(categoryName);
-        List<ProductResponse> products = getProductsByCategoryName(categoryName);
-        Map<String, Set<String>> filters = new HashMap<>();
-        for (String filterName : filterNames) {
-            filters.put(filterName, new HashSet<>());
-        }
-        for (ProductResponse product : products) {
-            for (String filterName : filterNames) {
-                String filterValue = product.getSpecifications().get(filterName);
-                if (filterValue != null) {
-                    filters.get(filterName).add(filterValue);
-                }
-            }
-        }
-
-        return filters;
     }
 }
 

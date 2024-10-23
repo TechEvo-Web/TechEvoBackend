@@ -3,7 +3,6 @@ package com.backend.ecommercebackend.controller;
 import com.backend.ecommercebackend.dto.request.ProductRequest;
 import com.backend.ecommercebackend.dto.response.ProductResponse;
 import com.backend.ecommercebackend.model.product.Product;
-import com.backend.ecommercebackend.model.product.ProductSpecification;
 import com.backend.ecommercebackend.service.ProductService;
 
 import java.io.IOException;
@@ -31,25 +30,22 @@ public class ProductController {
 
     private final ProductService service;
 
-    @GetMapping("/getAllProducts")
+    @GetMapping("/getAll")
     public ResponseEntity<List<ProductResponse>> getAllProducts() {
         return ResponseEntity.ok(service.getAllProduct());
     }
 
-    @GetMapping
+    @GetMapping("/getAllByCategoryName")
     public ResponseEntity<List<ProductResponse>> getProductsByCategory(@RequestParam String categoryName) {
         return ResponseEntity.ok(service.getProductsByCategoryName(categoryName));
     }
-    @GetMapping("/getFilters")
-    public ResponseEntity<Object> getFilters(@RequestParam String categoryName) {
-        return ResponseEntity.ok(service.getFiltersByCategoryName(categoryName));
-    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
         return ResponseEntity.ok(service.getProductById(id));
     }
 
-    @GetMapping("/getFilterProducts")
+    @GetMapping("/filterByPriceAndSpecs")
     public ResponseEntity<List<Product>> getFilteringProducts(@RequestParam(required = false) Float min,
                                                               @RequestParam(required = false) Float max,
                                                               @RequestParam(required = false) Map<String, String> filterSpec){

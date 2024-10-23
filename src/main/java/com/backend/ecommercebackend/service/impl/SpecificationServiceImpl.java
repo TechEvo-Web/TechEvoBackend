@@ -12,7 +12,6 @@ import com.backend.ecommercebackend.repository.product.CategoryRepository;
 import com.backend.ecommercebackend.repository.product.SpecificationRepository;
 import com.backend.ecommercebackend.service.SpecificationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -31,6 +30,10 @@ public class SpecificationServiceImpl implements SpecificationService {
         return mapper.SpecificationEntityToSpecificationDtoList(repository.findAll());
     }
 
+    @Override
+    public List<String> getSpecsByCategoryId(int id) {
+        return categoryRepository.findSpecificationNameByCategoryId(id);
+    }
     @Override
     public ProductSpecificationResponse addSpecification(ProductSpecificationRequest specificationRequest) {
         ProductSpecification specification = mapper.SpecificationDtoToEntity(specificationRequest);
