@@ -12,7 +12,7 @@ import java.io.IOException;
 
 
 public interface AuthenticationService {
-     AuthResponse register(RegisterRequest request, MultipartFile file);
+     AuthResponse register(RegisterRequest request);
      AuthResponse authenticate(AuthRequest request);
      void logout(LogoutRequest request);
      AuthResponse refreshAuthToken(HttpServletRequest request) throws ServletException, IOException;

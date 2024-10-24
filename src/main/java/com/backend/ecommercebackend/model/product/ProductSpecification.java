@@ -1,6 +1,7 @@
 package com.backend.ecommercebackend.model.product;
 
 import java.time.LocalDateTime;
+
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -15,23 +16,26 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Table(name = "product-specification")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductSpecification {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  Long specificationId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long specificationId;
 
-  @Column(nullable = false)
-  String specificationName;
+    @Column(nullable = false)
+    String specificationName;
 
-  @Column(nullable = false)
-  int categoryId;
+    @Column(nullable = false)
+    Boolean isFilterSpecification = false;
 
-  @CreationTimestamp
-  @Column(name = "created_at", nullable = false, updatable = false)
-  @DateTimeFormat(pattern = "yyyy-MM-dd")
-  LocalDateTime createdAt;
+    @Column(nullable = false)
+    int categoryId;
 
-  @UpdateTimestamp
-  @Column(name = "updated_at", nullable = false)
-  @DateTimeFormat(pattern = "yyyy-MM-dd")
-  LocalDateTime updatedAt;
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    LocalDateTime updatedAt;
 }
