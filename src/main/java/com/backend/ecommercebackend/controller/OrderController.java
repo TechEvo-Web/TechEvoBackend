@@ -1,5 +1,6 @@
 package com.backend.ecommercebackend.controller;
 
+import com.backend.ecommercebackend.dto.request.OrderRequest;
 import com.backend.ecommercebackend.dto.response.ProductResponse;
 import com.backend.ecommercebackend.model.order.Order;
 import com.backend.ecommercebackend.model.order.OrderItem;
@@ -31,8 +32,9 @@ public class OrderController {
     private final OrderItemRepository orderItemRepository;
 
     @PostMapping
-    public ResponseEntity<Order> addOrderItems(@RequestBody Order order) {
-        Order createdOrder = orderService.processOrderItems(order);
+    public ResponseEntity<Order> addOrderItems(@RequestBody OrderRequest orderRequest, @RequestHeader("Authorization") String token) {
+        token = token.substring(7);
+        Order createdOrder = orderService.processOrderItems(orderRequest,token);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
     }
     @DeleteMapping("/delete/{orderId}")
