@@ -10,4 +10,5 @@ public interface SpecificationService {
     ProductSpecificationResponse updateSpecification(Long specificationId, ProductSpecificationRequest specificationRequest);
     void deleteSpecification(Long id, int categoryId);
     List<String> getFilterSpecificationsByCategoryName(String categoryName);
+    List<String> getSpecsByCategoryId(int categoryId);
 }
