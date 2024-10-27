@@ -2,6 +2,7 @@ package com.backend.ecommercebackend.controller;
 import com.backend.ecommercebackend.dto.request.ProductSpecificationRequest;
 import com.backend.ecommercebackend.dto.response.ProductSpecificationResponse;
 import com.backend.ecommercebackend.service.SpecificationService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ public class SpecificationController {
     private final SpecificationService service;
 
     @GetMapping("/getAll")
+    @Operation(summary = "Bütün spesifikasiyaları almaq üçün endpoint")
     public ResponseEntity<List<ProductSpecificationResponse>> getAllSpecifications() {
         return ResponseEntity.ok(service.getAllSpecifications());
     }
@@ -25,12 +27,15 @@ public class SpecificationController {
         return ResponseEntity.ok(service.getFilterSpecificationsByCategoryName(categoryName));
     }
 
-    @GetMapping("/getAllBy/{categoryId}")
+    @GetMapping("/getAllSpec/{categoryId}")
+    @Operation(summary = "Kateqoriya id ilə bütün spesifikasiyaları almaq üçün endpoint")
+
     public ResponseEntity<List<String>> getAllSpecByCategoryId(@PathVariable int categoryId) {
         return ResponseEntity.ok(service.getSpecsByCategoryId(categoryId));
     }
 
     @PostMapping
+    @Operation(summary = "Yeni spefikasiyalari kateqoriyaya uyğun əlavə etmək üçün endpoint")
     public ResponseEntity<ProductSpecificationResponse> createSpecification(@RequestBody ProductSpecificationRequest specificationRequest) {
         final var createdSpecification = service.addSpecification(specificationRequest);
         final var location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/specification/{specificationId}").build(createdSpecification.getSpecificationId());
@@ -38,6 +43,7 @@ public class SpecificationController {
     }
 
     @PutMapping("/{specificationId}")
+    @Operation(summary = "Spesifikasiyaları güncəlləmək üçün endpoint")
     public ResponseEntity<ProductSpecificationResponse> updateSpecification(@PathVariable Long specificationId, @RequestBody ProductSpecificationRequest specificationRequest) {
         final var updatedSpecification = service.updateSpecification(specificationId, specificationRequest);
         final var location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/specification/{specificationId}").build(updatedSpecification.getSpecificationId());
@@ -45,6 +51,7 @@ public class SpecificationController {
     }
 
     @DeleteMapping("/{specificationId}/{categoryId}")
+    @Operation(summary = "Spesifikasiyaları silmək üçün endpoint")
     public ResponseEntity<Void> deleteSpecification(@PathVariable Long specificationId,@PathVariable int categoryId) {
         service.deleteSpecification(specificationId,categoryId);
         return ResponseEntity.noContent().build();
