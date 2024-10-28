@@ -49,5 +49,5 @@ public class Product {
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb", nullable = false)
-    Map<String,Object> specifications=new HashMap<>();
+    Map<String,String> specifications=new HashMap<>();
 }

@@ -12,7 +12,6 @@ import java.util.Map;
 
 @Getter
 @Setter
-
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductResponse {
     Long id;
@@ -24,5 +23,5 @@ public class ProductResponse {
     float rating;
     List<String>imageUrl;
     String categoryName;
-    Map<String,Object> specifications;
+    Map<String,String> specifications;
 }

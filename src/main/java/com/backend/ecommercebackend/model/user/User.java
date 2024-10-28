@@ -31,7 +31,6 @@ public class User {
     String email;
     @Column(nullable = false)
     String password;
-
     String profileImg;
     @Enumerated(EnumType.STRING)
     private Role role;
