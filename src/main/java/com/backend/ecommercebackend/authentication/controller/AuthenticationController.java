@@ -8,6 +8,7 @@ import com.backend.ecommercebackend.authentication.service.CustomOauth2UserServi
 import com.backend.ecommercebackend.authentication.service.impl.AuthenticationServiceImpl;
 
 import com.backend.ecommercebackend.dto.request.ProductRequest;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,26 +35,33 @@ public class AuthenticationController {
     private CustomOauth2UserService customOauth2UserService;
 
     @PostMapping("/register")
+    @Operation(summary = "Register istifade olunan endpoint.Data normal json data olaraq gonderilecek.")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request){
         return ResponseEntity.ok(service.register(request));
     }
+
     @PostMapping("/login")
+    @Operation(summary = "Registerden sonra login üçün endpoint")
     public ResponseEntity<AuthResponse> login (@Valid @RequestBody AuthRequest request){
         return ResponseEntity.ok(service.authenticate(request));
     }
+
     @PostMapping("/refresh")
+    @Operation(summary = "Refresh token ile access token almaq üçün endpoint",description = "Access token muddeti 10 deqiqe,refresh token muddeti ise 1 aydi.Ona gore access token muddeti bitdikde yenisini almaq üçün refresh tokeni authorization hissesinde gondermek lazimdi.")
     public ResponseEntity<AuthResponse> refreshAuthToken(HttpServletRequest request) throws IOException {
         AuthResponse authResponse = service.refreshAuthToken(request);
         return ResponseEntity.ok(authResponse);
     }
 
     @PostMapping("/logout")
+    @Operation(summary = "İstifadəçinin hesab çıxışı üçün endpoint")
     public ResponseEntity<String> logout(@Valid @RequestBody LogoutRequest request) {
         service.logout(request);
         return ResponseEntity.ok("Logged out successfully");
     }
 
     @PostMapping("/google-login")
+    @Operation(summary = "Google linki istifadə edərək asan login üçün endpoint")
     public ResponseEntity<AuthResponse> googleLogin(@RequestBody Map<String, String> body) throws Exception {
         String idToken = body.get("id_token");
         try {

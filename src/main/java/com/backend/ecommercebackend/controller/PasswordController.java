@@ -2,6 +2,7 @@ package com.backend.ecommercebackend.controller;
 import com.backend.ecommercebackend.dto.request.ChangePasswordRequest;
 import com.backend.ecommercebackend.dto.request.EmailVerifyRequest;
 import com.backend.ecommercebackend.service.impl.ChangePasswordServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,12 +22,16 @@ public class PasswordController {
     private final ChangePasswordServiceImpl service;
 
     @PostMapping("/changePassword")
+    @Operation(summary = "İstifadəçi şifrəsini dəyişmək üçün endpoint",
+            description = "Burda elave olaraq accestoken gonderilmelidi.Bu endpointden evvel sendVerificationCoke endpointi istifade olunacaq.Email gelen dogrulama kodu ve email verify endpointine gonderilecek.Eger cavab true dönsə o zaman changePassword hissesi açılacaq.Və bu endpoint sonra istifadə olunacaq.")
     public ResponseEntity<String> changePassword(@AuthenticationPrincipal UserDetails userDetails,
                                                  @Valid @RequestBody ChangePasswordRequest request ){
         return ResponseEntity.ok(service.changePassword(userDetails,request));
     }
 
     @PostMapping("/verify")
+    @Operation(summary = "Təsdiqləmə üçün endpoint",
+            description = "Bu endpointe sendVerificationCode istifade olunduqdan sonra gelen verification code ve hemin email gonderilecek.Cavab true olsa changePassword sehifesine kecide icaze olacaq.")
     public ResponseEntity<Boolean> verifyEmail(@Valid @RequestBody EmailVerifyRequest request){
         return ResponseEntity.ok(service.verifyEmail(request));
     }

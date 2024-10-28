@@ -9,6 +9,7 @@ import com.backend.ecommercebackend.repository.order.OrderItemRepository;
 import com.backend.ecommercebackend.repository.order.OrderRepository;
 import com.backend.ecommercebackend.repository.product.ProductRepository;
 import com.backend.ecommercebackend.service.OrderService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -32,24 +33,30 @@ public class OrderController {
     private final OrderItemRepository orderItemRepository;
 
     @PostMapping
+    @Operation(summary = "İstifadəçinin sifarişlərini əlavə etmək üçün endpoint")
     public ResponseEntity<Order> addOrderItems(@RequestBody OrderRequest orderRequest, @RequestHeader("Authorization") String token) {
         token = token.substring(7);
-        Order createdOrder = orderService.processOrderItems(orderRequest,token);
+        Order createdOrder = orderService.processOrderItems(orderRequest, token);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
     }
+
     @DeleteMapping("/delete/{orderId}")
+    @Operation(summary = "İstifadəçi sifarişlərini orderİd silmək üçün endpoint")
     public ResponseEntity<Void> deleteOrderItems(@PathVariable Long orderId) {
         orderRepository.deleteById(orderId);
         return ResponseEntity.noContent().build();
     }
 
 
-@GetMapping ("/orderItem/{orderItemId}")
-    public Product getOrderItemInfo(@PathVariable Long orderItemId){
+    @GetMapping("/orderItem/{orderItemId}")
+    @Operation(summary = "İstifadəçinin sifarişlərini almaq üçün endpoint")
+    public Product getOrderItemInfo(@PathVariable Long orderItemId) {
         orderService.getProductIdFromOrderItemId(orderItemId);
         return orderService.getProductIdFromOrderItemId(orderItemId);
-}
+    }
+
     @DeleteMapping("/orderItem/delete/{orderItemId}")
+    @Operation(summary = "İstifadəçi sifarişlərini orderİtemİd ilə silmək üçün endpoint")
     public ResponseEntity<Void> deleteOrderItem(@PathVariable Long orderItemId) {
         orderItemRepository.deleteById(orderItemId);
 
