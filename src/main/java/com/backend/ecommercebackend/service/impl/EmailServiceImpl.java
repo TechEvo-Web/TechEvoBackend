@@ -57,11 +57,13 @@ public class EmailServiceImpl implements EmailService {
     if (userEmail.isEmpty()) {
       String token = generateActivationToken();
       String activationUrl = generateActivationLink(token);
+      String activationUrlForTest = generateActivationLinkForTest(token);
       SimpleMailMessage message = new SimpleMailMessage();
       String myEmail = from;
       message.setFrom(myEmail);
       message.setSubject("Hesabınızı aktivləşdirin");
-      message.setText("Hesabınızı aktivləşdirmək üçün linkə klikləyin: " + activationUrl);
+      message.setText("Hesabınızı aktivləşdirmək üçün linkə klikləyin: " + activationUrl + "\n\n" +
+                      "Hesabınızı aktivləşdirmək funksiyasını test etmək üçün linkə klikləyin: " + activationUrlForTest);
       message.setTo(email);
       mailSender.send(message);
       redisActivationTokenService.storeActivationToken(email, token);
@@ -130,6 +132,10 @@ public class EmailServiceImpl implements EmailService {
 
   private String generateActivationLink(String activationToken) {
     return "http://localhost:5173/activate?token=" + activationToken;
+  }
+
+  private String generateActivationLinkForTest(String token) {
+    return "https://tech-evo-site.netlify.app/activate?token=" + token;
   }
 
   @Scheduled(fixedRate = 86400000)
