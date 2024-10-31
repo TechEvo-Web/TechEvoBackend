@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -31,21 +32,26 @@ public class ProductController {
     private final ProductService service;
 
     @GetMapping("/getAll")
+    @Operation(summary = "Bütün məhsulları almaq üçün endpoint")
     public ResponseEntity<List<ProductResponse>> getAllProducts() {
         return ResponseEntity.ok(service.getAllProduct());
     }
 
     @GetMapping("/getAllByCategoryName")
+    @Operation(summary = "Məhsulları kateqoriya adı ilə almaq üçün endpoint")
     public ResponseEntity<List<ProductResponse>> getProductsByCategory(@RequestParam String categoryName) {
         return ResponseEntity.ok(service.getProductsByCategoryName(categoryName));
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Hər hansı məhsulu id ilə almaq üçün endpoint")
     public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
         return ResponseEntity.ok(service.getProductById(id));
     }
 
     @GetMapping("/filterByPriceAndSpecs")
+    @Operation(summary = "Məhsulları filter etmək üçün endpoint",
+            description = "Bu endpointə min,max,və xüsusi kateqoriyaya görə gələn spesifikasiya adlarını param ilə göndərərək bu filterlərə uyğun məhsulları ala bilərik.")
     public ResponseEntity<List<Product>> getFilteringProducts(@RequestParam(required = false) Float min,
                                                               @RequestParam(required = false) Float max,
                                                               @RequestParam(required = false) Map<String, String> filterSpec){
@@ -53,6 +59,7 @@ public class ProductController {
     }
 
     @PostMapping
+    @Operation(summary = "Yeni məhsul əlavə etmək üçün endpoint",description = "Məlumatlar form-data olaraq göndəriləcək.Şəkil əlavə etmək mütləqdir.")
     public ResponseEntity<ProductResponse> createProduct(@ModelAttribute ProductRequest request, @RequestParam("imageFile") List<MultipartFile> imageFiles) {
         final var createdProduct = service.addProduct(request, imageFiles);
         final var location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/{id}").build(createdProduct.getId());
@@ -60,6 +67,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Məhsulları id ilə güncəlləmək üçün endpoint")
     public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id, @ModelAttribute ProductRequest request, @RequestParam(value = "imageFile") List<MultipartFile> imageFiles) throws IOException {
         final var updatedProduct = service.updateProduct(id, request, imageFiles);
         final var location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/{id}").build(updatedProduct.getId());
@@ -67,6 +75,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Məhsulu id ilə silmək üçün endpoint")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         service.deleteProduct(id);
         return ResponseEntity.noContent().build();

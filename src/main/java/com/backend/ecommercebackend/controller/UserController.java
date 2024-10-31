@@ -3,6 +3,7 @@ package com.backend.ecommercebackend.controller;
 import com.backend.ecommercebackend.dto.request.UserRequest;
 import com.backend.ecommercebackend.dto.response.UserResponse;
 import com.backend.ecommercebackend.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,18 +19,21 @@ public class UserController {
     private final UserService service;
 
     @GetMapping("/allUsers")
+    @Operation(summary = "Bütün istifadəçiləri almaq üçün endpoint")
     public List<UserResponse> getAllUsers() {
         return service.getAllUsers();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @ModelAttribute UserRequest userRequest, @RequestParam("profileImg") MultipartFile multipartFile) {
+    @Operation(summary = "İstifadəçi məlumatlarini güncəlləmək üçün endpoint",description = "Data form-data olaraq gondərilməlidi.Profileİmg istəyə görə param ile güncəlləyə bilərsiz.Amma id əlavə etmək mütləqdir.")
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @ModelAttribute UserRequest userRequest, @RequestParam(required = false,name ="profileImg") MultipartFile multipartFile) {
         final var updatedUser = service.updateUser(id, userRequest, multipartFile);
         final var location = ServletUriComponentsBuilder.fromCurrentContextPath().path("{id}").build(updatedUser.getId());
         return ResponseEntity.created(location).body(updatedUser);
     }
 
     @PutMapping("/updateUserImg/{id}")
+    @Operation(summary = "İstifadəçinin yalnız profil şəklini güncəlləmək üçün endpoint")
     public ResponseEntity<UserResponse> updateUser(@PathVariable Long id,@RequestParam("profileImg") MultipartFile multipartFile) {
         final var updatedUser = service.updateUserImg(id,multipartFile);
         final var location = ServletUriComponentsBuilder.fromCurrentContextPath().path("{id}").build(updatedUser.getId());
@@ -37,11 +41,13 @@ public class UserController {
     }
 
     @DeleteMapping("/delete/{id}")
+    @Operation(summary = "İstifadəçi məlumatlarini id ilə silmək üçün endpoint")
     public ResponseEntity<Void> deleteUserById(@PathVariable Long id) {
         service.deleteUserById(id);
         return ResponseEntity.noContent().build();
     }
     @DeleteMapping("/{email}")
+    @Operation(summary = "İstifadəçi məlumatlarini email ilə silmək üçün endpoint")
     public ResponseEntity<String> deleteUser(@PathVariable String email) {
         service.delete(email);
         return ResponseEntity.ok("User deleted successfully.");
