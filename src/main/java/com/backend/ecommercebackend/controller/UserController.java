@@ -6,7 +6,6 @@ import com.backend.ecommercebackend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -28,7 +27,7 @@ public class UserController {
     }
 
     @PutMapping("/profile/update")
-    @Operation(summary = "İstifadəçi məlumatlarini güncəlləmək üçün endpoint",description = "Data form-data olaraq gondərilməlidi.Profileİmg istəyə görə param ile güncəlləyə bilərsiz.Amma id əlavə etmək mütləqdir.")
+    @Operation(summary = "İstifadəçi məlumatlarini güncəlləmək üçün endpoint",description = "Data form-data olaraq gondərilməlidi.Profileİmg istəyə görə param ile güncəlləyə bilərsiz.")
     public ResponseEntity<UserResponse> updateUser(@AuthenticationPrincipal UserDetails userDetails, @RequestPart(required = false,name = "request") UserRequest userRequest, @RequestParam(required = false,name ="profileImg") MultipartFile multipartFile) {
         final var updatedUser = service.updateUser(userDetails,userRequest, multipartFile);
         final var location = ServletUriComponentsBuilder.fromCurrentContextPath().path("{id}").build(updatedUser.getId());
