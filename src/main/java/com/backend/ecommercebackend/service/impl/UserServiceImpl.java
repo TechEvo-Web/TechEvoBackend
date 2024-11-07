@@ -10,6 +10,7 @@ import com.backend.ecommercebackend.repository.user.UserRepository;
 import com.backend.ecommercebackend.service.FileStorageService;
 import com.backend.ecommercebackend.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,37 +32,25 @@ public class UserServiceImpl implements UserService {
         return mapper.entityListToDtoList(repository.findAll());
     }
 
-
     @Override
-    public UserResponse updateUser(Long id, UserRequest request, MultipartFile file) {
-        User user = repository.findById(id).orElseThrow(() -> new ApplicationException(Exceptions.USER_NOT_FOUND));
-        mapper.updateEntityFromDto(request, user);
-        user.setUpdatedAt(LocalDateTime.now());
-        try {
-            storageService.deleteFile(user.getProfileImg());
-            user.setProfileImg("");
-            String url = storageService.storeImages(file, "profileImages");
-            user.setProfileImg(url);
-        } catch (IOException e) {
-            throw new ApplicationException(Exceptions.IMAGE_STORAGE_EXCEPTION);
-
+    public UserResponse updateUser(UserDetails userDetails, UserRequest request, MultipartFile file) {
+        User user = repository.findByEmail(userDetails.getUsername()).orElseThrow(() -> new ApplicationException(Exceptions.USER_NOT_FOUND));
+        if(request!=null){
+            mapper.updateEntityFromDto(request, user);
         }
-        repository.save(user);
-        return mapper.entityToDto(user);
-    }
-
-    @Override
-    public UserResponse updateUserImg(Long id, MultipartFile file) {
-        User user = repository.findById(id).orElseThrow(() -> new ApplicationException(Exceptions.USER_NOT_FOUND));
         user.setUpdatedAt(LocalDateTime.now());
-        try{
-            storageService.deleteFile(user.getProfileImg());
-            user.setProfileImg("");
-            String url = storageService.storeImages(file, "profileImages");
-            user.setProfileImg(url);
-        } catch (IOException e) {
-            throw new ApplicationException(Exceptions.IMAGE_STORAGE_EXCEPTION);
+        if(file != null){
+            try {
+                if(user.getProfileImg()!=null){
+                    storageService.deleteFile(user.getProfileImg());
+                }
+                user.setProfileImg("");
+                String url = storageService.storeImages(file, "profileImages");
+                user.setProfileImg(url);
+            } catch (IOException e) {
+                throw new ApplicationException(Exceptions.IMAGE_STORAGE_EXCEPTION);
 
+            }
         }
         repository.save(user);
         return mapper.entityToDto(user);
