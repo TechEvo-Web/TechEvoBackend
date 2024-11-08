@@ -6,7 +6,6 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.format.annotation.DateTimeFormat;
-
 import java.time.LocalDateTime;
 
 @Getter
@@ -20,15 +19,23 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+
     @Column(nullable = false)
     String firstName;
+
     @Column(nullable = false)
     String lastName;
+
     @Column(nullable = false, unique = true)
     String email;
+
     @Column(nullable = false)
     String password;
+
     String profileImg;
+
+    String cityName;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 

@@ -8,7 +8,6 @@ import com.backend.ecommercebackend.dto.request.OrderRequest;
 import com.backend.ecommercebackend.model.order.Order;
 import com.backend.ecommercebackend.model.order.OrderItem;
 import com.backend.ecommercebackend.model.product.Product;
-import com.backend.ecommercebackend.model.user.User;
 import com.backend.ecommercebackend.repository.order.OrderItemRepository;
 import com.backend.ecommercebackend.repository.order.OrderRepository;
 import com.backend.ecommercebackend.repository.product.ProductRepository;
@@ -38,8 +37,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order processOrderItems(OrderRequest orderRequest,String token) {
-        String email = jwtService.extractUsername(token);  
-
+        String email = jwtService.extractUsername(token);
         Order addedOrder = new Order();
         addedOrder.setDeliveryType(orderRequest.getDeliveryType());
         addedOrder.setTotalPrice(orderRequest.getTotalPrice());

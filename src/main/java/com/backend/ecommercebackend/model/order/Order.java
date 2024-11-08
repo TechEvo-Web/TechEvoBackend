@@ -18,11 +18,14 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long orderId;
-String token;
+    String token;
     int totalPrice;
     String deliveryType;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb", nullable = false)
     List<OrderItem> orderItems;
+    @ManyToOne
+    @JoinColumn(name = "address_Id")
+    Address deliveryAddress;
 
 }
