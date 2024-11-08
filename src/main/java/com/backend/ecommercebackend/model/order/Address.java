@@ -7,6 +7,7 @@ import lombok.experimental.FieldDefaults;
 import java.util.List;
 
 @Entity
+@Table
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Address {
