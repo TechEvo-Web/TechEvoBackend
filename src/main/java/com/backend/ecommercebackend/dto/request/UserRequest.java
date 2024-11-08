@@ -20,6 +20,7 @@ public class UserRequest {
     @Max(value = 16, message = "your surname size over the max")
     String lastName;
     String email;
+    String cityName;
 }
 
 

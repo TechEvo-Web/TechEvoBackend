@@ -1,7 +1,6 @@
 package com.backend.ecommercebackend.service.impl;
 
 import com.backend.ecommercebackend.dto.request.ProductRequest;
-import com.backend.ecommercebackend.dto.response.ProductResponse;
 import com.backend.ecommercebackend.enums.Exceptions;
 import com.backend.ecommercebackend.exception.ApplicationException;
 import com.backend.ecommercebackend.mapper.ProductMapper;
@@ -31,14 +30,13 @@ public class ProductServiceImpl implements ProductService {
     private final CommentRepository commentRepository;
 
     @Override
-    public ProductResponse addProduct(ProductRequest request, List<MultipartFile> imageFiles) {
+    public Product addProduct(ProductRequest request, List<MultipartFile> imageFiles) {
         Product product = mapper.ProductDtoToEntity(request);
         Map<String, String> specifications = stringParseJson(request.getSpecifications());
         product.setSpecifications(specifications);
         List<String> imageUrls = new ArrayList<>();
         addImage(imageFiles, product, imageUrls);
-        repository.save(product);
-        return mapper.EntityToProductDto(product);
+        return repository.save(product);
     }
 
     private Map<String, String> stringParseJson(String requestSpecifications) {
@@ -56,7 +54,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse updateProduct(Long id, ProductRequest request, List<MultipartFile> imageFiles) throws IOException {
+    public Product updateProduct(Long id, ProductRequest request, List<MultipartFile> imageFiles) throws IOException {
         Product product = repository.findById(id).orElseThrow(() -> new ApplicationException(Exceptions.NOT_FOUND_EXCEPTION));
         mapper.updateProductFromProductDto(request, product);
         List<String> imageUrls = new ArrayList<>();
@@ -69,8 +67,8 @@ public class ProductServiceImpl implements ProductService {
         }
         product.setImageUrl(imageUrls);
         addImage(imageFiles, product, imageUrls);
-        repository.save(product);
-        return mapper.EntityToProductDto(product);
+
+        return repository.save(product);
     }
 
     public void addImage(List<MultipartFile> imageFiles, Product product, List<String> imageUrls) {
@@ -89,13 +87,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponse getProductById(Long id) {
-        Product product = repository.findById(id).orElseThrow(() -> new ApplicationException(Exceptions.NOT_FOUND_EXCEPTION));
-        return mapper.EntityToProductDto(product);
+    public Product getProductById(Long id) {
+       return repository.findById(id).orElseThrow(() -> new ApplicationException(Exceptions.NOT_FOUND_EXCEPTION));
     }
 
     @Override
-    public List<ProductResponse> getProductsByCategoryName(String categoryName) {
+    public List<Product> getProductsByCategoryName(String categoryName) {
         if (categoryName == null || categoryName.trim().isEmpty()) {
             throw new ApplicationException(Exceptions.NOT_FOUND_EXCEPTION, "Category name cannot be empty");
         }
@@ -103,12 +100,12 @@ public class ProductServiceImpl implements ProductService {
         if (products.isEmpty()) {
             throw  new ApplicationException(Exceptions.NOT_FOUND_EXCEPTION,"No products found or wrong category name");
         }
-        return mapper.EntityListToProductDtoList(products);
+        return products;
     }
 
     @Override
-    public List<ProductResponse> getAllProduct() {
-        return mapper.EntityListToProductDtoList(repository.findAll());
+    public List<Product> getAllProduct() {
+        return repository.findAll();
     }
 
     @Override

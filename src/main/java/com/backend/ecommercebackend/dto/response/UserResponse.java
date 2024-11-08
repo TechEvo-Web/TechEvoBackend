@@ -16,8 +16,8 @@ public class UserResponse {
     String firstName;
     String lastName;
     String email;
-    String password;
     String profileImg;
+    String cityName;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
 }

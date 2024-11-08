@@ -2,12 +2,11 @@ package com.backend.ecommercebackend.service.impl;
 
 import com.backend.ecommercebackend.dto.ProductSpecificationDto;
 import com.backend.ecommercebackend.dto.request.CategoryRequest;
-import com.backend.ecommercebackend.dto.response.CategoryResponse;
-import com.backend.ecommercebackend.dto.response.ProductResponse;
 import com.backend.ecommercebackend.enums.Exceptions;
 import com.backend.ecommercebackend.exception.ApplicationException;
 import com.backend.ecommercebackend.mapper.CategoryMapper;
 import com.backend.ecommercebackend.model.product.Category;
+import com.backend.ecommercebackend.model.product.Product;
 import com.backend.ecommercebackend.repository.product.CategoryRepository;
 import com.backend.ecommercebackend.repository.product.SpecificationRepository;
 import com.backend.ecommercebackend.service.CategoryService;
@@ -33,25 +32,25 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
-    public CategoryResponse createCategory(CategoryRequest categoryRequest) {
+    public Category createCategory(CategoryRequest categoryRequest) {
        Category save = categoryMapper.CategoryDtoToEntity(categoryRequest);
-        repository.save(save);
-        return categoryMapper.EntityToCategoryDto(save);
+        return repository.save(save);
+
     }
 
     @Override
-    public List<CategoryResponse> getAllCategories() {
-        return categoryMapper.CategoryEntityToCategoryDtoList(repository.findAll());
+    public List<Category> getAllCategories() {
+        return repository.findAll();
     }
 
     @Override
-    public CategoryResponse updateCategory(int categoryId, CategoryRequest categoryRequest) {
+    public Category updateCategory(int categoryId, CategoryRequest categoryRequest) {
         Category category = repository.findById(categoryId).orElseThrow(()-> new ApplicationException(Exceptions.NOT_FOUND_EXCEPTION));
         List<ProductSpecificationDto>specifications=category.getSpecifications();
         Category save = categoryMapper.updateCategoryFromDto(categoryRequest,category);
         save.setSpecifications(specifications);
-        repository.save(save);
-        return categoryMapper.EntityToCategoryDto(save);
+        return repository.save(save);
+
     }
 
     @Override
@@ -63,12 +62,12 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Object getFiltersByCategoryName(String categoryName) {
         List<String> filterNames = specificationService.getFilterSpecificationsByCategoryName(categoryName);
-        List<ProductResponse> products = productService.getProductsByCategoryName(categoryName);
+        List<Product> products = productService.getProductsByCategoryName(categoryName);
         Map<String, Set<String>> filters = new HashMap<>();
         for (String filterName : filterNames) {
             filters.put(filterName, new HashSet<>());
         }
-        for (ProductResponse product : products) {
+        for (Product product : products) {
             for (String filterName : filterNames) {
                 String filterValue = product.getSpecifications().get(filterName);
                 if (filterValue != null) {
