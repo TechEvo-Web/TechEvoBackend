@@ -18,4 +18,5 @@ public class OrderResponse {
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb", nullable = false)
     List<OrderItem> orderItems;
+
 }
