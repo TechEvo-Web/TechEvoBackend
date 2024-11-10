@@ -82,4 +82,10 @@ public class UserServiceImpl implements UserService {
         }
         repository.delete(user.get());
     }
+
+    @Override
+    public UserResponse getUser(UserDetails userDetails) {
+        User user = repository.findByEmail(userDetails.getUsername()).orElseThrow(() -> new ApplicationException(Exceptions.USER_NOT_FOUND));
+        return mapper.entityToDto(user);
+    }
 }

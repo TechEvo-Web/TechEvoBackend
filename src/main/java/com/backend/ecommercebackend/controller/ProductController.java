@@ -1,7 +1,6 @@
 package com.backend.ecommercebackend.controller;
 
 import com.backend.ecommercebackend.dto.request.ProductRequest;
-import com.backend.ecommercebackend.dto.response.ProductResponse;
 import com.backend.ecommercebackend.model.product.Product;
 import com.backend.ecommercebackend.service.ProductService;
 
@@ -33,19 +32,19 @@ public class ProductController {
 
     @GetMapping("/getAll")
     @Operation(summary = "Bütün məhsulları almaq üçün endpoint")
-    public ResponseEntity<List<ProductResponse>> getAllProducts() {
+    public ResponseEntity<List<Product>> getAllProducts() {
         return ResponseEntity.ok(service.getAllProduct());
     }
 
     @GetMapping("/getAllByCategoryName")
     @Operation(summary = "Məhsulları kateqoriya adı ilə almaq üçün endpoint")
-    public ResponseEntity<List<ProductResponse>> getProductsByCategory(@RequestParam String categoryName) {
+    public ResponseEntity<List<Product>> getProductsByCategory(@RequestParam String categoryName) {
         return ResponseEntity.ok(service.getProductsByCategoryName(categoryName));
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Hər hansı məhsulu id ilə almaq üçün endpoint")
-    public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
+    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
         return ResponseEntity.ok(service.getProductById(id));
     }
 
@@ -60,7 +59,7 @@ public class ProductController {
 
     @PostMapping
     @Operation(summary = "Yeni məhsul əlavə etmək üçün endpoint",description = "Məlumatlar form-data olaraq göndəriləcək.Şəkil əlavə etmək mütləqdir.")
-    public ResponseEntity<ProductResponse> createProduct(@ModelAttribute ProductRequest request, @RequestParam("imageFile") List<MultipartFile> imageFiles) {
+    public ResponseEntity<Product> createProduct(@ModelAttribute ProductRequest request, @RequestParam("imageFile") List<MultipartFile> imageFiles) {
         final var createdProduct = service.addProduct(request, imageFiles);
         final var location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/{id}").build(createdProduct.getId());
         return ResponseEntity.created(location).body(createdProduct);
@@ -68,7 +67,7 @@ public class ProductController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Məhsulları id ilə güncəlləmək üçün endpoint")
-    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id, @ModelAttribute ProductRequest request, @RequestParam(value = "imageFile") List<MultipartFile> imageFiles) throws IOException {
+    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @ModelAttribute ProductRequest request, @RequestParam(value = "imageFile") List<MultipartFile> imageFiles) throws IOException {
         final var updatedProduct = service.updateProduct(id, request, imageFiles);
         final var location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/{id}").build(updatedProduct.getId());
         return ResponseEntity.created(location).body(updatedProduct);

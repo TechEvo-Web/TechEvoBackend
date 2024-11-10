@@ -1,7 +1,6 @@
 package com.backend.ecommercebackend.service.impl;
 
 import com.backend.ecommercebackend.dto.request.CommentRequest;
-import com.backend.ecommercebackend.dto.response.CommentResponse;
 import com.backend.ecommercebackend.enums.Exceptions;
 import com.backend.ecommercebackend.exception.ApplicationException;
 import com.backend.ecommercebackend.mapper.CommentMapper;
@@ -29,7 +28,7 @@ public class CommentServiceImpl implements CommentService {
     private final RatingServiceImpl ratingService;
 
     @Override
-    public CommentResponse addComment(UserDetails userDetails,CommentRequest commentRequest) {
+    public Comment addComment(UserDetails userDetails, CommentRequest commentRequest) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(()->new ApplicationException(Exceptions.USER_NOT_FOUND));
         Product product = productRepository.findById(commentRequest.getProductId()).orElseThrow(() -> new ApplicationException(Exceptions.NOT_FOUND_EXCEPTION));
         String commentOwner = String.format("%s %s",user.getFirstName(),user.getLastName());
@@ -42,22 +41,22 @@ public class CommentServiceImpl implements CommentService {
         comment.setRating(ratingScore);
         repository.save(comment);
         productRepository.save(product);
-        return mapper.CommentEntityToDto(comment);
+        return comment;
     }
 
     @Override
-    public List<CommentResponse> getAllCommentsByProductId(Long productId) {
-        List<Comment>comments = repository.findByProductId(productId);
-        return mapper.CommentEntityListToDtoList(comments);
+    public List<Comment> getAllCommentsByProductId(Long productId) {
+        return repository.findByProductId(productId);
+
     }
 
     @Override
-    public CommentResponse updateComment(Long commentId, CommentRequest commentRequest) {
+    public Comment updateComment(Long commentId, CommentRequest commentRequest) {
         Comment comment = repository.findById(commentId).orElseThrow(()->new ApplicationException(Exceptions.NOT_FOUND_EXCEPTION));
         Comment save = mapper.updateCommentEntityFromDto(commentRequest,comment);
         save.setUpdatedAt(LocalDateTime.now());
         repository.save(save);
-        return mapper.CommentEntityToDto(comment);
+        return comment;
     }
 
     @Override

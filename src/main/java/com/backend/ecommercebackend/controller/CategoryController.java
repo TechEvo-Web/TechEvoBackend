@@ -1,7 +1,7 @@
 package com.backend.ecommercebackend.controller;
 
 import com.backend.ecommercebackend.dto.request.CategoryRequest;
-import com.backend.ecommercebackend.dto.response.CategoryResponse;
+import com.backend.ecommercebackend.model.product.Category;
 import com.backend.ecommercebackend.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -19,13 +19,13 @@ public class CategoryController {
 
     @GetMapping("/getAll")
     @Operation(summary = "Bütün kateqoriya məlumatlarını almaq üçün endpoint")
-    public ResponseEntity<List<CategoryResponse>> getAllCategories() {
+    public ResponseEntity<List<Category>> getAllCategories() {
         return ResponseEntity.ok(service.getAllCategories());
     }
 
     @PostMapping
     @Operation(summary = "Yeni kateqoriya əlavə etmək üçün endpoint")
-    public ResponseEntity<CategoryResponse> createCategory(@RequestBody CategoryRequest categoryRequest) {
+    public ResponseEntity<Category> createCategory(@RequestBody CategoryRequest categoryRequest) {
         final var createdCategory = service.createCategory(categoryRequest);
         final var location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/{categoryId}").build(createdCategory.getCategoryId());
         return ResponseEntity.created(location).body(createdCategory);
@@ -40,7 +40,7 @@ public class CategoryController {
 
     @PutMapping("/{categoryId}")
     @Operation(summary = "Kateqoriyani id ilə güncəlləmək üçün endpoint")
-    public ResponseEntity<CategoryResponse> updateCategory(@PathVariable int categoryId, @RequestBody CategoryRequest categoryRequest) {
+    public ResponseEntity<Category> updateCategory(@PathVariable int categoryId, @RequestBody CategoryRequest categoryRequest) {
         final var updatedCategory = service.updateCategory(categoryId, categoryRequest);
         final var location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/{categoryId}").build(updatedCategory.getCategoryId());
         return  ResponseEntity.created(location).body(updatedCategory);

@@ -13,5 +13,5 @@ public interface UserService {
     UserResponse updateUser(UserDetails userDetails, UserRequest request, MultipartFile file);
     void deleteUserById(Long id);
     void delete(String email);
-
+    UserResponse getUser(UserDetails user);
 }

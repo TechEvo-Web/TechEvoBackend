@@ -20,6 +20,10 @@ import java.util.List;
 public class UserController {
     private final UserService service;
 
+    @GetMapping
+    public ResponseEntity<UserResponse> getUser(@AuthenticationPrincipal UserDetails user) {
+        return ResponseEntity.ok(service.getUser(user)) ;
+    }
     @GetMapping("/allUsers")
     @Operation(summary = "Bütün istifadəçiləri almaq üçün endpoint")
     public List<UserResponse> getAllUsers() {
