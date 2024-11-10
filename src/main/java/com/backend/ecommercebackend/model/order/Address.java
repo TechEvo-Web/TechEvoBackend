@@ -18,6 +18,4 @@ public class Address {
     String city;
     String building;
     String area;
-    @OneToMany(mappedBy = "address",cascade = CascadeType.ALL)
-    List<Order> order;
 }

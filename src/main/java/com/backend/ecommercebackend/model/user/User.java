@@ -1,5 +1,6 @@
 package com.backend.ecommercebackend.model.user;
 
+import com.backend.ecommercebackend.model.order.Order;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -7,6 +8,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -36,6 +39,7 @@ public class User {
 
     String cityName;
 
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -50,4 +54,5 @@ public class User {
     LocalDateTime updatedAt;
 
     private String googleId;
+
 }
