@@ -14,7 +14,6 @@ import com.backend.ecommercebackend.repository.product.ProductRepository;
 import com.backend.ecommercebackend.repository.user.UserRepository;
 import com.backend.ecommercebackend.service.FavoriteService;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +29,7 @@ public class FavoriteServiceImpl implements FavoriteService {
 
   @Override
   public FavoritesResponse addFavorites(FavoritesRequest request, String token) {
-    if (jwtService.isTokenExpired(token)) {
+    if (Boolean.TRUE.equals(jwtService.isTokenExpired(token))) {
       throw new ApplicationException(Exceptions.INVALID_TOKEN_EXCEPTION,"token expired");
     }
     String email = jwtService.extractUsername(token);
@@ -66,7 +65,29 @@ public class FavoriteServiceImpl implements FavoriteService {
     List<Favorites> favoritesList = favoriteRepository.findByUserId(user.getId());
 
     return favoritesList.stream()
-            .map(favorite -> new FavoritesResponse(favorite.getProductId()))
-            .collect(Collectors.toList());
+            .map(favorite -> new FavoritesResponse(favorite.getProductId())).
+            toList();
+  }
+
+  @Override
+  public void deleteFav(Long productId, String token) {
+    if (Boolean.TRUE.equals(jwtService.isTokenExpired(token))) {
+      throw new ApplicationException(Exceptions.INVALID_TOKEN_EXCEPTION,"token expired");
+    }
+
+    String email = jwtService.extractUsername(token);
+
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new ApplicationException(Exceptions.USER_NOT_FOUND));
+
+    Product product = productRepository.findById(productId)
+            .orElseThrow(()-> new ApplicationException(Exceptions.NOT_FOUND_EXCEPTION,"Product not found"));
+
+    var favorite = favoriteRepository.findByUserIdAndProductId(user.getId(), product.getId())
+            .orElseThrow(() -> new ApplicationException(Exceptions.NOT_FOUND_EXCEPTION, "Product not found in user's favorites"));
+
+    if (favoriteRepository.existsByUserIdAndProductId(user.getId(), product.getId())) {
+        favoriteRepository.delete(favorite);
+    }
   }
 }

@@ -9,4 +9,6 @@ public interface FavoriteService {
   FavoritesResponse addFavorites(FavoritesRequest request, String token);
 
   List<FavoritesResponse> getFavorites(String token);
+
+  void deleteFav(Long id, String token);
 }

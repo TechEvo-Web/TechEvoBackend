@@ -37,7 +37,8 @@ public class Favorites {
 
   @JoinColumn(nullable = false)
   Long productId;
-
+  @JoinColumn(nullable = false)
+  Boolean isFav;
   @CreationTimestamp
   @Column(name = "created_at", nullable = false, updatable = false)
   @DateTimeFormat(pattern = "yyyy-MM-dd")
