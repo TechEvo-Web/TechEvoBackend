@@ -133,6 +133,12 @@ public class OrderServiceImpl implements OrderService {
         Product product = productRepository.findById(productId).get();
         return product;
     }
+    @Override
+    public List<Order>getOrdersByToken(String token) {
+        String email = jwtService.extractUsername(token);
+        List<Order> orders=orderRepository.findByUserEmail(email);
+        return orders;
+    }
 }
 
 

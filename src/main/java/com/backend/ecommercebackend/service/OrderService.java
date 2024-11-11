@@ -11,5 +11,5 @@ import java.util.List;
 public interface OrderService {
     Order processOrderItems(OrderRequest orderRequest,String token);
     Product getProductIdFromOrderItemId(Long orderItemId);
-
+    List<Order> getOrdersByToken(String token);
 }

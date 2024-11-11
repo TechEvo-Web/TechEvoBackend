@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/order")
 @RequiredArgsConstructor
@@ -38,10 +40,16 @@ public class OrderController {
 
 
     @GetMapping("/orderItem/{orderItemId}")
-    @Operation(summary = "İstifadəçinin sifarişlərini almaq üçün endpoint")
+    @Operation(summary = "OrderItem-i Product kimi qaytarmaq ucun endpoint")
     public Product getOrderItemInfo(@PathVariable Long orderItemId) {
         orderService.getProductIdFromOrderItemId(orderItemId);
         return orderService.getProductIdFromOrderItemId(orderItemId);
+    }
+    @GetMapping()
+    @Operation(summary = "Token gondererek userin Orderlarini qaytarmaq ucun endpoint")
+    public List<Order> getOrders(@RequestHeader("Authorization") String token) {
+        token = token.substring(7);
+        return orderService.getOrdersByToken(token);
     }
 
     @DeleteMapping("/orderItem/delete/{orderItemId}")
