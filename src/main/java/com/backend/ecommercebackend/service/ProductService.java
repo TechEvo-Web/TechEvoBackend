@@ -1,5 +1,6 @@
 package com.backend.ecommercebackend.service;
 import com.backend.ecommercebackend.dto.request.ProductRequest;
+import com.backend.ecommercebackend.dto.request.RecommendProductRequest;
 import com.backend.ecommercebackend.model.product.Product;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,4 +16,5 @@ public interface ProductService {
      Product updateProduct(Long id, ProductRequest request, List<MultipartFile> imageFile) throws IOException;
      void deleteProduct(Long id);
      List<Product> getFilteringProducts(Float min, Float max, Map<String, String> filterSpec);
+     List<Product>  findRecommendedProduct(RecommendProductRequest request);
 }

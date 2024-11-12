@@ -47,6 +47,15 @@ public class Product {
     @Column(nullable = false)
     String categoryName;
 
+    @Column(nullable = false)
+    String usingPurpose;
+
+    @Column(nullable = false)
+    String whereUse;
+
+    @Column(nullable = false)
+    String look;
+
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb", nullable = false)
     Map<String,String> specifications=new HashMap<>();
