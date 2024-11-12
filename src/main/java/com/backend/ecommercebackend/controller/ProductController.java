@@ -1,6 +1,7 @@
 package com.backend.ecommercebackend.controller;
 
 import com.backend.ecommercebackend.dto.request.ProductRequest;
+import com.backend.ecommercebackend.dto.response.ProductResponse;
 import com.backend.ecommercebackend.model.product.Product;
 import com.backend.ecommercebackend.service.ProductService;
 
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,8 +34,9 @@ public class ProductController {
 
     @GetMapping("/getAll")
     @Operation(summary = "Bütün məhsulları almaq üçün endpoint")
-    public ResponseEntity<List<Product>> getAllProducts() {
-        return ResponseEntity.ok(service.getAllProduct());
+    public ResponseEntity<List<ProductResponse>> getAllProducts(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        return ResponseEntity.ok(service.getAllProduct(token));
     }
 
     @GetMapping("/getAllByCategoryName")

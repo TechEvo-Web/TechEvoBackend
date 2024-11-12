@@ -1,5 +1,6 @@
 package com.backend.ecommercebackend.controller;
 
+import com.backend.ecommercebackend.dto.response.ProductResponse;
 import com.backend.ecommercebackend.service.FavoriteService;
 import java.util.List;
 import lombok.Builder;
@@ -31,7 +32,7 @@ public class FavoritesController {
   }
 
   @GetMapping
-  public ResponseEntity<List<FavoritesResponse>> getFavorites(@RequestHeader("Authorization") String token) {
+  public ResponseEntity<List<ProductResponse>> getFavorites(@RequestHeader("Authorization") String token) {
     return ResponseEntity.ok(favoriteService.getFavorites(token));
   }
 

@@ -1,12 +1,18 @@
 package com.backend.ecommercebackend.service.impl;
 
+import com.backend.ecommercebackend.authentication.jwt.JwtService;
 import com.backend.ecommercebackend.dto.request.ProductRequest;
+import com.backend.ecommercebackend.dto.response.ProductResponse;
 import com.backend.ecommercebackend.enums.Exceptions;
 import com.backend.ecommercebackend.exception.ApplicationException;
 import com.backend.ecommercebackend.mapper.ProductMapper;
+import com.backend.ecommercebackend.model.product.Favorites;
 import com.backend.ecommercebackend.model.product.Product;
+import com.backend.ecommercebackend.model.user.User;
 import com.backend.ecommercebackend.repository.product.CommentRepository;
+import com.backend.ecommercebackend.repository.product.FavoriteRepository;
 import com.backend.ecommercebackend.repository.product.ProductRepository;
+import com.backend.ecommercebackend.repository.user.UserRepository;
 import com.backend.ecommercebackend.service.FileStorageService;
 import com.backend.ecommercebackend.service.ProductService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -28,6 +34,9 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository repository;
     private final FileStorageService fileStorageService;
     private final CommentRepository commentRepository;
+    private final JwtService jwtService;
+    private final UserRepository userRepository;
+    private final FavoriteRepository favoriteRepository;
 
     @Override
     public Product addProduct(ProductRequest request, List<MultipartFile> imageFiles) {
@@ -104,8 +113,29 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> getAllProduct() {
-        return repository.findAll();
+    public List<ProductResponse> getAllProduct(String token) {
+
+        if (Boolean.TRUE.equals(jwtService.isTokenExpired(token))) {
+            throw new ApplicationException(Exceptions.INVALID_TOKEN_EXCEPTION, "token expired");
+        }
+
+        String email = jwtService.extractUsername(token);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ApplicationException(Exceptions.USER_NOT_FOUND));
+
+        List<Product> products = repository.findAll();
+        List<Favorites> userFavorites = favoriteRepository.findByUserId(user.getId());
+
+        List<Long> favoriteProductIds = userFavorites.stream()
+                .map(Favorites::getProductId)
+                .toList();
+
+        return products.stream()
+                .map(product -> {
+                    boolean isFav = favoriteProductIds.contains(product.getId());
+                    return mapper.toProductResponse(product, isFav);
+                })
+                .toList();
     }
 
     @Override

@@ -4,8 +4,10 @@ package com.backend.ecommercebackend.service.impl;
 import com.backend.ecommercebackend.authentication.jwt.JwtService;
 import com.backend.ecommercebackend.controller.FavoritesController.FavoritesResponse;
 import com.backend.ecommercebackend.controller.FavoritesController.FavoritesRequest;
+import com.backend.ecommercebackend.dto.response.ProductResponse;
 import com.backend.ecommercebackend.enums.Exceptions;
 import com.backend.ecommercebackend.exception.ApplicationException;
+import com.backend.ecommercebackend.mapper.ProductMapper;
 import com.backend.ecommercebackend.model.product.Favorites;
 import com.backend.ecommercebackend.model.product.Product;
 import com.backend.ecommercebackend.model.user.User;
@@ -26,12 +28,14 @@ public class FavoriteServiceImpl implements FavoriteService {
   private final UserRepository userRepository;
   private final ProductRepository productRepository;
   private final JwtService jwtService;
+  private final ProductMapper mapper;
 
   @Override
   public FavoritesResponse addFavorites(FavoritesRequest request, String token) {
     if (Boolean.TRUE.equals(jwtService.isTokenExpired(token))) {
       throw new ApplicationException(Exceptions.INVALID_TOKEN_EXCEPTION,"token expired");
     }
+
     String email = jwtService.extractUsername(token);
     User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new ApplicationException(Exceptions.USER_NOT_FOUND));
@@ -57,7 +61,7 @@ public class FavoriteServiceImpl implements FavoriteService {
   }
 
   @Override
-  public List<FavoritesResponse> getFavorites(String token) {
+  public List<ProductResponse> getFavorites(String token) {
     String email = jwtService.extractUsername(token);
 
     User user = userRepository.findByEmail(email)
@@ -65,8 +69,11 @@ public class FavoriteServiceImpl implements FavoriteService {
     List<Favorites> favoritesList = favoriteRepository.findByUserId(user.getId());
 
     return favoritesList.stream()
-            .map(favorite -> new FavoritesResponse(favorite.getProductId())).
-            toList();
+            .map(favorite -> productRepository.findById(favorite.getProductId())
+                    .map(product -> mapper.toProductResponse(product, true))
+                    .orElseThrow(() -> new ApplicationException(Exceptions.NOT_FOUND_EXCEPTION, "Product not found")))
+            .toList();
+
   }
 
   @Override
