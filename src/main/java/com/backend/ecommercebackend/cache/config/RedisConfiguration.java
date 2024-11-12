@@ -27,7 +27,7 @@ public class RedisConfiguration {
     if (!redisPassword.isEmpty()) {
       configuration.setPassword(redisPassword);
     }
-    LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder().build();
+    LettuceClientConfiguration clientConfig = LettuceClientConfiguration.builder().useSsl().build();
     return new LettuceConnectionFactory(configuration, clientConfig);
   }
 
