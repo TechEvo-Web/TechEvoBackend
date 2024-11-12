@@ -26,7 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -200,13 +199,11 @@ public class ProductServiceImpl implements ProductService {
         String usingPurpose = request.getUsingPurpose();
         String whereUse = request.getWhereUse();
         String look = request.getLook();
-        List<Product> matchingProducts = productRepository.findAll().stream()
+        return productRepository.findAll().stream()
                 .filter(product -> usingPurpose != null && usingPurpose.trim().equalsIgnoreCase(product.getUsingPurpose().trim()))
                 .filter(product -> whereUse != null && whereUse.trim().equalsIgnoreCase(product.getWhereUse().trim()))
                 .filter(product -> look != null && look.trim().equalsIgnoreCase(product.getLook().trim()))
-                .collect(Collectors.toList());
-    return  matchingProducts;
-
+                .toList();
     }
 }
 
