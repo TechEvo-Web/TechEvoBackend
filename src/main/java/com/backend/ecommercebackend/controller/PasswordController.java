@@ -24,9 +24,8 @@ public class PasswordController {
     @PostMapping("/changePassword")
     @Operation(summary = "İstifadəçi şifrəsini dəyişmək üçün endpoint",
             description = "Burda elave olaraq accestoken gonderilmelidi.Bu endpointden evvel sendVerificationCoke endpointi istifade olunacaq.Email gelen dogrulama kodu ve email verify endpointine gonderilecek.Eger cavab true dönsə o zaman changePassword hissesi açılacaq.Və bu endpoint sonra istifadə olunacaq.")
-    public ResponseEntity<String> changePassword(@AuthenticationPrincipal UserDetails userDetails,
-                                                 @Valid @RequestBody ChangePasswordRequest request ){
-        return ResponseEntity.ok(service.changePassword(userDetails,request));
+    public ResponseEntity<String> changePassword(@Valid @RequestBody ChangePasswordRequest request ){
+        return ResponseEntity.ok(service.changePassword(request));
     }
 
     @PostMapping("/verify")

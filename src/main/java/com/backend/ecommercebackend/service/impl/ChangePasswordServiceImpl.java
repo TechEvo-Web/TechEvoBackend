@@ -24,8 +24,14 @@ public class ChangePasswordServiceImpl implements ChangePasswordService {
     private final UserRepository repository;
 
     @Override
-    public String changePassword(UserDetails userDetails, ChangePasswordRequest changePasswordRequest) {
-        User user = repository.findByEmail(userDetails.getUsername())
+    public String changePassword(ChangePasswordRequest changePasswordRequest) {
+        String email = changePasswordRequest.getEmail();
+        String verificationCode = redisVerificationService.getVerificationCode(email);
+
+        if (verificationCode == null || !verificationCode.equals(changePasswordRequest.getVerificationCode())) {
+            throw new ApplicationException(Exceptions.INVALID_VERIFICATION_CODE);
+        }
+        User user = repository.findByEmail(email)
                 .orElseThrow(() -> new ApplicationException(Exceptions.USER_NOT_FOUND));
 
         if (passwordEncoder.matches(changePasswordRequest.getNewPassword(), user.getPassword())) {
