@@ -1,5 +1,6 @@
 package com.backend.ecommercebackend.dto.request;
 
+import jakarta.persistence.Column;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,5 +21,8 @@ public class ProductRequest {
     String description;
     String categoryName;
     float rating;
+    String usingPurpose;
+    String whereUse;
+    String look;
     String specifications;
 }

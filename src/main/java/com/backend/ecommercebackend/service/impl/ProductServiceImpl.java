@@ -1,6 +1,7 @@
 package com.backend.ecommercebackend.service.impl;
 
 import com.backend.ecommercebackend.dto.request.ProductRequest;
+import com.backend.ecommercebackend.dto.request.RecommendProductRequest;
 import com.backend.ecommercebackend.enums.Exceptions;
 import com.backend.ecommercebackend.exception.ApplicationException;
 import com.backend.ecommercebackend.mapper.ProductMapper;
@@ -19,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +30,8 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository repository;
     private final FileStorageService fileStorageService;
     private final CommentRepository commentRepository;
-
+    private final ProductRepository productRepository;
+    private final Random random = new Random();
     @Override
     public Product addProduct(ProductRequest request, List<MultipartFile> imageFiles) {
         Product product = mapper.ProductDtoToEntity(request);
@@ -160,6 +163,19 @@ public class ProductServiceImpl implements ProductService {
             }
         }
         return result;
+    }
+    @Override
+    public List<Product> findRecommendedProduct(RecommendProductRequest request) {
+        String usingPurpose = request.getUsingPurpose();
+        String whereUse = request.getWhereUse();
+        String look = request.getLook();
+        List<Product> matchingProducts = productRepository.findAll().stream()
+                .filter(product -> usingPurpose != null && usingPurpose.trim().equalsIgnoreCase(product.getUsingPurpose().trim()))
+                .filter(product -> whereUse != null && whereUse.trim().equalsIgnoreCase(product.getWhereUse().trim()))
+                .filter(product -> look != null && look.trim().equalsIgnoreCase(product.getLook().trim()))
+                .collect(Collectors.toList());
+    return  matchingProducts;
+
     }
 }
 
