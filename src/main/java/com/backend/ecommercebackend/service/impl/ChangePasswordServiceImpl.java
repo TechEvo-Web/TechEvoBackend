@@ -26,11 +26,7 @@ public class ChangePasswordServiceImpl implements ChangePasswordService {
     @Override
     public String changePassword(ChangePasswordRequest changePasswordRequest) {
         String email = changePasswordRequest.getEmail();
-        String verificationCode = redisVerificationService.getVerificationCode(email);
 
-        if (verificationCode == null || !verificationCode.equals(changePasswordRequest.getVerificationCode())) {
-            throw new ApplicationException(Exceptions.INVALID_VERIFICATION_CODE);
-        }
         User user = repository.findByEmail(email)
                 .orElseThrow(() -> new ApplicationException(Exceptions.USER_NOT_FOUND));
 
