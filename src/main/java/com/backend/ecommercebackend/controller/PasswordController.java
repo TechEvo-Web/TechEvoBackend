@@ -23,7 +23,6 @@ import java.util.Map;
 @Validated
 public class PasswordController {
     private final ChangePasswordServiceImpl service;
-
     @PostMapping("/changePassword")
     @Operation(summary = "İstifadəçi şifrəsini dəyişmək üçün endpoint",
             description = "Burda elave olaraq accestoken gonderilmelidi.Bu endpointden evvel sendVerificationCoke endpointi istifade olunacaq.Email gelen dogrulama kodu ve email verify endpointine gonderilecek.Eger cavab true dönsə o zaman changePassword hissesi açılacaq.Və bu endpoint sonra istifadə olunacaq.")
