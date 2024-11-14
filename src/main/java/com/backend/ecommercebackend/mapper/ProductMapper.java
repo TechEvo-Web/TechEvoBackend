@@ -9,8 +9,9 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
-  @Mapping(target = "specifications",ignore = true)
+//  @Mapping(target = "specifications",ignore = true)
   Product ProductDtoToEntity(ProductRequest request);
+//  @Mapping(target = "specifications",ignore = true)
   ProductResponse toProductResponse(Product product, boolean isFav);
   @Mapping(target = "specifications",ignore = true)
   Product updateProductFromProductDto(ProductRequest productRequest, @MappingTarget Product product);

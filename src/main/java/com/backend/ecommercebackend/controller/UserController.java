@@ -14,7 +14,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
 
-@RequestMapping("/api/v1/user/")
+@RequestMapping("/api/v1/user")
 @RestController
 @RequiredArgsConstructor
 public class UserController {

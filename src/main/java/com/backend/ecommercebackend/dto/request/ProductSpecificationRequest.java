@@ -11,6 +11,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductSpecificationRequest {
      int categoryId;
+     String specificationType;
      String specificationName;
      Boolean isFilterSpecification;
 }

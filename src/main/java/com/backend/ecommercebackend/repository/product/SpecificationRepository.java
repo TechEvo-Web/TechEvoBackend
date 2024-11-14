@@ -11,6 +11,10 @@ import java.util.List;
 public interface SpecificationRepository extends JpaRepository<ProductSpecification, Long> {
     @Transactional
     void deleteByCategoryId(int categoryId);
-
     List<ProductSpecification> findByCategoryId(int categoryId);
+    @Transactional
+    @Query("""
+            select s.specificationType from ProductSpecification s where s.specificationName=:specificationName
+            """)
+    List<String> findBySpecificationName(String specificationName);
 }
