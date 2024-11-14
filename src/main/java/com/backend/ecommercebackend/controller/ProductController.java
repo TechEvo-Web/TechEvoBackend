@@ -56,7 +56,7 @@ public class ProductController {
 
     @GetMapping("/filterCreatePc")
     @Operation(summary = "pc yarat hissəsi üçün endpoint")
-    public ResponseEntity<Map<String,List<String>>>createPcFilter(@RequestParam Map<String,String> filter){
+    public ResponseEntity<Map<String,Map<String,Object>>>createPcFilter(@RequestParam Map<String,String> filter){
         return ResponseEntity.ok(service.createPcFilter(filter));
     }
 

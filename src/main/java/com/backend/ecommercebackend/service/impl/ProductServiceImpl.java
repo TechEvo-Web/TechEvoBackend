@@ -13,7 +13,6 @@ import com.backend.ecommercebackend.service.FileStorageService;
 import com.backend.ecommercebackend.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.antlr.v4.runtime.misc.Array2DHashSet;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -177,15 +176,19 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Map<String, List<String>> createPcFilter(Map<String, String> filter) {
+    public Map<String, Map<String, Object>> createPcFilter(Map<String, String> filter) {
         List<Product> products = repository.findAll();
-        Map<String, Set<String>> parts = new HashMap<>();
-        Map<String, List<String>> result = new HashMap<>();
+        Map<String,Map<String,Object>>defaultParts = new HashMap<>();
         List<String> categories = List.of("Ram", "Cpu", "Psu", "Gpu", "Ssd", "Hdd", "Case", "Motherboard");
+
+        for (Product product : products) {
+            if (categories.contains(product.getCategoryName())) {
+                defaultParts.computeIfAbsent(product.getCategoryName(), k -> new HashMap<>()).put(product.getName(), false);
+            }
+        }
         for (Product product : products) {
             if (categories.contains(product.getCategoryName())) {
                 boolean isCompatible = true;
-                Product existProduct = repository.findByNameAndAndCategoryName(product.getName(),product.getCategoryName());
                 for (Map.Entry<String, String> entry : filter.entrySet()) {
                     String filterKey = entry.getKey();
                     String filterValue = entry.getValue();
@@ -197,19 +200,14 @@ public class ProductServiceImpl implements ProductService {
                             break;
                         }
                     }
-
                 }
                 if (isCompatible) {
-                      parts.computeIfAbsent(product.getCategoryName(), k -> new HashSet<>()).add(product.getName());
+                    defaultParts.get(product.getCategoryName()).put(product.getName(), true);
                 }
             }
         }
 
-        for (Map.Entry<String, Set<String>> entry : parts.entrySet()) {
-            result.put(entry.getKey(), new ArrayList<>(entry.getValue()));
-        }
-
-        return result;
+        return defaultParts;
     }
 
     @Override
