@@ -14,11 +14,8 @@ import com.backend.ecommercebackend.service.ProductService;
 import com.backend.ecommercebackend.service.SpecificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+
+import java.util.*;
 
 
 @Service
@@ -33,7 +30,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category createCategory(CategoryRequest categoryRequest) {
-       Category save = categoryMapper.CategoryDtoToEntity(categoryRequest);
+        Category save = categoryMapper.CategoryDtoToEntity(categoryRequest);
         return repository.save(save);
 
     }
@@ -45,9 +42,9 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category updateCategory(int categoryId, CategoryRequest categoryRequest) {
-        Category category = repository.findById(categoryId).orElseThrow(()-> new ApplicationException(Exceptions.NOT_FOUND_EXCEPTION));
-        List<ProductSpecificationDto>specifications=category.getSpecifications();
-        Category save = categoryMapper.updateCategoryFromDto(categoryRequest,category);
+        Category category = repository.findById(categoryId).orElseThrow(() -> new ApplicationException(Exceptions.NOT_FOUND_EXCEPTION));
+        List<ProductSpecificationDto> specifications = category.getSpecifications();
+        Category save = categoryMapper.updateCategoryFromDto(categoryRequest, category);
         save.setSpecifications(specifications);
         return repository.save(save);
 
@@ -63,15 +60,28 @@ public class CategoryServiceImpl implements CategoryService {
     public Object getFiltersByCategoryName(String categoryName) {
         List<String> filterNames = specificationService.getFilterSpecificationsByCategoryName(categoryName);
         List<Product> products = productService.getProductsByCategoryName(categoryName);
-        Map<String, Set<String>> filters = new HashMap<>();
+        List<String> objectTypeSpecifications = new ArrayList<>();
+        Map<String, Set<Object>> filters = new HashMap<>();
+
         for (String filterName : filterNames) {
             filters.put(filterName, new HashSet<>());
         }
         for (Product product : products) {
             for (String filterName : filterNames) {
-                String filterValue = product.getSpecifications().get(filterName);
-                if (filterValue != null) {
-                    filters.get(filterName).add(filterValue);
+                objectTypeSpecifications = specificationRepository.findBySpecificationName(filterName);
+                if (objectTypeSpecifications.contains("Object")) {
+                    Object filterObjectValue = product.getSpecifications().get(filterName);
+                    if (filterObjectValue instanceof Map) {
+                        Map<String, Object> filterValue = (Map<String,Object>) filterObjectValue;
+                        for (String value : filterValue.keySet())
+                            filters.get(filterName).add(value);
+                    }
+                } else {
+                    filters.put(filterName, new HashSet<>());
+                    Object filterValue = product.getSpecifications().get(filterName);
+                    if (filterValue != null) {
+                        filters.get(filterName).add(filterValue);
+                    }
                 }
             }
         }

@@ -17,4 +17,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 select p from Product p where p.categoryName=:categoryName
 """)
  List<Product> findByCategoryName(String categoryName);
+@Query("""
+select p from Product p where p.name=:name and p.categoryName=:categoryName
+""")
+ Product findByNameAndAndCategoryName(String name,String categoryName);
 }

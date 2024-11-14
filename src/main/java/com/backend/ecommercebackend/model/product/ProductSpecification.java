@@ -24,6 +24,9 @@ public class ProductSpecification {
     String specificationName;
 
     @Column(nullable = false)
+    String specificationType;
+
+    @Column(nullable = false)
     Boolean isFilterSpecification = false;
 
     @Column(nullable = false)

@@ -25,7 +25,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public class ProductController {
 
     private final ProductService service;
-private final Random random = new Random();
+    private final Random random = new Random();
+
     @GetMapping("/getAll")
     @Operation(summary = "Bütün məhsulları almaq üçün endpoint")
     public ResponseEntity<List<Product>> getAllProducts() {
@@ -49,13 +50,19 @@ private final Random random = new Random();
             description = "Bu endpointə min,max,və xüsusi kateqoriyaya görə gələn spesifikasiya adlarını param ilə göndərərək bu filterlərə uyğun məhsulları ala bilərik.")
     public ResponseEntity<List<Product>> getFilteringProducts(@RequestParam(required = false) Float min,
                                                               @RequestParam(required = false) Float max,
-                                                              @RequestParam(required = false) Map<String, String> filterSpec){
-        return ResponseEntity.ok(service.getFilteringProducts(min,max,filterSpec));
+                                                              @RequestParam(required = false) Map<String, String> filterSpec) {
+        return ResponseEntity.ok(service.getFilteringProducts(min, max, filterSpec));
+    }
+
+    @GetMapping("/filterCreatePc")
+    @Operation(summary = "pc yarat hissəsi üçün endpoint")
+    public ResponseEntity<Map<String,List<String>>>createPcFilter(@RequestParam Map<String,String> filter){
+        return ResponseEntity.ok(service.createPcFilter(filter));
     }
 
     @PostMapping
-    @Operation(summary = "Yeni məhsul əlavə etmək üçün endpoint",description = "Məlumatlar form-data olaraq göndəriləcək.Şəkil əlavə etmək mütləqdir.")
-    public ResponseEntity<Product> createProduct(@ModelAttribute ProductRequest request, @RequestParam("imageFile") List<MultipartFile> imageFiles) {
+    @Operation(summary = "Yeni məhsul əlavə etmək üçün endpoint", description = "Məlumatlar form-data olaraq göndəriləcək.Şəkil əlavə etmək mütləqdir.")
+    public ResponseEntity<Product> createProduct(@RequestPart(name = "request") ProductRequest request, @RequestParam("imageFile") List<MultipartFile> imageFiles) {
         final var createdProduct = service.addProduct(request, imageFiles);
         final var location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/{id}").build(createdProduct.getId());
         return ResponseEntity.created(location).body(createdProduct);
@@ -63,7 +70,7 @@ private final Random random = new Random();
 
     @PutMapping("/{id}")
     @Operation(summary = "Məhsulları id ilə güncəlləmək üçün endpoint")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @ModelAttribute ProductRequest request, @RequestParam(value = "imageFile") List<MultipartFile> imageFiles) throws IOException {
+    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestPart(name = "request",required = false) ProductRequest request, @RequestParam(value = "imageFile",required = false) List<MultipartFile> imageFiles) throws IOException {
         final var updatedProduct = service.updateProduct(id, request, imageFiles);
         final var location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/{id}").build(updatedProduct.getId());
         return ResponseEntity.created(location).body(updatedProduct);
@@ -76,19 +83,20 @@ private final Random random = new Random();
         return ResponseEntity.noContent().build();
 
     }
+
     @PostMapping("/recommend")
     @Operation(summary = "Komputer meslehet gormek ucun endpoint")
     public ResponseEntity<?> recommendComputer(@RequestBody RecommendProductRequest request) {
-        final var recommendedProductList= service.findRecommendedProduct(request);
+        final var recommendedProductList = service.findRecommendedProduct(request);
 
         if (!recommendedProductList.isEmpty()) {
             int randomIndex = random.nextInt(recommendedProductList.size());
-           Product recommendedProduct= recommendedProductList.get(randomIndex);
+            Product recommendedProduct = recommendedProductList.get(randomIndex);
             return ResponseEntity.status(HttpStatus.CREATED).body(recommendedProduct);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Uygun mehsul tapilmadi");
         }
 
     }
-    }
+}
 
