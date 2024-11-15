@@ -51,6 +51,7 @@ public class SecurityConfig {
     private ClientRegistration googleClientRegistration() {
         return ClientRegistration.withRegistrationId("google")
                 .clientId("523070151170-f80npg62nl1rapmi86m2f2c2efgthibi.apps.googleusercontent.com")
+                .clientSecret("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")
                 .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
                 .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
                 .redirectUri("{baseUrl}/login/oauth2/code/google")
@@ -70,8 +71,6 @@ public class SecurityConfig {
     }
 
 
-
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
          http
@@ -82,9 +81,9 @@ public class SecurityConfig {
                  )
                    .authorizeHttpRequests( auth ->
                     auth
-                            .requestMatchers("/api/v1/auth/**","/api/v1/product/**","/api/v1/user/**","/api/v1/order/**").permitAll()
-                            .requestMatchers("/api/v1/product/comment/**").authenticated()
+                            .requestMatchers("/api/v1/auth/**","/api/v1/product/**","/api/v1/order/**","/api/v1/profile/**","/api/v1/user/allUsers").permitAll()
                             .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                            .requestMatchers("/api/v1/product/comment/**").authenticated()
                             .anyRequest().authenticated()
                 )
 

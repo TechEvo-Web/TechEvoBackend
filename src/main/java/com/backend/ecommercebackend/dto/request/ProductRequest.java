@@ -1,11 +1,11 @@
 package com.backend.ecommercebackend.dto.request;
 
+import jakarta.persistence.Column;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import java.util.List;
+
 import java.util.Map;
 
 
@@ -20,5 +20,8 @@ public class ProductRequest {
     String description;
     String categoryName;
     float rating;
-    String specifications;
+    String usingPurpose;
+    String whereUse;
+    String look;
+    Map<String,Object> specifications;
 }

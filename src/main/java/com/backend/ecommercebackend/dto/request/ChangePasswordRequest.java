@@ -1,5 +1,6 @@
 package com.backend.ecommercebackend.dto.request;
 
+import jakarta.validation.constraints.Email;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,4 +25,6 @@ public class ChangePasswordRequest {
 
     @NotBlank(message = "Confirm password is required")
     String confirmPassword;
+    String email;
 }
+

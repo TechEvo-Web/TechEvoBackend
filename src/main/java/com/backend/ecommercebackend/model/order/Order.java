@@ -1,6 +1,8 @@
 package com.backend.ecommercebackend.model.order;
 
 
+import com.backend.ecommercebackend.dto.request.AddressRequest;
+import com.backend.ecommercebackend.model.user.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -18,11 +20,14 @@ public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long orderId;
-String token;
     int totalPrice;
     String deliveryType;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb", nullable = false)
     List<OrderItem> orderItems;
+    @ManyToOne(cascade = CascadeType.PERSIST,fetch = FetchType.EAGER)
+    @JoinColumn(name = "address_Id")
+    Address address;
+    String userEmail;
 
 }

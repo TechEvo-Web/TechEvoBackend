@@ -3,12 +3,10 @@ package com.backend.ecommercebackend.dto.request;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class OrderItemRequest {
-    int quantity;
-    int price;
-    Long productId;
-
+public class RecommendProductRequest {
+    String usingPurpose;
+    String whereUse;
+    String look;
 }

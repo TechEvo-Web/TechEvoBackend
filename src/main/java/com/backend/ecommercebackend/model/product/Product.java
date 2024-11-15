@@ -10,6 +10,7 @@ import org.hibernate.type.SqlTypes;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Entity
 @Data
@@ -34,7 +35,6 @@ public class Product {
     @Column(nullable = false)
     double price;
 
-    @Column(nullable = false)
     double discountPrice;
 
     @Column(nullable = false)
@@ -47,7 +47,17 @@ public class Product {
     @Column(nullable = false)
     String categoryName;
 
+    @Column(nullable = false)
+    String usingPurpose;
+
+    @Column(nullable = false)
+    String whereUse;
+
+    @Column(nullable = false)
+    String look;
+
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb", nullable = false)
-    Map<String,String> specifications=new HashMap<>();
+    Map<String,Object> specifications=new HashMap<>();
+
 }

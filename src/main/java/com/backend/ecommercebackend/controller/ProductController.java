@@ -1,27 +1,22 @@
 package com.backend.ecommercebackend.controller;
 
 import com.backend.ecommercebackend.dto.request.ProductRequest;
-import com.backend.ecommercebackend.dto.response.ProductResponse;
+import com.backend.ecommercebackend.dto.request.RecommendProductRequest;
 import com.backend.ecommercebackend.model.product.Product;
 import com.backend.ecommercebackend.service.ProductService;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Random;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
@@ -30,22 +25,23 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public class ProductController {
 
     private final ProductService service;
+    private final Random random = new Random();
 
     @GetMapping("/getAll")
     @Operation(summary = "Bütün məhsulları almaq üçün endpoint")
-    public ResponseEntity<List<ProductResponse>> getAllProducts() {
+    public ResponseEntity<List<Product>> getAllProducts() {
         return ResponseEntity.ok(service.getAllProduct());
     }
 
     @GetMapping("/getAllByCategoryName")
     @Operation(summary = "Məhsulları kateqoriya adı ilə almaq üçün endpoint")
-    public ResponseEntity<List<ProductResponse>> getProductsByCategory(@RequestParam String categoryName) {
+    public ResponseEntity<List<Product>> getProductsByCategory(@RequestParam String categoryName) {
         return ResponseEntity.ok(service.getProductsByCategoryName(categoryName));
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Hər hansı məhsulu id ilə almaq üçün endpoint")
-    public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
+    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
         return ResponseEntity.ok(service.getProductById(id));
     }
 
@@ -54,13 +50,19 @@ public class ProductController {
             description = "Bu endpointə min,max,və xüsusi kateqoriyaya görə gələn spesifikasiya adlarını param ilə göndərərək bu filterlərə uyğun məhsulları ala bilərik.")
     public ResponseEntity<List<Product>> getFilteringProducts(@RequestParam(required = false) Float min,
                                                               @RequestParam(required = false) Float max,
-                                                              @RequestParam(required = false) Map<String, String> filterSpec){
-        return ResponseEntity.ok(service.getFilteringProducts(min,max,filterSpec));
+                                                              @RequestParam(required = false) Map<String, String> filterSpec) {
+        return ResponseEntity.ok(service.getFilteringProducts(min, max, filterSpec));
+    }
+
+    @GetMapping("/filterCreatePc")
+    @Operation(summary = "pc yarat hissəsi üçün endpoint")
+    public ResponseEntity<Map<String,Map<String,Object>>>createPcFilter(@RequestParam Map<String,String> filter){
+        return ResponseEntity.ok(service.createPcFilter(filter));
     }
 
     @PostMapping
-    @Operation(summary = "Yeni məhsul əlavə etmək üçün endpoint",description = "Məlumatlar form-data olaraq göndəriləcək.Şəkil əlavə etmək mütləqdir.")
-    public ResponseEntity<ProductResponse> createProduct(@ModelAttribute ProductRequest request, @RequestParam("imageFile") List<MultipartFile> imageFiles) {
+    @Operation(summary = "Yeni məhsul əlavə etmək üçün endpoint", description = "Məlumatlar form-data olaraq göndəriləcək.Şəkil əlavə etmək mütləqdir.")
+    public ResponseEntity<Product> createProduct(@RequestPart(name = "request") ProductRequest request, @RequestParam("imageFile") List<MultipartFile> imageFiles) {
         final var createdProduct = service.addProduct(request, imageFiles);
         final var location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/{id}").build(createdProduct.getId());
         return ResponseEntity.created(location).body(createdProduct);
@@ -68,7 +70,7 @@ public class ProductController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Məhsulları id ilə güncəlləmək üçün endpoint")
-    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id, @ModelAttribute ProductRequest request, @RequestParam(value = "imageFile") List<MultipartFile> imageFiles) throws IOException {
+    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestPart(name = "request",required = false) ProductRequest request, @RequestParam(value = "imageFile",required = false) List<MultipartFile> imageFiles) throws IOException {
         final var updatedProduct = service.updateProduct(id, request, imageFiles);
         final var location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/{id}").build(updatedProduct.getId());
         return ResponseEntity.created(location).body(updatedProduct);
@@ -81,4 +83,20 @@ public class ProductController {
         return ResponseEntity.noContent().build();
 
     }
+
+    @PostMapping("/recommend")
+    @Operation(summary = "Komputer meslehet gormek ucun endpoint")
+    public ResponseEntity<?> recommendComputer(@RequestBody RecommendProductRequest request) {
+        final var recommendedProductList = service.findRecommendedProduct(request);
+
+        if (!recommendedProductList.isEmpty()) {
+            int randomIndex = random.nextInt(recommendedProductList.size());
+            Product recommendedProduct = recommendedProductList.get(randomIndex);
+            return ResponseEntity.status(HttpStatus.CREATED).body(recommendedProduct);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Uygun mehsul tapilmadi");
+        }
+
+    }
 }
+

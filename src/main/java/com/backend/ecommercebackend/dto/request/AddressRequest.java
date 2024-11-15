@@ -5,13 +5,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
-
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ProductSpecificationRequest {
-     int categoryId;
-     String specificationType;
-     String specificationName;
-     Boolean isFilterSpecification;
+public class AddressRequest {
+    String street;
+    String city;
+    String building;
+    String area;
 }
