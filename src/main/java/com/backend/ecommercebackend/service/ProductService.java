@@ -14,6 +14,6 @@ public interface ProductService {
      List<Product> getAllProducts();
      Product updateProduct(Long id, ProductRequest request, List<MultipartFile> imageFile) throws IOException;
      void deleteProduct(Long id);
-     List<Product> getFilteringProducts(Float min, Float max, Map<String, String> filterSpec);
+     List<Product> getFilteringProducts(Float min, Float max, Map<String, String> filterSpec,String categoryName);
      Map<String, Map<String, Object>> createPcFilter(Map<String, String> filter);
 }

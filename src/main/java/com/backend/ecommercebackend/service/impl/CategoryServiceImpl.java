@@ -69,7 +69,6 @@ public class CategoryServiceImpl implements CategoryService {
         for (Product product : products) {
             for (String filterName : filterNames) {
                 objectTypeSpecifications = specificationRepository.findBySpecificationName(filterName);
-                System.out.println(objectTypeSpecifications);
                 if (objectTypeSpecifications.contains("Object")) {
                     Object filterObjectValue = product.getSpecifications().get(filterName);
                     if (filterObjectValue instanceof Map) {
@@ -81,7 +80,6 @@ public class CategoryServiceImpl implements CategoryService {
                 else {
                     Object filterValue = product.getSpecifications().get(filterName);
                     if (filterValue != null) {
-//                        filters.get(filterName).add(filterValue);
                         filters.computeIfAbsent(filterName, k->new HashSet<>()).add(filterValue);
 
                     }

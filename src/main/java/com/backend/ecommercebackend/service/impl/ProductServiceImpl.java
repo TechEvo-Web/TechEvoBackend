@@ -93,11 +93,17 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> getFilteringProducts(Float min, Float max, Map<String, String> filterSpec) {
+    public List<Product> getFilteringProducts(Float min, Float max,Map<String, String> filterSpec,String categoryName) {
         List<Product> result = new ArrayList<>();
-        List<Product> allProducts = repository.findAll();
+        List<Product> allProducts;
         List<Product> filter = new ArrayList<>();
         List<String> objectTypeSpecifications = new ArrayList<>();
+        if(categoryName!=null){
+           allProducts=repository.findByCategoryName(categoryName);
+        }
+        else{
+            allProducts = repository.findAll();
+        }
         if (min != null && max != null) {
             result = allProducts.stream().filter(item -> item.getPrice() >= min && item.getPrice() < max).toList();
         } else {
