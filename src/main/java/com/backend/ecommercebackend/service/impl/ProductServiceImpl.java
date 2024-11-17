@@ -44,14 +44,13 @@ public class ProductServiceImpl implements ProductService {
         Product product = repository.findById(id).orElseThrow(() -> new ApplicationException(Exceptions.NOT_FOUND_EXCEPTION));
         mapper.updateProductFromProductDto(request, product);
         List<String> imageUrls = new ArrayList<>();
-        for (String imageUrl : product.getImageUrl()) {
-            if (imageUrl != null) {
+        if (imageFiles != null) {
+            for (String imageUrl : product.getImageUrl()) {
                 fileStorageService.deleteFile(imageUrl);
             }
+            product.setImageUrl(imageUrls);
+            addImage(imageFiles, product, imageUrls);
         }
-        product.setImageUrl(imageUrls);
-        addImage(imageFiles, product, imageUrls);
-
         return repository.save(product);
     }
 
