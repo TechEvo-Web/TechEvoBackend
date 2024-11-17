@@ -12,7 +12,7 @@ public interface ProductMapper {
 //  @Mapping(target = "specifications",ignore = true)
   Product ProductDtoToEntity(ProductRequest request);
 //  @Mapping(target = "specifications",ignore = true)
-  ProductResponse toProductResponse(Product product, boolean isFav);
+  ProductResponse toProductResponse(Product product);
   @Mapping(target = "specifications",ignore = true)
   Product updateProductFromProductDto(ProductRequest productRequest, @MappingTarget Product product);
 }

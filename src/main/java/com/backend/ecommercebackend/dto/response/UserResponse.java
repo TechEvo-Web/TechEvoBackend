@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,4 +21,5 @@ public class UserResponse {
     String cityName;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
+    List<Long> favoriteProductIds;
 }

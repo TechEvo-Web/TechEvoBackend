@@ -1,18 +1,13 @@
 package com.backend.ecommercebackend.service.impl;
 
 import com.backend.ecommercebackend.dto.request.ProductRequest;
-import com.backend.ecommercebackend.dto.request.RecommendProductRequest;
-import com.backend.ecommercebackend.dto.response.ProductResponse;
 import com.backend.ecommercebackend.enums.Exceptions;
 import com.backend.ecommercebackend.exception.ApplicationException;
 import com.backend.ecommercebackend.mapper.ProductMapper;
-import com.backend.ecommercebackend.model.product.Favorites;
 import com.backend.ecommercebackend.model.product.Product;
-import com.backend.ecommercebackend.model.user.User;
 import com.backend.ecommercebackend.repository.product.CommentRepository;
-import com.backend.ecommercebackend.repository.product.FavoriteRepository;
 import com.backend.ecommercebackend.repository.product.ProductRepository;
-import com.backend.ecommercebackend.repository.user.UserRepository;
+import com.backend.ecommercebackend.repository.product.SpecificationRepository;
 import com.backend.ecommercebackend.service.FileStorageService;
 import com.backend.ecommercebackend.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +28,9 @@ public class ProductServiceImpl implements ProductService {
     private final FileStorageService fileStorageService;
     private final CommentRepository commentRepository;
     private final ProductRepository productRepository;
-    private final Random random = new Random();
+    private final SpecificationRepository specificationRepository;
+
+
     @Override
     public Product addProduct(ProductRequest request, List<MultipartFile> imageFiles) {
         Product product = mapper.ProductDtoToEntity(request);
@@ -58,21 +55,6 @@ public class ProductServiceImpl implements ProductService {
         return repository.save(product);
     }
 
-    public void addImage(List<MultipartFile> imageFiles, Product product, List<String> imageUrls) {
-        for (MultipartFile imageFile : imageFiles) {
-            if (imageFile != null && !imageFile.isEmpty()) {
-                try {
-                    String url = fileStorageService.storeImages(imageFile, "productImages");
-                    imageUrls.add(url);
-                    product.setImageUrl(imageUrls);
-
-                } catch (IOException e) {
-                    throw new ApplicationException(Exceptions.IMAGE_STORAGE_EXCEPTION);
-                }
-            }
-        }
-    }
-
     @Override
     public Product getProductById(Long id) {
         return repository.findById(id).orElseThrow(() -> new ApplicationException(Exceptions.NOT_FOUND_EXCEPTION));
@@ -91,8 +73,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> getAllProduct() {
-        return repository.findAll();
+    public List<Product> getAllProducts() {
+        return productRepository.findAll();
     }
 
     @Override
@@ -214,17 +196,19 @@ public class ProductServiceImpl implements ProductService {
         return defaultParts;
     }
 
-    @Override
-    public List<Product> findRecommendedProduct(RecommendProductRequest request) {
-        String usingPurpose = request.getUsingPurpose();
-        String whereUse = request.getWhereUse();
-        String look = request.getLook();
-        List<Product> matchingProducts = repository.findAll().stream()
-                .filter(product -> usingPurpose != null && usingPurpose.trim().equalsIgnoreCase(product.getUsingPurpose().trim()))
-                .filter(product -> whereUse != null && whereUse.trim().equalsIgnoreCase(product.getWhereUse().trim()))
-                .filter(product -> look != null && look.trim().equalsIgnoreCase(product.getLook().trim()))
-                .collect(Collectors.toList());
-        return matchingProducts;
+    private void addImage(List<MultipartFile> imageFiles, Product product, List<String> imageUrls) {
+        for (MultipartFile imageFile : imageFiles) {
+            if (imageFile != null && !imageFile.isEmpty()) {
+                try {
+                    String url = fileStorageService.storeImages(imageFile, "productImages");
+                    imageUrls.add(url);
+                    product.setImageUrl(imageUrls);
+
+                } catch (IOException e) {
+                    throw new ApplicationException(Exceptions.IMAGE_STORAGE_EXCEPTION);
+                }
+            }
+        }
     }
 }
 

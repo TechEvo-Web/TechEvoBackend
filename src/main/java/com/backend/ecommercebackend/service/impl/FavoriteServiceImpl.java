@@ -70,7 +70,7 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     return favoritesList.stream()
             .map(favorite -> productRepository.findById(favorite.getProductId())
-                    .map(product -> mapper.toProductResponse(product, true))
+                    .map(mapper::toProductResponse)
                     .orElseThrow(() -> new ApplicationException(Exceptions.NOT_FOUND_EXCEPTION, "Product not found")))
             .toList();
 

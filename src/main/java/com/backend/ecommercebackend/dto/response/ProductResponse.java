@@ -21,6 +21,5 @@ public class ProductResponse {
   private float rating;
   private List<String> imageUrl;
   private String categoryName;
-  private Map<String, String> specifications;
-  private Boolean isFav;
+  private Map<String, Object> specifications;
 }

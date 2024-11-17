@@ -1,19 +1,20 @@
 package com.backend.ecommercebackend.controller;
 
 import com.backend.ecommercebackend.dto.request.ProductRequest;
-import com.backend.ecommercebackend.dto.response.ProductResponse;
 import com.backend.ecommercebackend.dto.request.RecommendProductRequest;
 import com.backend.ecommercebackend.model.product.Product;
+import com.backend.ecommercebackend.service.ProductRecommendService;
 import com.backend.ecommercebackend.service.ProductService;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Random;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -25,16 +26,17 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @RestController
 @RequestMapping("/api/v1/product")
 @RequiredArgsConstructor
+@Slf4j
 public class ProductController {
 
     private final ProductService service;
+    private final ProductRecommendService recommendService;
     private final Random random = new Random();
 
     @GetMapping("/getAll")
     @Operation(summary = "Bütün məhsulları almaq üçün endpoint")
-    public ResponseEntity<List<ProductResponse>> getAllProducts(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        return ResponseEntity.ok(service.getAllProduct(token));
+    public ResponseEntity<List<Product>> getAllProducts() {
+        return ResponseEntity.ok(service.getAllProducts());
     }
 
     @GetMapping("/getAllByCategoryName")
@@ -91,8 +93,7 @@ public class ProductController {
     @PostMapping("/recommend")
     @Operation(summary = "Komputer meslehet gormek ucun endpoint")
     public ResponseEntity<?> recommendComputer(@RequestBody RecommendProductRequest request) {
-        final var recommendedProductList = service.findRecommendedProduct(request);
-
+        final var recommendedProductList= recommendService.findRecommendedProduct(request);
         if (!recommendedProductList.isEmpty()) {
             int randomIndex = random.nextInt(recommendedProductList.size());
             Product recommendedProduct = recommendedProductList.get(randomIndex);
@@ -100,7 +101,6 @@ public class ProductController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Uygun mehsul tapilmadi");
         }
-
     }
 }
 
