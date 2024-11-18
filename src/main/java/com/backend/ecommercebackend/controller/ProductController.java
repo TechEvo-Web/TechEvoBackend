@@ -50,8 +50,10 @@ public class ProductController {
             description = "Bu endpointə min,max,və xüsusi kateqoriyaya görə gələn spesifikasiya adlarını param ilə göndərərək bu filterlərə uyğun məhsulları ala bilərik.")
     public ResponseEntity<List<Product>> getFilteringProducts(@RequestParam(required = false) Float min,
                                                               @RequestParam(required = false) Float max,
-                                                              @RequestParam(required = false) Map<String, String> filterSpec) {
-        return ResponseEntity.ok(service.getFilteringProducts(min, max, filterSpec));
+                                                              @RequestParam(required = false) Map<String, String> filterSpec,
+                                                              @RequestParam(required = false) String categoryName
+    ) {
+        return ResponseEntity.ok(service.getFilteringProducts(min, max, filterSpec,categoryName));
     }
 
     @GetMapping("/filterCreatePc")

@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/product/category")
@@ -34,7 +36,7 @@ public class CategoryController {
     @GetMapping("/getFilters")
     @Operation(summary = "Filter spesifikasiyalarını almaq üçün endpoint",
             description = "Bura param ilə kateqoriya adı göndəririk.Və geriyə kateqoriyaya özəl seçilmiş filter spesifikasiyalar və bu spesifikasiyalarin productlarda olan fərqli dəyərləri dönür.")
-    public ResponseEntity<Object> getFilters(@RequestParam String categoryName) {
+    public ResponseEntity<Map<String, Set<Object>>>getFilters(@RequestParam String categoryName) {
         return ResponseEntity.ok(service.getFiltersByCategoryName(categoryName));
     }
 

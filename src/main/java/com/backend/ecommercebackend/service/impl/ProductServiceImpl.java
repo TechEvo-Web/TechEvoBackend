@@ -43,14 +43,13 @@ public class ProductServiceImpl implements ProductService {
         Product product = repository.findById(id).orElseThrow(() -> new ApplicationException(Exceptions.NOT_FOUND_EXCEPTION));
         mapper.updateProductFromProductDto(request, product);
         List<String> imageUrls = new ArrayList<>();
-        for (String imageUrl : product.getImageUrl()) {
-            if (imageUrl != null) {
+        if (imageFiles != null) {
+            for (String imageUrl : product.getImageUrl()) {
                 fileStorageService.deleteFile(imageUrl);
             }
+            product.setImageUrl(imageUrls);
+            addImage(imageFiles, product, imageUrls);
         }
-        product.setImageUrl(imageUrls);
-        addImage(imageFiles, product, imageUrls);
-
         return repository.save(product);
     }
 
@@ -108,11 +107,17 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<Product> getFilteringProducts(Float min, Float max, Map<String, String> filterSpec) {
+    public List<Product> getFilteringProducts(Float min, Float max,Map<String, String> filterSpec,String categoryName) {
         List<Product> result = new ArrayList<>();
-        List<Product> allProducts = repository.findAll();
+        List<Product> allProducts;
         List<Product> filter = new ArrayList<>();
         List<String> objectTypeSpecifications = new ArrayList<>();
+        if(categoryName!=null){
+           allProducts=repository.findByCategoryName(categoryName);
+        }
+        else{
+            allProducts = repository.findAll();
+        }
         if (min != null && max != null) {
             result = allProducts.stream().filter(item -> item.getPrice() >= min && item.getPrice() < max).toList();
         } else {
