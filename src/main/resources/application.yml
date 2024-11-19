@@ -53,7 +53,7 @@ refresh-token:
   expiration: 2592000000
 
 access-token:
-  expiration: 600000
+  expiration: 120000
 
 verification-code:
   expiration: 300000
