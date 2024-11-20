@@ -23,6 +23,10 @@ spring:
       url: jdbc:postgresql://localhost:5436/Order
       username: ORDER
       password: 12345
+    fourth:
+        url: jdbc:postgresql://localhost:5438/Dynamic
+        username: DYNAMIC
+        password: 12345
   jpa:
     show-sql: true
     hibernate:
