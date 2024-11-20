@@ -57,7 +57,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Object getFiltersByCategoryName(String categoryName) {
+    public Map<String, Set<Object>> getFiltersByCategoryName(String categoryName) {
         List<String> filterNames = specificationService.getFilterSpecificationsByCategoryName(categoryName);
         List<Product> products = productService.getProductsByCategoryName(categoryName);
         List<String> objectTypeSpecifications = new ArrayList<>();
@@ -76,11 +76,12 @@ public class CategoryServiceImpl implements CategoryService {
                         for (String value : filterValue.keySet())
                             filters.get(filterName).add(value);
                     }
-                } else {
-                    filters.put(filterName, new HashSet<>());
+                }
+                else {
                     Object filterValue = product.getSpecifications().get(filterName);
                     if (filterValue != null) {
-                        filters.get(filterName).add(filterValue);
+                        filters.computeIfAbsent(filterName, k->new HashSet<>()).add(filterValue);
+
                     }
                 }
             }
