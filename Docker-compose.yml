@@ -33,7 +33,17 @@ services:
       - '5436:5432'
     volumes:
       - orderData:/var/lib/postgresql/data
-
+  dynamic_service:
+    container_name: dynamic
+    image: postgres
+    environment:
+      POSTGRES_USER: DYNAMIC
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: Dynamic
+    ports:
+      - '5438:5432'
+    volumes:
+      - dynamicData:/var/lib/postgresql/data
 
   redis:
     image: docker.io/bitnami/redis:7.2
@@ -51,3 +61,4 @@ volumes:
   redis_data: {}
   productDataEvo: {}
   orderData: {}
+  dynamicData: {}
