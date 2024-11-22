@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class RecommendProductRequest {
+public class SelectProductRequest {
     String usingPurpose;
     String whereUse;
     String look;

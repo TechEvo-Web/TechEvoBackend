@@ -3,30 +3,29 @@ spring:
     name: EcommerceBackend
   data:
     redis:
-      host: localhost
+      host: master.e-commerce-redis.8fiqjj.eun1.cache.amazonaws.com
       port: 6380
-      password: ecommerce-redis-p@ss
+      password: ecommerce-redis-pass
       timeout: 60000
       client-type: lettuce
 
-
   datasource:
     first:
-      url: jdbc:postgresql://localhost:5437/User
-      username: SECURITY
-      password: SECURITY
+      url: jdbc:postgresql://database-user.c3u2osgmm56j.eu-north-1.rds.amazonaws.com:5432/USER
+      username: postgres
+      password: Pexqip-vacga2-zusjiz
     second:
-      url: jdbc:postgresql://localhost:5433/EvoProduct
-      username: ROOT
-      password: 1234
+      url: jdbc:postgresql://database-product.c3u2osgmm56j.eu-north-1.rds.amazonaws.com:5433/PRODUCT
+      username: postgres
+      password: Pexqip-vacga2-zusjiz
     third:
-      url: jdbc:postgresql://localhost:5436/Order
-      username: ORDER
-      password: 12345
+      url: jdbc:postgresql://database-order.c3u2osgmm56j.eu-north-1.rds.amazonaws.com:5434/ORDER
+      username: postgres
+      password: Pexqip-vacga2-zusjiz
     fourth:
-        url: jdbc:postgresql://localhost:5438/Admin
-        username: ADMIN
-        password: 12345
+      url: jdbc:postgresql://database-admin.c3u2osgmm56j.eu-north-1.rds.amazonaws.com:5438/ADMIN
+      username: postgres
+      password: Pexqip-vacga2-zusjiz
   jpa:
     show-sql: true
     hibernate:
@@ -43,7 +42,6 @@ spring:
       mail.smtp.starttls.enable: true
       mail.debug: true
 
-
       security:
         oauth2:
           client:
@@ -57,7 +55,7 @@ refresh-token:
   expiration: 2592000000
 
 access-token:
-  expiration: 600000
+  expiration: 120000
 
 verification-code:
   expiration: 300000

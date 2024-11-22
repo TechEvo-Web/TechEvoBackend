@@ -20,10 +20,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
@@ -128,15 +128,9 @@ public class OrderServiceImpl implements OrderService {
                     "</div>";
         }
 
-
-
-
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
-
-
-
             helper.setTo("serxanbabayev614@gmail.com");
             helper.setSubject("Yeni Sifariş Bildişi");
             helper.setText(htmlContent, true);
@@ -148,8 +142,6 @@ public class OrderServiceImpl implements OrderService {
 
         return addedOrder;
     }
-
-
 
 
     @Override

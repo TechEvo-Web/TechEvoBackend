@@ -73,7 +73,6 @@ public class FavoriteServiceImpl implements FavoriteService {
                     .map(mapper::toProductResponse)
                     .orElseThrow(() -> new ApplicationException(Exceptions.NOT_FOUND_EXCEPTION, "Product not found")))
             .toList();
-
   }
 
   @Override

@@ -22,4 +22,5 @@ public class UserResponse {
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
     List<Long> favoriteProductIds;
+    Boolean hasPurchased;
 }
