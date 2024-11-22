@@ -24,8 +24,8 @@ spring:
       username: ORDER
       password: 12345
     fourth:
-        url: jdbc:postgresql://localhost:5438/Dynamic
-        username: DYNAMIC
+        url: jdbc:postgresql://localhost:5438/Admin
+        username: ADMIN
         password: 12345
   jpa:
     show-sql: true

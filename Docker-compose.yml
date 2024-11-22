@@ -33,17 +33,17 @@ services:
       - '5436:5432'
     volumes:
       - orderData:/var/lib/postgresql/data
-  dynamic_service:
-    container_name: dynamic
+  admin_service:
+    container_name: admin
     image: postgres
     environment:
-      POSTGRES_USER: DYNAMIC
+      POSTGRES_USER: ADMIN
       POSTGRES_PASSWORD: 12345
-      POSTGRES_DB: Dynamic
+      POSTGRES_DB: Admin
     ports:
       - '5438:5432'
     volumes:
-      - dynamicData:/var/lib/postgresql/data
+      - adminData:/var/lib/postgresql/data
 
   redis:
     image: docker.io/bitnami/redis:7.2
@@ -61,4 +61,4 @@ volumes:
   redis_data: {}
   productDataEvo: {}
   orderData: {}
-  dynamicData: {}
+  adminData: {}

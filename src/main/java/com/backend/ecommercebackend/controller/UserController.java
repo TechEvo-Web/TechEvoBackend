@@ -2,6 +2,8 @@ package com.backend.ecommercebackend.controller;
 
 import com.backend.ecommercebackend.dto.request.UserRequest;
 import com.backend.ecommercebackend.dto.response.UserResponse;
+import com.backend.ecommercebackend.model.admin.term.UserTerm;
+import com.backend.ecommercebackend.repository.admin.term.UserTermRepository;
 import com.backend.ecommercebackend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -50,4 +52,5 @@ public class UserController {
         service.delete(email);
         return ResponseEntity.ok("User deleted successfully.");
     }
+
 }

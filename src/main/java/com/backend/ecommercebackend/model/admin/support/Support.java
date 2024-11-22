@@ -1,9 +1,12 @@
-package com.backend.ecommercebackend.model.dynamic;
+package com.backend.ecommercebackend.model.admin.support;
+
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.List;
 
@@ -17,6 +20,7 @@ public class Support {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     int id;
     String serviceName;
-    @ElementCollection(fetch = FetchType.EAGER)
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(columnDefinition = "jsonb", nullable = false)
     List<String> serviceComponents;
 }
