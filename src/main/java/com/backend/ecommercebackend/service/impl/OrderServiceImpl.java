@@ -3,14 +3,12 @@ package com.backend.ecommercebackend.service.impl;
 
 import com.backend.ecommercebackend.authentication.jwt.JwtService;
 import com.backend.ecommercebackend.cache.service.RedisTokenService;
-import com.backend.ecommercebackend.dto.request.AddressRequest;
 import com.backend.ecommercebackend.dto.request.OrderItemRequest;
 import com.backend.ecommercebackend.dto.request.OrderRequest;
 import com.backend.ecommercebackend.model.order.Address;
 import com.backend.ecommercebackend.model.order.Order;
 import com.backend.ecommercebackend.model.order.OrderItem;
 import com.backend.ecommercebackend.model.product.Product;
-import com.backend.ecommercebackend.model.user.User;
 import com.backend.ecommercebackend.repository.order.OrderItemRepository;
 import com.backend.ecommercebackend.repository.order.OrderRepository;
 import com.backend.ecommercebackend.repository.product.ProductRepository;
@@ -19,14 +17,13 @@ import com.backend.ecommercebackend.service.OrderService;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -44,9 +41,36 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Order processOrderItems(OrderRequest orderRequest, String token) {
         String email = jwtService.extractUsername(token);
+        LocalDate now = LocalDate.now();
+        String month = "";
+       int monthValue= now.getMonthValue();
+        if (monthValue == 1) {
+            month = "Yanvar";
+        } else if (monthValue == 2) {
+            month = "Fevral";
+        } else if (monthValue == 3) {
+            month = "Mart";
+        } else if (monthValue == 4) {
+            month = "Aprel";
+        } else if (monthValue == 5) {
+            month = "May";
+        } else if (monthValue == 6) {
+            month = "İyun";
+        } else if (monthValue == 7) {
+            month = "İyul";
+        } else if (monthValue == 8) {
+            month = "Avqust";
+        } else if (monthValue == 9) {
+            month = "Sentyabr";
+        } else if (monthValue == 10) {
+            month = "Oktyabr";
+        } else if (monthValue == 11) {
+            month = "Noyabr";
+        } else if (monthValue == 12) {
+            month = "Dekabr";
+        }
 
-
-         Address address = new Address();
+        Address address = new Address();
         address.setStreet(orderRequest.getAddress().getStreet());
         address.setCity(orderRequest.getAddress().getCity());
         address.setBuilding(orderRequest.getAddress().getBuilding());
@@ -56,9 +80,11 @@ public class OrderServiceImpl implements OrderService {
         addedOrder.setDeliveryType(orderRequest.getDeliveryType());
         addedOrder.setTotalPrice(orderRequest.getTotalPrice());
         addedOrder.setAddress(address);
+        addedOrder.setDay(now.getDayOfMonth());
+        addedOrder.setMonth(month);
+        addedOrder.setYear(now.getYear());
         addedOrder.setUserEmail(email);
-
-
+        addedOrder.setOrderStatus("Sifariş Alındı");
 
         List<OrderItem> savedOrderItems = new ArrayList<>();
         for (OrderItemRequest orderItemRequest : orderRequest.getOrderItems()) {
@@ -102,15 +128,9 @@ public class OrderServiceImpl implements OrderService {
                     "</div>";
         }
 
-
-
-
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
-
-
-
             helper.setTo("serxanbabayev614@gmail.com");
             helper.setSubject("Yeni Sifariş Bildişi");
             helper.setText(htmlContent, true);
@@ -122,8 +142,6 @@ public class OrderServiceImpl implements OrderService {
 
         return addedOrder;
     }
-
-
 
 
     @Override
