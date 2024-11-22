@@ -12,9 +12,8 @@ import java.util.List;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class SupportRequest {
-    String serviceName;
+public class UserTermRequest {
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb", nullable = false)
-    List<String> serviceComponents;
+    List<String>terms;
 }

@@ -22,12 +22,12 @@ import java.util.Map;
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(
-        basePackages = "com.backend.ecommercebackend.repository.dynamic",
+        basePackages = "com.backend.ecommercebackend.repository.admin",
         entityManagerFactoryRef = "fourthEntityManagerFactory",
         transactionManagerRef = "fourthTransactionManager"
 )
 
-public class DynamicDbConfig {
+public class AdminDbConfig {
 
     @Value("${spring.datasource.fourth.url}")
     private String fourthDbUrl;
@@ -57,7 +57,7 @@ public class DynamicDbConfig {
             EntityManagerFactoryBuilder builder) {
         return builder
                 .dataSource(fourthDataSource())
-                .packages("com.backend.ecommercebackend.model.dynamic")
+                .packages("com.backend.ecommercebackend.model.admin")
                 .persistenceUnit("fourth")
                 .properties(hibernateProperties())
                 .build();
