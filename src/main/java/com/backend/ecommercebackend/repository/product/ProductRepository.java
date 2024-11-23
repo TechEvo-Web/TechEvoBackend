@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
- @Query("""
+  @Query("""
 select p from Product p where p.categoryName=:categoryName
 """)
  List<Product> findByCategoryName(String categoryName);
@@ -21,4 +21,4 @@ select p from Product p where p.categoryName=:categoryName
 select p from Product p where p.name=:name and p.categoryName=:categoryName
 """)
  Product findByNameAndAndCategoryName(String name,String categoryName);
-}
+ }

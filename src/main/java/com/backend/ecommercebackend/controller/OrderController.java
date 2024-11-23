@@ -1,5 +1,6 @@
 package com.backend.ecommercebackend.controller;
 
+import com.backend.ecommercebackend.authentication.jwt.JwtService;
 import com.backend.ecommercebackend.dto.request.OrderRequest;
 import com.backend.ecommercebackend.model.order.Order;
 import com.backend.ecommercebackend.model.product.Product;
@@ -22,6 +23,7 @@ public class OrderController {
     private final OrderRepository orderRepository;
 
     private final OrderItemRepository orderItemRepository;
+    private final JwtService jwtService;
 
     @PostMapping
     @Operation(summary = "İstifadəçinin sifarişlərini əlavə etmək üçün endpoint")
@@ -50,6 +52,22 @@ public class OrderController {
     public List<Order> getOrders(@RequestHeader("Authorization") String token) {
         token = token.substring(7);
         return orderService.getOrdersByToken(token);
+    }
+    @GetMapping("/{orderId}")
+    @Operation(summary = "Order'ı id'ye göre tapmaq ucun endpoint")
+    public ResponseEntity<?> getOrder(@PathVariable Long orderId, @RequestHeader("Authorization") String token) {
+        token = token.substring(7);
+        String userEmail = jwtService.extractUsername(token);
+
+        return orderRepository.findById(orderId)
+                .map(order -> {
+                    if (order.getUserEmail().equals(userEmail)) {
+                         return ResponseEntity.ok(order);
+                    } else {
+                         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+                    }
+                })
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/orderItem/delete/{orderItemId}")
