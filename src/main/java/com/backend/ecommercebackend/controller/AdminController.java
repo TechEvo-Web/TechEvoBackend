@@ -1,14 +1,18 @@
 package com.backend.ecommercebackend.controller;
 
-import com.backend.ecommercebackend.dto.request.SupportRequest;
-import com.backend.ecommercebackend.dto.request.SupportStepRequest;
-import com.backend.ecommercebackend.dto.request.UserTermRequest;
+import com.backend.ecommercebackend.dto.request.*;
+import com.backend.ecommercebackend.model.admin.doortodoor.DoorToDoor;
+import com.backend.ecommercebackend.model.admin.doortodoor.DoorToDoorStep;
 import com.backend.ecommercebackend.model.admin.support.Support;
 import com.backend.ecommercebackend.model.admin.support.SupportStep;
 import com.backend.ecommercebackend.model.admin.term.UserTerm;
+import com.backend.ecommercebackend.repository.admin.doortodoor.DoorToDoorRepository;
+import com.backend.ecommercebackend.repository.admin.doortodoor.DoorToDoorStepRepository;
 import com.backend.ecommercebackend.repository.admin.support.SupportRepository;
 import com.backend.ecommercebackend.repository.admin.support.SupportStepRepository;
 import com.backend.ecommercebackend.repository.admin.term.UserTermRepository;
+import com.backend.ecommercebackend.service.DoorToDoorService;
+import com.backend.ecommercebackend.service.DoorToDoorStepService;
 import com.backend.ecommercebackend.service.SupportService;
 import com.backend.ecommercebackend.service.UserTermService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,7 +20,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,13 +37,10 @@ public class AdminController {
     private final SupportStepRepository supportStepRepository;
 private final UserTermService userTermService;
     private final UserTermRepository userTermRepository;
-
-    @PostMapping("/support")
-    @Operation(summary = "Xidmetleri elave etmek ucun endpoint")
-    public ResponseEntity<Support> addSupport(@RequestBody SupportRequest supportRequest) {
-        Support createdSupport = supportService.addSupport(supportRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdSupport);
-    }
+    private final DoorToDoorStepService doorToDoorStepService;
+    private final DoorToDoorStepRepository doorToDoorStepRepository;
+    private final DoorToDoorService doorToDoorService;
+    private final DoorToDoorRepository doorToDoorRepository;
 
     @DeleteMapping("/support/{id}")
     @Operation(summary = "Xidmetleri idye gore silmek ucun endpoint")
@@ -45,26 +48,73 @@ private final UserTermService userTermService;
         supportRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+    @DeleteMapping("/supportStep/{id}")
+    @Operation(summary = "Xidmetler merhelelerini idye gore silmek ucun endpoint")
+    public ResponseEntity<SupportStep> deleteSupportStep(@PathVariable int id) {
+        supportStepRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+    @DeleteMapping("/doorStep/{id}")
+    @Operation(summary = "Xidmetler merhelelerini idye gore silmek ucun endpoint (Qapidan qapiya)")
+    public ResponseEntity<DoorToDoorStep> deleteDoorToDoorStep(@PathVariable int id) {
+        doorToDoorStepRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+    @DeleteMapping("/door/{id}")
+    @Operation(summary = "Faydalari idye gore silmek ucun endpoint")
+    public ResponseEntity<Support> deleteDoorToDoor(@PathVariable int id) {
+        doorToDoorRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
 
+    @PostMapping("/support")
+    @Operation(summary = "Xidmetleri elave etmek ucun endpoint")
+    public ResponseEntity<Support> addSupport(@RequestBody SupportRequest supportRequest) {
+        Support createdSupport = supportService.addSupport(supportRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdSupport);
+    }
+    @PostMapping("/supportStep")
+    @Operation(summary = "Xidmet merhelelerini elave etmek ucun endpoint")
+    public ResponseEntity<?> addSupportSteps(@RequestBody SupportStepRequest supportStepRequest) {
+        if (supportStepRepository.existsByStepOrder(supportStepRequest.getStepOrder())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bu sıra doludur");
+        }
+
+        SupportStep createdSupportStep = supportService.addSupportStep(supportStepRequest);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdSupportStep);
+    }
+    @PostMapping("/term")
+    @Operation(summary = "Terms/Policy elave edib deyismek ucun")
+
+    public ResponseEntity<UserTerm> addTerm(@RequestBody UserTermRequest userTermRequest){
+        UserTerm userTerm = userTermService.addTerm(userTermRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userTerm);
+    }
+    @PostMapping("/doorStep")
+    @Operation(summary = "Xidmetleri merhelelerini etmek ucun endpoint(Qapidan qapiya)")
+    public ResponseEntity<?> addDoorStep(@RequestBody DoorToDoorStepRequest doorToDoorStepRequest) {
+        if (doorToDoorStepRepository.existsByStepOrder(doorToDoorStepRequest.getStepOrder())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bu sıra doludur");
+        }
+
+        DoorToDoorStep createdDoorToDoorStep = doorToDoorStepService.addDoorToDoorStep(doorToDoorStepRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdDoorToDoorStep);
+    }
+
+    @PostMapping("/door")
+    @Operation(summary = "Faydalari elave etmek ucun endpoint")
+
+    public DoorToDoor addDoor( @RequestPart("doorToDoorRequest") DoorToDoorRequest doorToDoorRequest,
+                               @RequestPart("file") MultipartFile multipartFile){
+        return doorToDoorService.addDoorToDoor(doorToDoorRequest, multipartFile);
+    }
     @PutMapping("/support/{id}")
     @Operation(summary = "Xidmetleri idye gore update etmek ucun endpoint")
     public ResponseEntity<Support> updateSupport(@PathVariable int id, @RequestBody SupportRequest supportRequest) {
         Support updatedSupport = supportService.updateSupport(id, supportRequest);
         return ResponseEntity.ok(updatedSupport);
     }
-
-    @PostMapping("/supportStep")
-    @Operation(summary = "Xidmet merhelelerini elave etmek ucun endpoint")
-    public ResponseEntity<?> addSupportSteps(@RequestBody SupportStepRequest supportStepRequest) {
-         if (supportStepRepository.existsByStepOrder(supportStepRequest.getStepOrder())) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bu sıra doludur");
-        }
-
-         SupportStep createdSupportStep = supportService.addSupportStep(supportStepRequest);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdSupportStep);
-    }
-
 
     @PutMapping("/supportStep/{id}")
     @Operation(summary = "Xidmet merhelelerini idye gore update etmek ucun endpoint")
@@ -84,14 +134,39 @@ private final UserTermService userTermService;
 
         return ResponseEntity.status(HttpStatus.OK).body(updatedSupportStep);
     }
-@PostMapping("/term")
-    public ResponseEntity<UserTerm> addTerm(@RequestBody UserTermRequest userTermRequest){
-     UserTerm userTerm = userTermService.addTerm(userTermRequest);
-     return ResponseEntity.status(HttpStatus.CREATED).body(userTerm);
-}
+    @PutMapping("/doorStep/{id}")
+    @Operation(summary = "Xidmet merhelelerini idye gore update etmek ucun endpoint (Qapidan qapiya)")
+    public ResponseEntity<?> updateDoorToDoorStep(
+            @PathVariable int id,
+            @RequestBody DoorToDoorStepRequest doorToDoorStepRequest) {
+        try {
+            DoorToDoorStep updatedStep = doorToDoorStepService.updateDoorToDoorStep(id, doorToDoorStepRequest);
+            return ResponseEntity.ok(updatedStep); // Başarılı yanıt
+        } catch (IllegalArgumentException e) {
+            // stepOrder doluysa hata döndür
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (RuntimeException e) {
+            // Eğer kayıt bulunamazsa hata döndür
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+    @PutMapping("/door/{id}")
+    @Operation(summary = "Faydalari idye gore update etmek ucun endpoint")
+    public DoorToDoor updateDoor(
+            @PathVariable int id,
+            @RequestPart("doorToDoorRequest") DoorToDoorRequest doorToDoorRequest,
+            @RequestPart(value = "file", required = false) MultipartFile multipartFile) throws IOException, IOException {
+        return doorToDoorService.updateDoorToDoor(id, doorToDoorRequest, multipartFile);
+    }
     @GetMapping("/terms")
+    @Operation(summary = "Qanunlari deyisdirmek ucun endpoint")
+
     public List<UserTerm> getUserTerm(){
         return userTermRepository.findAll();
     }
+
+
+
+
 }
 
