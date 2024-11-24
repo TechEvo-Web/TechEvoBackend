@@ -7,7 +7,7 @@ import lombok.experimental.FieldDefaults;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DoorToDoorRequest {
-    String doorName;
-    String doorDescription;
+    String benefitName;
+
 
 }

@@ -13,7 +13,6 @@ public class DoorToDoor {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     int id;
-    String doorName;
-    String doorDescription;
-    String doorImage="";
+    String benefitName;
+    String benefitImage="";
 }

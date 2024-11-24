@@ -32,9 +32,9 @@ public class DoorToDoorServiceImpl implements DoorToDoorService {
         }
 
         DoorToDoor doorToDoor = new DoorToDoor();
-        doorToDoor.setDoorName(doorToDoorRequest.getDoorName());
-        doorToDoor.setDoorDescription(doorToDoorRequest.getDoorDescription());
-        doorToDoor.setDoorImage(url);
+        doorToDoor.setBenefitName(doorToDoorRequest.getBenefitName());
+
+        doorToDoor.setBenefitImage(url);
         return doorToDoorRepository.save(doorToDoor);
     }
     @Override
@@ -48,11 +48,10 @@ public class DoorToDoorServiceImpl implements DoorToDoorService {
 
         if (multipartFile != null && !multipartFile.isEmpty()) {
             String newUrl = storageService.storeImages(multipartFile, "profileImages");
-            existingDoorToDoor.setDoorImage(newUrl);
+            existingDoorToDoor.setBenefitImage(newUrl);
         }
 
-        existingDoorToDoor.setDoorName(doorToDoorRequest.getDoorName());
-        existingDoorToDoor.setDoorDescription(doorToDoorRequest.getDoorDescription());
+        existingDoorToDoor.setBenefitName(doorToDoorRequest.getBenefitName());
 
         return doorToDoorRepository.save(existingDoorToDoor);
     }
