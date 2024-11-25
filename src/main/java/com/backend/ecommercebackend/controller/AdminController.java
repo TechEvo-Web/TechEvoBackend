@@ -1,20 +1,19 @@
 package com.backend.ecommercebackend.controller;
 
 import com.backend.ecommercebackend.dto.request.*;
+import com.backend.ecommercebackend.model.admin.credit.CreditCard;
 import com.backend.ecommercebackend.model.admin.doortodoor.DoorToDoor;
 import com.backend.ecommercebackend.model.admin.doortodoor.DoorToDoorStep;
 import com.backend.ecommercebackend.model.admin.support.Support;
 import com.backend.ecommercebackend.model.admin.support.SupportStep;
 import com.backend.ecommercebackend.model.admin.term.UserTerm;
+import com.backend.ecommercebackend.repository.admin.credit.CreditCardRepository;
 import com.backend.ecommercebackend.repository.admin.doortodoor.DoorToDoorRepository;
 import com.backend.ecommercebackend.repository.admin.doortodoor.DoorToDoorStepRepository;
 import com.backend.ecommercebackend.repository.admin.support.SupportRepository;
 import com.backend.ecommercebackend.repository.admin.support.SupportStepRepository;
 import com.backend.ecommercebackend.repository.admin.term.UserTermRepository;
-import com.backend.ecommercebackend.service.DoorToDoorService;
-import com.backend.ecommercebackend.service.DoorToDoorStepService;
-import com.backend.ecommercebackend.service.SupportService;
-import com.backend.ecommercebackend.service.UserTermService;
+import com.backend.ecommercebackend.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -41,6 +40,8 @@ private final UserTermService userTermService;
     private final DoorToDoorStepRepository doorToDoorStepRepository;
     private final DoorToDoorService doorToDoorService;
     private final DoorToDoorRepository doorToDoorRepository;
+    private final CreditCardService creditCardService;
+    private final CreditCardRepository creditCardRepository;
 
     @DeleteMapping("/support/{id}")
     @Operation(summary = "Xidmetleri idye gore silmek ucun endpoint")
@@ -52,6 +53,12 @@ private final UserTermService userTermService;
     @Operation(summary = "Xidmetler merhelelerini idye gore silmek ucun endpoint")
     public ResponseEntity<SupportStep> deleteSupportStep(@PathVariable int id) {
         supportStepRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+    @DeleteMapping("/credit/{id}")
+    @Operation(summary = "Xidmetler merhelelerini idye gore silmek ucun endpoint")
+    public ResponseEntity<SupportStep> deleteCreditCard(@PathVariable int id) {
+        creditCardRepository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
     @DeleteMapping("/doorStep/{id}")
@@ -109,6 +116,13 @@ private final UserTermService userTermService;
                                @RequestPart("file") MultipartFile multipartFile){
         return doorToDoorService.addDoorToDoor(doorToDoorRequest, multipartFile);
     }
+    @PostMapping("/credit")
+    @Operation(summary = "Kredit kartlarini elave etmek ucun endpoint")
+
+    public CreditCard addCredit(@RequestPart("creditCardRequest") CreditCardRequest creditCardRequest,
+                                @RequestPart("file") MultipartFile multipartFile){
+        return creditCardService.addCreditCard(creditCardRequest, multipartFile);
+    }
     @PutMapping("/support/{id}")
     @Operation(summary = "Xidmetleri idye gore update etmek ucun endpoint")
     public ResponseEntity<Support> updateSupport(@PathVariable int id, @RequestBody SupportRequest supportRequest) {
@@ -157,6 +171,14 @@ private final UserTermService userTermService;
             @RequestPart("doorToDoorRequest") DoorToDoorRequest doorToDoorRequest,
             @RequestPart(value = "file", required = false) MultipartFile multipartFile) throws IOException, IOException {
         return doorToDoorService.updateDoorToDoor(id, doorToDoorRequest, multipartFile);
+    }
+    @PutMapping("/credit/{id}")
+    @Operation(summary = "Kredit kartlarini idye gore update etmek ucun endpoint")
+    public CreditCard updateCreditCard(
+            @PathVariable int id,
+            @RequestPart("creditCardRequest") CreditCardRequest creditCardRequest,
+            @RequestPart(value = "file", required = false) MultipartFile multipartFile) throws IOException, IOException {
+        return creditCardService.updateCreditCard(id, creditCardRequest, multipartFile);
     }
     @GetMapping("/terms")
     @Operation(summary = "Qanunlari deyisdirmek ucun endpoint")

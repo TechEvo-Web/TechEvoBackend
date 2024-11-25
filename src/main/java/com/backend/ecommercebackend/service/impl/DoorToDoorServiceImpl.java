@@ -26,7 +26,7 @@ public class DoorToDoorServiceImpl implements DoorToDoorService {
 
         String url;
         try {
-            url = storageService.storeImages(multipartFile, "profileImages");
+            url = storageService.storeImages(multipartFile, "benefitİmages");
         } catch (IOException e) {
             throw new RuntimeException("Failed to store file: " + e.getMessage(), e);
         }
@@ -47,7 +47,7 @@ public class DoorToDoorServiceImpl implements DoorToDoorService {
         DoorToDoor existingDoorToDoor = existingDoorToDoorOpt.get();
 
         if (multipartFile != null && !multipartFile.isEmpty()) {
-            String newUrl = storageService.storeImages(multipartFile, "profileImages");
+            String newUrl = storageService.storeImages(multipartFile, "benefitİmages");
             existingDoorToDoor.setBenefitImage(newUrl);
         }
 
