@@ -21,9 +21,9 @@ import java.util.List;
 public class OrderController {
     private final OrderService orderService;
     private final OrderRepository orderRepository;
-
     private final OrderItemRepository orderItemRepository;
     private final JwtService jwtService;
+
 
     @PostMapping
     @Operation(summary = "İstifadəçinin sifarişlərini əlavə etmək üçün endpoint")
@@ -47,6 +47,7 @@ public class OrderController {
         orderService.getProductIdFromOrderItemId(orderItemId);
         return orderService.getProductIdFromOrderItemId(orderItemId);
     }
+
     @GetMapping()
     @Operation(summary = "Token gondererek userin Orderlarini qaytarmaq ucun endpoint")
     public List<Order> getOrders(@RequestHeader("Authorization") String token) {

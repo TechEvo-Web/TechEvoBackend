@@ -20,12 +20,15 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class UserController {
+
     private final UserService service;
 
     @GetMapping
-    public ResponseEntity<UserResponse> getUser(@AuthenticationPrincipal UserDetails user) {
-        return ResponseEntity.ok(service.getUser(user)) ;
+    @Operation(summary = "Spesifik istifadəçi info-su almaq üçün endpoint. Ichinde fav product Ids saxlanilir.")
+    public ResponseEntity<UserResponse> getUser(@AuthenticationPrincipal UserDetails userDetails) {
+        return ResponseEntity.ok(service.getUser(userDetails));
     }
+
     @GetMapping("/allUsers")
     @Operation(summary = "Bütün istifadəçiləri almaq üçün endpoint")
     public List<UserResponse> getAllUsers() {
@@ -46,6 +49,7 @@ public class UserController {
         service.deleteUserById(id);
         return ResponseEntity.noContent().build();
     }
+
     @DeleteMapping("/{email}")
     @Operation(summary = "İstifadəçi məlumatlarini email ilə silmək üçün endpoint")
     public ResponseEntity<String> deleteUser(@PathVariable String email) {
