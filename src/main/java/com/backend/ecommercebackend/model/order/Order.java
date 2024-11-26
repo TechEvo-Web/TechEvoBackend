@@ -29,7 +29,7 @@ public class Order {
     @JoinColumn(name = "address_Id")
     Address address;
     String userEmail;
-    String orderStatus;
+    Statuses orderStatus;
     int day;
     String month;
     int year;

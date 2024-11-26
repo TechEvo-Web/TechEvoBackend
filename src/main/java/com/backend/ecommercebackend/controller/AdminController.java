@@ -2,14 +2,22 @@ package com.backend.ecommercebackend.controller;
 
 import com.backend.ecommercebackend.dto.request.*;
 import com.backend.ecommercebackend.model.admin.credit.CreditCard;
+import com.backend.ecommercebackend.model.admin.credit.Header1;
+import com.backend.ecommercebackend.model.admin.credit.Header2;
+import com.backend.ecommercebackend.model.admin.doortodoor.DoorHeader;
 import com.backend.ecommercebackend.model.admin.doortodoor.DoorToDoor;
 import com.backend.ecommercebackend.model.admin.doortodoor.DoorToDoorStep;
 import com.backend.ecommercebackend.model.admin.support.Support;
+import com.backend.ecommercebackend.model.admin.support.SupportHeader;
 import com.backend.ecommercebackend.model.admin.support.SupportStep;
 import com.backend.ecommercebackend.model.admin.term.UserTerm;
+import com.backend.ecommercebackend.model.order.Statuses;
 import com.backend.ecommercebackend.repository.admin.credit.CreditCardRepository;
+import com.backend.ecommercebackend.repository.admin.credit.Header1Repository;
+import com.backend.ecommercebackend.repository.admin.doortodoor.DoorHeaderRepository;
 import com.backend.ecommercebackend.repository.admin.doortodoor.DoorToDoorRepository;
 import com.backend.ecommercebackend.repository.admin.doortodoor.DoorToDoorStepRepository;
+import com.backend.ecommercebackend.repository.admin.support.SupportHeaderRepository;
 import com.backend.ecommercebackend.repository.admin.support.SupportRepository;
 import com.backend.ecommercebackend.repository.admin.support.SupportStepRepository;
 import com.backend.ecommercebackend.repository.admin.term.UserTermRepository;
@@ -42,6 +50,10 @@ private final UserTermService userTermService;
     private final DoorToDoorRepository doorToDoorRepository;
     private final CreditCardService creditCardService;
     private final CreditCardRepository creditCardRepository;
+    private final DoorHeaderRepository doorHeaderRepository;
+    private final SupportHeaderRepository supportHeaderRepository;
+    private final Header1Repository header1Repository;
+    private final OrderService orderService;
 
     @DeleteMapping("/support/{id}")
     @Operation(summary = "Xidmetleri idye gore silmek ucun endpoint")
@@ -97,6 +109,38 @@ private final UserTermService userTermService;
     public ResponseEntity<UserTerm> addTerm(@RequestBody UserTermRequest userTermRequest){
         UserTerm userTerm = userTermService.addTerm(userTermRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(userTerm);
+    }
+    @PostMapping("/doorHeader")
+    @Operation(summary = "Catdirilma Header elave edib deyismek ucun(Qapidan qapiya)")
+    public ResponseEntity<DoorHeader> addDoorHeader(@RequestBody DoorHeaderRequest doorHeaderRequest){
+        doorHeaderRepository.deleteAll();
+
+        DoorHeader doorHeader = doorToDoorService.addHeader(doorHeaderRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(doorHeader);
+    }
+    @PostMapping("/supportHeader")
+    @Operation(summary = "Xidmet sehifesine Header elave edib deyismek ucun")
+    public ResponseEntity<SupportHeader> addDoorHeader(@RequestBody SupportHeaderRequest supportHeaderRequest){
+        supportHeaderRepository.deleteAll();
+
+        SupportHeader supportHeader = supportService.addHeader(supportHeaderRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(supportHeader);
+    }
+    @PostMapping("/cardHeader1")
+    @Operation(summary = "Xidmet sehifesine Header elave edib deyismek ucun")
+    public ResponseEntity<Header1> addHeader1(@RequestBody Header1Request header1Request){
+        header1Repository.deleteAll();
+
+        Header1 header1 = creditCardService.addHeader1(header1Request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(header1);
+    }
+    @PostMapping("/cardHeader2")
+    @Operation(summary = "Xidmet sehifesine Header 2 elave edib deyismek ucun")
+    public ResponseEntity<Header2> addHeader2(@RequestBody Header2Request header2Request){
+        header1Repository.deleteAll();
+
+        Header2 header2 = creditCardService.addHeader2(header2Request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(header2);
     }
     @PostMapping("/doorStep")
     @Operation(summary = "Xidmetleri merhelelerini etmek ucun endpoint(Qapidan qapiya)")
@@ -180,11 +224,19 @@ private final UserTermService userTermService;
             @RequestPart(value = "file", required = false) MultipartFile multipartFile) throws IOException, IOException {
         return creditCardService.updateCreditCard(id, creditCardRequest, multipartFile);
     }
-    @GetMapping("/terms")
-    @Operation(summary = "Qanunlari deyisdirmek ucun endpoint")
-
-    public List<UserTerm> getUserTerm(){
-        return userTermRepository.findAll();
+    @PutMapping("/order/{orderId}/status")
+    @Operation(summary = "İstifadəçinin sifarişlərinin statusunu update etmək üçün endpoint")
+    public ResponseEntity<String> updateOrderStatus(
+            @PathVariable Long orderId,
+            @RequestParam Statuses status) {
+        try {
+            orderService.updateOrderStatus(orderId, status);
+            return ResponseEntity.ok("Order status updated successfully.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(500).body("An unexpected error occurred.");
+        }
     }
 
 

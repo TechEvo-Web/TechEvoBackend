@@ -8,6 +8,7 @@ import com.backend.ecommercebackend.dto.request.OrderRequest;
 import com.backend.ecommercebackend.model.order.Address;
 import com.backend.ecommercebackend.model.order.Order;
 import com.backend.ecommercebackend.model.order.OrderItem;
+import com.backend.ecommercebackend.model.order.Statuses;
 import com.backend.ecommercebackend.model.product.Product;
 import com.backend.ecommercebackend.repository.order.OrderItemRepository;
 import com.backend.ecommercebackend.repository.order.OrderRepository;
@@ -59,7 +60,7 @@ public class OrderServiceImpl implements OrderService {
         addedOrder.setMonth(month);
         addedOrder.setYear(now.getYear());
         addedOrder.setUserEmail(email);
-        addedOrder.setOrderStatus("Sifariş Alındı");
+        addedOrder.setOrderStatus(Statuses.Gözləyir);
 
         List<OrderItem> savedOrderItems = new ArrayList<>();
         for (OrderItemRequest orderItemRequest : orderRequest.getOrderItems()) {
@@ -201,6 +202,17 @@ public class OrderServiceImpl implements OrderService {
         String email = jwtService.extractUsername(token);
         List<Order> orders=orderRepository.findByUserEmail(email);
         return orders;
+    }
+    public void updateOrderStatus(Long orderId, Statuses status) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
+
+        if (status != Statuses.Çatdırılıb && status != Statuses.İmtina) {
+            throw new IllegalArgumentException("Invalid status change. Only Çatdırılıb or İmtina are allowed.");
+        }
+
+        order.setOrderStatus(status);
+        orderRepository.save(order);
     }
 }
 

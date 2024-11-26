@@ -3,6 +3,7 @@ package com.backend.ecommercebackend.service;
 import com.backend.ecommercebackend.dto.request.OrderRequest;
 import com.backend.ecommercebackend.model.order.Order;
 import com.backend.ecommercebackend.model.order.OrderItem;
+import com.backend.ecommercebackend.model.order.Statuses;
 import com.backend.ecommercebackend.model.product.Product;
 import org.mapstruct.Mapper;
 
@@ -12,4 +13,5 @@ public interface OrderService {
     Order processOrderItems(OrderRequest orderRequest,String token);
     Product getProductIdFromOrderItemId(Long orderItemId);
     List<Order> getOrdersByToken(String token);
+    public void updateOrderStatus(Long orderId, Statuses status);
 }

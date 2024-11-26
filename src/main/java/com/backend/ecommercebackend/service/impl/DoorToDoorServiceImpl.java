@@ -1,7 +1,12 @@
 package com.backend.ecommercebackend.service.impl;
 
+import com.backend.ecommercebackend.dto.request.DoorHeaderRequest;
 import com.backend.ecommercebackend.dto.request.DoorToDoorRequest;
+import com.backend.ecommercebackend.dto.request.UserTermRequest;
+import com.backend.ecommercebackend.model.admin.doortodoor.DoorHeader;
 import com.backend.ecommercebackend.model.admin.doortodoor.DoorToDoor;
+import com.backend.ecommercebackend.model.admin.term.UserTerm;
+import com.backend.ecommercebackend.repository.admin.doortodoor.DoorHeaderRepository;
 import com.backend.ecommercebackend.repository.admin.doortodoor.DoorToDoorRepository;
 import com.backend.ecommercebackend.service.DoorToDoorService;
 import com.backend.ecommercebackend.service.FileStorageService;
@@ -17,6 +22,7 @@ import java.util.Optional;
 public class DoorToDoorServiceImpl implements DoorToDoorService {
     private final FileStorageService storageService;
     private final DoorToDoorRepository doorToDoorRepository;
+    private final DoorHeaderRepository doorHeaderRepository;
 
     @Override
     public DoorToDoor addDoorToDoor(DoorToDoorRequest doorToDoorRequest, MultipartFile multipartFile) {
@@ -55,6 +61,14 @@ public class DoorToDoorServiceImpl implements DoorToDoorService {
 
         return doorToDoorRepository.save(existingDoorToDoor);
     }
+@Override
+    public DoorHeader addHeader(DoorHeaderRequest doorHeaderRequest){
+        doorHeaderRepository.deleteAll();
+        DoorHeader doorHeader = new DoorHeader();
+    doorHeader.setHeaderName(doorHeaderRequest.getHeaderName());
+    doorHeader.setHeaderDescription(doorHeaderRequest.getHeaderDescription());
+        return  doorHeaderRepository.save(doorHeader);
 
+}
 }
 

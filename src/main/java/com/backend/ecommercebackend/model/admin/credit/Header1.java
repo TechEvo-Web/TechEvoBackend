@@ -1,18 +1,19 @@
-package com.backend.ecommercebackend.model.admin.doortodoor;
+package com.backend.ecommercebackend.model.admin.credit;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
-@Table(name = "door_header")
+@Data
+@Table
 @Entity
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Data
-public class DoorHeader {
+public class Header1 {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     int id;
     String headerName;
     String headerDescription;
+
 }

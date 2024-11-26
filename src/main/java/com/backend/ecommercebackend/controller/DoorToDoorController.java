@@ -1,7 +1,9 @@
 package com.backend.ecommercebackend.controller;
 
+import com.backend.ecommercebackend.model.admin.doortodoor.DoorHeader;
 import com.backend.ecommercebackend.model.admin.doortodoor.DoorToDoor;
 import com.backend.ecommercebackend.model.admin.doortodoor.DoorToDoorStep;
+import com.backend.ecommercebackend.repository.admin.doortodoor.DoorHeaderRepository;
 import com.backend.ecommercebackend.repository.admin.doortodoor.DoorToDoorRepository;
 import com.backend.ecommercebackend.repository.admin.doortodoor.DoorToDoorStepRepository;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,6 +21,7 @@ import java.util.List;
 public class DoorToDoorController {
     private final DoorToDoorStepRepository doorToDoorStepRepository;
     private final DoorToDoorRepository doorToDoorRepository;
+    private final DoorHeaderRepository doorHeaderRepository;
 
     @GetMapping()
     @Operation(summary = "Elave Faydalari elde etmek ucun endpoint(Qapidan qapiya)")
@@ -29,6 +32,11 @@ public class DoorToDoorController {
     @Operation(summary = "Xidmet merhelelerini elde etmek ucun endpoint(Qapidan qapiya)")
     List<DoorToDoorStep>getDoorToDoorStep(){
         return  doorToDoorStepRepository.findAll();
+    }
+    @GetMapping("/header")
+    @Operation(summary = "Headeri elde etmek ucun endpoint(Qapidan qapiya)")
+    List<DoorHeader>getHeader(){
+        return  doorHeaderRepository.findAll();
     }
 
 }

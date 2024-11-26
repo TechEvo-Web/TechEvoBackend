@@ -1,5 +1,6 @@
 package com.backend.ecommercebackend.dto.request;
 
+import com.backend.ecommercebackend.model.order.Statuses;
 import jakarta.persistence.Column;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -14,6 +15,7 @@ import java.util.List;
 public class OrderRequest {
     int totalPrice;
     String deliveryType;
+    Statuses orderStatus;
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb", nullable = false)
     List<OrderItemRequest> orderItems;

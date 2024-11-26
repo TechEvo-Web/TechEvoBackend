@@ -1,7 +1,10 @@
 package com.backend.ecommercebackend.controller;
 
+import com.backend.ecommercebackend.model.admin.doortodoor.DoorHeader;
 import com.backend.ecommercebackend.model.admin.support.Support;
+import com.backend.ecommercebackend.model.admin.support.SupportHeader;
 import com.backend.ecommercebackend.model.admin.support.SupportStep;
+import com.backend.ecommercebackend.repository.admin.support.SupportHeaderRepository;
 import com.backend.ecommercebackend.repository.admin.support.SupportRepository;
 import com.backend.ecommercebackend.repository.admin.support.SupportStepRepository;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,6 +22,7 @@ import java.util.List;
 public class SupportController {
     private  final SupportRepository supportRepository;
     private final SupportStepRepository supportStepRepository;
+    private final SupportHeaderRepository supportHeaderRepository;
 
     @Transactional
     @GetMapping
@@ -33,4 +37,11 @@ public class SupportController {
     public List<SupportStep> getSupportSteps(){
         return  supportStepRepository.findAllByOrderByStepOrderAsc();
     }
+
+    @GetMapping("/header")
+    @Operation(summary = "Xidmetlerin Headerini elde etmek ucun endpoint")
+    List<SupportHeader>getHeader(){
+        return  supportHeaderRepository.findAll();
+    }
+
 }

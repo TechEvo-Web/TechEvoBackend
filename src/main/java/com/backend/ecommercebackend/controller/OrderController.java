@@ -3,6 +3,7 @@ package com.backend.ecommercebackend.controller;
 import com.backend.ecommercebackend.authentication.jwt.JwtService;
 import com.backend.ecommercebackend.dto.request.OrderRequest;
 import com.backend.ecommercebackend.model.order.Order;
+import com.backend.ecommercebackend.model.order.Statuses;
 import com.backend.ecommercebackend.model.product.Product;
 import com.backend.ecommercebackend.repository.order.OrderItemRepository;
 import com.backend.ecommercebackend.repository.order.OrderRepository;
@@ -24,6 +25,9 @@ public class OrderController {
     private final OrderItemRepository orderItemRepository;
     private final JwtService jwtService;
 
+    @GetMapping("/getAllOrders")
+    @Operation(summary = "Butun sifarisleri elde etmek üçün endpoint")
+    List<Order>getAll(){return  orderRepository.findAll();}
 
     @PostMapping
     @Operation(summary = "İstifadəçinin sifarişlərini əlavə etmək üçün endpoint")
