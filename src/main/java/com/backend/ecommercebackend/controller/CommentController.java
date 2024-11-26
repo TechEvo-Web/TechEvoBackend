@@ -18,6 +18,10 @@ import java.util.List;
 public class CommentController {
     private final CommentService service;
 
+    @GetMapping("/getAll")
+    public ResponseEntity<List<Comment>> getAll() {
+        return ResponseEntity.ok(service.getAllComments());
+    }
     @GetMapping("/{productId}")
     public ResponseEntity<List<Comment>> getCommentsByProductId(@PathVariable Long productId) {
         return ResponseEntity.ok(service.getAllCommentsByProductId(productId));
