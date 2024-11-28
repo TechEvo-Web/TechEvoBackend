@@ -5,10 +5,10 @@ import com.backend.ecommercebackend.authentication.jwt.JwtService;
 import com.backend.ecommercebackend.cache.service.RedisTokenService;
 import com.backend.ecommercebackend.dto.request.OrderItemRequest;
 import com.backend.ecommercebackend.dto.request.OrderRequest;
+import com.backend.ecommercebackend.dto.request.OrderStatusRequest;
 import com.backend.ecommercebackend.model.order.Address;
 import com.backend.ecommercebackend.model.order.Order;
 import com.backend.ecommercebackend.model.order.OrderItem;
-import com.backend.ecommercebackend.model.order.Statuses;
 import com.backend.ecommercebackend.model.product.Product;
 import com.backend.ecommercebackend.repository.order.OrderItemRepository;
 import com.backend.ecommercebackend.repository.order.OrderRepository;
@@ -23,7 +23,9 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @Service
@@ -60,7 +62,7 @@ public class OrderServiceImpl implements OrderService {
         addedOrder.setMonth(month);
         addedOrder.setYear(now.getYear());
         addedOrder.setUserEmail(email);
-        addedOrder.setOrderStatus(Statuses.Gözləyir);
+        addedOrder.setOrderStatus("Gözləyir");
 
         List<OrderItem> savedOrderItems = new ArrayList<>();
         for (OrderItemRequest orderItemRequest : orderRequest.getOrderItems()) {
@@ -73,7 +75,7 @@ public class OrderServiceImpl implements OrderService {
             orderItemRepository.save(orderItem);
         }
 
-         addedOrder.setOrderItems(savedOrderItems);
+        addedOrder.setOrderItems(savedOrderItems);
         orderRepository.save(addedOrder);
 
         String adminHtmlContent = "<html><body style='font-family: Arial, sans-serif; background-color: #f8f8f8; padding: 20px;'>" +
@@ -91,7 +93,7 @@ public class OrderServiceImpl implements OrderService {
                 "<tr><td style='padding: 8px; border: 1px solid #ddd;'><strong>Şəhər:</strong></td><td style='padding: 8px; border: 1px solid #ddd;'>" + addedOrder.getAddress().getCity() + "</td></tr>" +
                 "<tr><td style='padding: 8px; border: 1px solid #ddd;'><strong>Küçə:</strong></td><td style='padding: 8px; border: 1px solid #ddd;'>" + addedOrder.getAddress().getStreet() + "</td></tr>" +
                 "<tr><td style='padding: 8px; border: 1px solid #ddd;'><strong>Bina:</strong></td><td style='padding: 8px; border: 1px solid #ddd;'>" + addedOrder.getAddress().getBuilding() + "</td></tr>" +
-                "</table>" +"<h2 style='font-size: 18px; color: #333; margin-top: 20px;'>Sifariş edilən məhsullar</h2>";
+                "</table>" + "<h2 style='font-size: 18px; color: #333; margin-top: 20px;'>Sifariş edilən məhsullar</h2>";
 
 
         String userHtmlContent = "<html><body style='font-family: Arial, sans-serif; background-color: #f8f8f8; padding: 20px;'>" +
@@ -158,8 +160,7 @@ public class OrderServiceImpl implements OrderService {
                 "</div></body></html>";
 
 
-
-         for (OrderItem oi : savedOrderItems) {
+        for (OrderItem oi : savedOrderItems) {
             adminHtmlContent += "<div style='background-color: #f1f1f1; padding: 10px; margin-top: 10px; border-radius: 8px;'>" +
                     "<p style='font-size: 16px;'><strong>Məhsul ID:</strong> " + oi.getProductId() + "</p>" +
                     "<p style='font-size: 16px;'><strong>Məhsul Qiyməti:</strong> " + oi.getPrice() + " AZN</p>" +
@@ -197,24 +198,47 @@ public class OrderServiceImpl implements OrderService {
         Product product = productRepository.findById(productId).get();
         return product;
     }
+
     @Override
-    public List<Order>getOrdersByToken(String token) {
+    public List<Order> getOrdersByToken(String token) {
         String email = jwtService.extractUsername(token);
-        List<Order> orders=orderRepository.findByUserEmail(email);
+        List<Order> orders = orderRepository.findByUserEmail(email);
         return orders;
     }
-    public void updateOrderStatus(Long orderId, Statuses status) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
 
-        if (status != Statuses.Çatdırılıb && status != Statuses.İmtina) {
-            throw new IllegalArgumentException("Invalid status change. Only Çatdırılıb or İmtina are allowed.");
+
+        @Override
+        public void updateOrderStatus(Long orderId, OrderStatusRequest orderStatusRequest) {
+            Order order = orderRepository.findById(orderId)
+                    .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
+
+            String newStatus = orderStatusRequest.getOrderStatus();
+            if (!newStatus.equals("Çatdırılıb") && !newStatus.equals("İmtina")) {
+                throw new IllegalArgumentException("Invalid status: " + newStatus + ". Only 'çatdırılıb' or 'cancel' are allowed.");
+            }
+
+            order.setOrderStatus(newStatus);
+            orderRepository.save(order);
         }
+@Override
+public Map<String, Long> getOrdersGroupedByStatus() {
+    // Her durum için ayrı sorgular
+    Long countGozleyir = (long) orderRepository.findOrderIdsByStatusGozleyir().size();
+    Long countImtina = (long) orderRepository.findOrderIdsByStatusImtina().size();
+    Long countCatdirilma = (long) orderRepository.findOrderIdsByStatusCatdirilib().size();
 
-        order.setOrderStatus(status);
-        orderRepository.save(order);
-    }
+    // Sonuçları bir Map'e koy
+    Map<String, Long> result = new HashMap<>();
+    result.put("Gözləyir", countGozleyir);
+    result.put("İmtina", countImtina);
+    result.put("Çatdırılıb", countCatdirilma);
+
+    return result;
 }
+
+}
+
+
 
 
 

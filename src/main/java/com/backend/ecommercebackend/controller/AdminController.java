@@ -11,7 +11,6 @@ import com.backend.ecommercebackend.model.admin.support.Support;
 import com.backend.ecommercebackend.model.admin.support.SupportHeader;
 import com.backend.ecommercebackend.model.admin.support.SupportStep;
 import com.backend.ecommercebackend.model.admin.term.UserTerm;
-import com.backend.ecommercebackend.model.order.Statuses;
 import com.backend.ecommercebackend.repository.admin.credit.CreditCardRepository;
 import com.backend.ecommercebackend.repository.admin.credit.Header1Repository;
 import com.backend.ecommercebackend.repository.admin.doortodoor.DoorHeaderRepository;
@@ -31,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -53,8 +53,7 @@ private final UserTermService userTermService;
     private final DoorHeaderRepository doorHeaderRepository;
     private final SupportHeaderRepository supportHeaderRepository;
     private final Header1Repository header1Repository;
-    private final OrderService orderService;
-
+private  final  OrderService orderService;
     @DeleteMapping("/support/{id}")
     @Operation(summary = "Xidmetleri idye gore silmek ucun endpoint")
     public ResponseEntity<Support> deleteSupport(@PathVariable int id) {
@@ -224,19 +223,23 @@ private final UserTermService userTermService;
             @RequestPart(value = "file", required = false) MultipartFile multipartFile) throws IOException, IOException {
         return creditCardService.updateCreditCard(id, creditCardRequest, multipartFile);
     }
-    @PutMapping("/order/{orderId}/status")
+    @PutMapping("/order/{orderId}")
     @Operation(summary = "İstifadəçinin sifarişlərinin statusunu update etmək üçün endpoint")
     public ResponseEntity<String> updateOrderStatus(
-            @PathVariable Long orderId,
-            @RequestParam Statuses status) {
+            @PathVariable Long orderId, @RequestBody OrderStatusRequest orderStatusRequest) {
         try {
-            orderService.updateOrderStatus(orderId, status);
+            orderService.updateOrderStatus(orderId, orderStatusRequest);
             return ResponseEntity.ok("Order status updated successfully.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (RuntimeException e) {
             return ResponseEntity.status(500).body("An unexpected error occurred.");
         }
+    }
+    @GetMapping("/grouped-by-status")
+    @Operation(summary = "Sifarisleri statuslarina gore qruplasdirmaq ucun endpoint  ")
+    public Map<String, Long> getOrdersGroupedByStatus() {
+        return orderService.getOrdersGroupedByStatus();
     }
 
 
