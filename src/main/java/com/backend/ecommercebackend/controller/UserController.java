@@ -22,6 +22,7 @@ import java.util.List;
 public class UserController {
 
     private final UserService service;
+    private final UserTermRepository userTermRepository;
 
     @GetMapping
     @Operation(summary = "Spesifik istifadəçi info-su almaq üçün endpoint. Ichinde fav product Ids saxlanilir.")
@@ -55,6 +56,12 @@ public class UserController {
     public ResponseEntity<String> deleteUser(@PathVariable String email) {
         service.delete(email);
         return ResponseEntity.ok("User deleted successfully.");
+    }
+    @GetMapping("/terms")
+    @Operation(summary = "Privacy/Policy elde etmek ucun endpoint")
+
+    public List<UserTerm> getUserTerm(){
+        return userTermRepository.findAll();
     }
 
 }
