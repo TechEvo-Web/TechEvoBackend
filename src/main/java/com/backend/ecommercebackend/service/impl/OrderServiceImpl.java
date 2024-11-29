@@ -6,6 +6,7 @@ import com.backend.ecommercebackend.cache.service.RedisTokenService;
 import com.backend.ecommercebackend.dto.request.OrderItemRequest;
 import com.backend.ecommercebackend.dto.request.OrderRequest;
 import com.backend.ecommercebackend.dto.request.OrderStatusRequest;
+import com.backend.ecommercebackend.mapper.OrderMapper;
 import com.backend.ecommercebackend.model.order.Address;
 import com.backend.ecommercebackend.model.order.Order;
 import com.backend.ecommercebackend.model.order.OrderItem;
@@ -48,15 +49,10 @@ public class OrderServiceImpl implements OrderService {
         String[] months = {"Yanvar", "Fevral", "Mart", "Aprel", "May", "İyun", "İyul", "Avqust", "Sentyabr", "Oktyabr", "Noyabr", "Dekabr"};
         String month = months[now.getMonthValue() - 1];
 
-        Address address = new Address();
-        address.setStreet(orderRequest.getAddress().getStreet());
-        address.setCity(orderRequest.getAddress().getCity());
-        address.setBuilding(orderRequest.getAddress().getBuilding());
-        address.setArea(orderRequest.getAddress().getArea());
 
-        Order addedOrder = new Order();
-        addedOrder.setDeliveryType(orderRequest.getDeliveryType());
-        addedOrder.setTotalPrice(orderRequest.getTotalPrice());
+
+        Order addedOrder = OrderMapper.INSTANCE.toOrder(orderRequest);
+        Address address = OrderMapper.INSTANCE.toAddress(orderRequest.getAddress());
         addedOrder.setAddress(address);
         addedOrder.setDay(now.getDayOfMonth());
         addedOrder.setMonth(month);
