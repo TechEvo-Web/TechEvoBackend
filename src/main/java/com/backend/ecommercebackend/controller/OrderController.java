@@ -3,7 +3,6 @@ package com.backend.ecommercebackend.controller;
 import com.backend.ecommercebackend.authentication.jwt.JwtService;
 import com.backend.ecommercebackend.dto.request.OrderRequest;
 import com.backend.ecommercebackend.model.order.Order;
-import com.backend.ecommercebackend.model.order.Statuses;
 import com.backend.ecommercebackend.model.product.Product;
 import com.backend.ecommercebackend.repository.order.OrderItemRepository;
 import com.backend.ecommercebackend.repository.order.OrderRepository;
