@@ -11,6 +11,7 @@ import com.backend.ecommercebackend.model.admin.support.Support;
 import com.backend.ecommercebackend.model.admin.support.SupportHeader;
 import com.backend.ecommercebackend.model.admin.support.SupportStep;
 import com.backend.ecommercebackend.model.admin.term.UserTerm;
+import com.backend.ecommercebackend.model.order.Order;
 import com.backend.ecommercebackend.repository.admin.credit.CreditCardRepository;
 import com.backend.ecommercebackend.repository.admin.credit.Header1Repository;
 import com.backend.ecommercebackend.repository.admin.doortodoor.DoorHeaderRepository;
@@ -20,6 +21,7 @@ import com.backend.ecommercebackend.repository.admin.support.SupportHeaderReposi
 import com.backend.ecommercebackend.repository.admin.support.SupportRepository;
 import com.backend.ecommercebackend.repository.admin.support.SupportStepRepository;
 import com.backend.ecommercebackend.repository.admin.term.UserTermRepository;
+import com.backend.ecommercebackend.repository.order.OrderRepository;
 import com.backend.ecommercebackend.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -54,6 +56,8 @@ private final UserTermService userTermService;
     private final SupportHeaderRepository supportHeaderRepository;
     private final Header1Repository header1Repository;
 private  final  OrderService orderService;
+    private final OrderRepository orderRepository;
+
     @DeleteMapping("/support/{id}")
     @Operation(summary = "Xidmetleri idye gore silmek ucun endpoint")
     public ResponseEntity<Support> deleteSupport(@PathVariable int id) {
@@ -242,8 +246,9 @@ private  final  OrderService orderService;
         return orderService.getOrdersGroupedByStatus();
     }
 
-
-
-
+    @GetMapping("/chart-data")
+    public Map<String, Long>  getChartData(){
+        return orderService.findMonthlyData();
+    }
 }
 

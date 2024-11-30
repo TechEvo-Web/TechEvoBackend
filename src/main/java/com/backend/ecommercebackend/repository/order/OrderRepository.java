@@ -19,4 +19,8 @@ public interface OrderRepository extends JpaRepository<Order,Long> {
 
     @Query("SELECT o.orderId FROM Order o WHERE o.orderStatus = 'Çatdırılıb'")
     List<Long> findOrderIdsByStatusCatdirilib();
+    @Query("SELECT o FROM Order o WHERE o.orderStatus = 'Çatdırılıb'")
+    List<Order> findOrdersByStatusCatdirilib();
+
+
 }

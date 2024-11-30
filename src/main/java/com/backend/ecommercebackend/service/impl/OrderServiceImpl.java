@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -48,8 +49,12 @@ public class OrderServiceImpl implements OrderService {
         LocalDate now = LocalDate.now();
         String[] months = {"Yanvar", "Fevral", "Mart", "Aprel", "May", "İyun", "İyul", "Avqust", "Sentyabr", "Oktyabr", "Noyabr", "Dekabr"};
         String month = months[now.getMonthValue() - 1];
-
-
+        int monthValue = now.getMonthValue();
+        int week=0;
+        if (now.getDayOfMonth()<=7){week=1; }
+        if (now.getDayOfMonth()<=14 &&now.getDayOfMonth()>7){week=2; }
+        if (now.getDayOfMonth()<=21 &&now.getDayOfMonth()>14){week=3; }
+        if (now.getDayOfMonth()>21 ){week=4; }
 
         Order addedOrder = OrderMapper.INSTANCE.toOrder(orderRequest);
         Address address = OrderMapper.INSTANCE.toAddress(orderRequest.getAddress());
@@ -58,7 +63,9 @@ public class OrderServiceImpl implements OrderService {
         addedOrder.setMonth(month);
         addedOrder.setYear(now.getYear());
         addedOrder.setUserEmail(email);
+        addedOrder.setMonthValue(monthValue);
         addedOrder.setOrderStatus("Gözləyir");
+        addedOrder.setWeekPeriod(week);
 
         List<OrderItem> savedOrderItems = new ArrayList<>();
         for (OrderItemRequest orderItemRequest : orderRequest.getOrderItems()) {
@@ -232,6 +239,26 @@ public Map<String, Long> getOrdersGroupedByStatus() {
 
     return result;
 }
+    @Override
+    public Map<String, Long> findMonthlyData() {
+        LocalDate now = LocalDate.now();
+         List<Order> orders = orderRepository.findOrdersByStatusCatdirilib();
+          List<Order> filteredOrders = orders.stream()
+                .filter(o -> o.getYear() == now.getYear() && o.getMonthValue() == now.getMonthValue())
+                .toList();
+          Map<Integer, Long> weekCounts = filteredOrders.stream()
+                .collect(Collectors.groupingBy(Order::getWeekPeriod, Collectors.counting()));
+
+         Map<String, Long> result = new HashMap<>();
+        result.put("Week1", weekCounts.getOrDefault(1, 0L));
+        result.put("Week2", weekCounts.getOrDefault(2, 0L));
+        result.put("Week3", weekCounts.getOrDefault(3, 0L));
+        result.put("Week4", weekCounts.getOrDefault(4, 0L));
+
+        return result;
+    }
+
+
 
 }
 
