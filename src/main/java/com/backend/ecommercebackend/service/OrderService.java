@@ -13,5 +13,5 @@ public interface OrderService {
     Product getProductIdFromOrderItemId(Long orderItemId);
     List<Order> getOrdersByToken(String token);
     public void updateOrderStatus(Long orderId, OrderStatusRequest orderStatusRequest);
-    Map<String, Long> getOrdersGroupedByStatus();
+    Map<String, Long> getAdminAnalytics();
 }

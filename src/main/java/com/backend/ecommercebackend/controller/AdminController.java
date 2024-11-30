@@ -258,19 +258,11 @@ public class AdminController {
     visitService.incrementVisitCount();
   }
 
-  @GetMapping("/grouped-by-status")
-  @Operation(summary = "Sifarisleri statuslarina gore qruplasdirmaq ve total ziyaret sayini qaytarmaq ucun endpoint")
-  public StatisticsResponse getOrdersGroupedByStatus() {
-    Map<String, Long> ordersGroupedByStatus = orderService.getOrdersGroupedByStatus();
-    Long totalVisitorCount = visitService.getVisitCount();
-    return new StatisticsResponse(ordersGroupedByStatus, totalVisitorCount);
+  @GetMapping("/getAnalytics")
+  @Operation(summary = "Ümumi admin panelinin statistikalarini almaq üçün endpoint")
+  public ResponseEntity<Map<String,Long>> getAdminPanelAnalytics() {
+    return ResponseEntity.ok(orderService.getAdminAnalytics());
   }
 
-  public record StatisticsResponse(
-      Map<String, Long> ordersGroupedByStatus,
-      Long totalUserVisits
-  ) {
-
-  }
 }
 

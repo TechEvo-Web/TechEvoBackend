@@ -3,6 +3,7 @@ package com.backend.ecommercebackend.service.impl;
 
 import com.backend.ecommercebackend.authentication.jwt.JwtService;
 import com.backend.ecommercebackend.cache.service.RedisTokenService;
+import com.backend.ecommercebackend.cache.service.VisitCounterService;
 import com.backend.ecommercebackend.dto.request.OrderItemRequest;
 import com.backend.ecommercebackend.dto.request.OrderRequest;
 import com.backend.ecommercebackend.dto.request.OrderStatusRequest;
@@ -39,6 +40,7 @@ public class OrderServiceImpl implements OrderService {
     private final UserRepository userRepository;
     private final RedisTokenService redisTokenService;
     private final JwtService jwtService;
+    private final VisitCounterService visitCounterService;
     @Value("${spring.mail.username}")
     private String from;
 
@@ -218,19 +220,19 @@ public class OrderServiceImpl implements OrderService {
             orderRepository.save(order);
         }
 @Override
-public Map<String, Long> getOrdersGroupedByStatus() {
-    // Her durum için ayrı sorgular
-    Long countLoginUser= (long) userRepository.findAll().size();
-    Long countGozleyir = (long) orderRepository.findOrderIdsByStatusGozleyir().size();
-    Long countImtina = (long) orderRepository.findOrderIdsByStatusImtina().size();
-    Long countCatdirilma = (long) orderRepository.findOrderIdsByStatusCatdirilib().size();
+public Map<String, Long> getAdminAnalytics() {
+    Long loginUserCount= (long) userRepository.findAll().size();
+    Long expectingOrderCount = (long) orderRepository.findOrderIdsByStatusGozleyir().size();
+    Long rejectOrderCount = (long) orderRepository.findOrderIdsByStatusImtina().size();
+    Long successOrderCount = (long) orderRepository.findOrderIdsByStatusCatdirilib().size();
+    Long visitCount=visitCounterService.getVisitCount();
 
-    // Sonuçları bir Map'e koy
     Map<String, Long> result = new HashMap<>();
-    result.put("Gözləyir", countGozleyir);
-    result.put("İmtina", countImtina);
-    result.put("Çatdırılıb", countCatdirilma);
-    result.put("loginUserCount", countLoginUser);
+    result.put("expectingOrderCount", expectingOrderCount);
+    result.put("rejectOrderCount", rejectOrderCount);
+    result.put("successOrderCount", successOrderCount);
+    result.put("loginUserCount", loginUserCount);
+    result.put("visitCount", visitCount);
     return result;
 }
 
