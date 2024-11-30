@@ -268,7 +268,7 @@ public class AdminController {
 
   public record StatisticsResponse(
       Map<String, Long> ordersGroupedByStatus,
-      Long totalVisitorCount
+      Long totalUserVisits
   ) {
 
   }
