@@ -23,6 +23,7 @@ public enum Exceptions {
   ALREADY_EXISTS_EXCEPTION(HttpStatus.BAD_REQUEST, ExceptionMessage.ALREADY_EXISTS_MSG),
   INVALID_VERIFICATION_CODE(HttpStatus.UNAUTHORIZED, ExceptionMessage.INVALID_VERIFICATION_CODE_MSG);
 
+
   private final HttpStatus httpStatus;
   private final String message;
 }

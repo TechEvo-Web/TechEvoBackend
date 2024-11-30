@@ -20,7 +20,6 @@ public class ApplicationException extends RuntimeException{
     this.exception = exception;
     this.message = customMessage;
   }
-
   public HttpStatus getHttpStatus() {
     return exception.getHttpStatus();
   }

@@ -17,6 +17,7 @@ import com.backend.ecommercebackend.service.FileStorageService;
 import com.backend.ecommercebackend.service.impl.EmailServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -124,4 +125,42 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new ApplicationException(Exceptions.INVALID_TOKEN_EXCEPTION);
         }
     }
+
+    @Override
+    public AuthResponse registerAdmin(RegisterRequest request) {
+
+        if (!request.getConfirmPassword().equals(request.getPassword())) {
+            throw new ApplicationException(Exceptions.PASSWORD_MISMATCH_EXCEPTION);
+        }
+
+        if (request.getAcceptTerms().equals(Boolean.FALSE)) {
+            throw new ApplicationException(Exceptions.TERMS_ACCEPTANCE_EXCEPTION);
+        }
+
+        Optional<User> existingUser = repository.findByEmail(request.getEmail());
+        if (existingUser.isPresent()) {
+            throw new ApplicationException(Exceptions.USER_ALREADY_EXIST);
+        }
+
+
+        User user = authMapper.RegisterDtoToEntity(request, passwordEncoder);
+        user.setRole(Role.ADMIN);
+        user.setCreatedAt(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now());
+
+        repository.save(user);
+
+
+        emailService.deleteStoredEmail(request.getEmail());
+
+
+        String accessToken = jwtService.generateAccessToken(user.getEmail());
+        String refreshToken = jwtService.generateRefreshToken(user.getEmail());
+
+        return AuthResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
 }
+
