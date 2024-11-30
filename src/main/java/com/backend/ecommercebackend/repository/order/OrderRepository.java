@@ -11,12 +11,12 @@ import java.util.List;
 public interface OrderRepository extends JpaRepository<Order,Long> {
     List<Order> findByUserEmail(String email);
     boolean existsByUserEmail(String email);
-    @Query("SELECT o.id FROM Order o WHERE o.orderStatus = 'Gözləyir'")
+    @Query("SELECT o.orderId FROM Order o WHERE o.orderStatus = 'Gözləyir'")
     List<Long> findOrderIdsByStatusGozleyir();
 
-    @Query("SELECT o.id FROM Order o WHERE o.orderStatus = 'İmtina'")
+    @Query("SELECT o.orderId FROM Order o WHERE o.orderStatus = 'İmtina'")
     List<Long> findOrderIdsByStatusImtina();
 
-    @Query("SELECT o.id FROM Order o WHERE o.orderStatus = 'Çatdırılıb'")
+    @Query("SELECT o.orderId FROM Order o WHERE o.orderStatus = 'Çatdırılıb'")
     List<Long> findOrderIdsByStatusCatdirilib();
 }

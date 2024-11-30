@@ -26,7 +26,9 @@ public class OrderController {
 
     @GetMapping("/getAllOrders")
     @Operation(summary = "Butun sifarisleri elde etmek üçün endpoint")
-    List<Order>getAll(){return  orderRepository.findAll();}
+    List<Order>getAll(){
+        return  orderRepository.findAll();
+    }
 
     @PostMapping
     @Operation(summary = "İstifadəçinin sifarişlərini əlavə etmək üçün endpoint")
