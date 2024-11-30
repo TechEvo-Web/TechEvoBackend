@@ -28,6 +28,11 @@ public class CommentServiceImpl implements CommentService {
     private final RatingServiceImpl ratingService;
 
     @Override
+    public List<Comment> getAllComments() {
+        return repository.findAll();
+    }
+
+    @Override
     public Comment addComment(UserDetails userDetails, CommentRequest commentRequest) {
         User user = userRepository.findByEmail(userDetails.getUsername()).orElseThrow(()->new ApplicationException(Exceptions.USER_NOT_FOUND));
         Product product = productRepository.findById(commentRequest.getProductId()).orElseThrow(() -> new ApplicationException(Exceptions.NOT_FOUND_EXCEPTION));
@@ -47,7 +52,6 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public List<Comment> getAllCommentsByProductId(Long productId) {
         return repository.findByProductId(productId);
-
     }
 
     @Override

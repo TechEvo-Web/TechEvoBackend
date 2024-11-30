@@ -3,29 +3,35 @@ spring:
     name: EcommerceBackend
   data:
     redis:
-      host: master.e-commerce-redis.8fiqjj.eun1.cache.amazonaws.com
+      host: localhost
       port: 6380
-      password: ecommerce-redis-pass
+      password: ecommerce-redis-p@ss
       timeout: 60000
       client-type: lettuce
 
+  servlet:
+   multipart:
+    enabled: true
+    max-file-size: 10MB
+    max-request-size: 10MB
+
   datasource:
     first:
-      url: jdbc:postgresql://database-user.c3u2osgmm56j.eu-north-1.rds.amazonaws.com:5432/USER
-      username: postgres
-      password: Pexqip-vacga2-zusjiz
+      url: jdbc:postgresql://localhost:5437/User
+      username: SECURITY
+      password: SECURITY
     second:
-      url: jdbc:postgresql://database-product.c3u2osgmm56j.eu-north-1.rds.amazonaws.com:5433/PRODUCT
-      username: postgres
-      password: Pexqip-vacga2-zusjiz
+      url: jdbc:postgresql://localhost:5433/EvoProduct
+      username: ROOT
+      password: 1234
     third:
-      url: jdbc:postgresql://database-order.c3u2osgmm56j.eu-north-1.rds.amazonaws.com:5434/ORDER
-      username: postgres
-      password: Pexqip-vacga2-zusjiz
+      url: jdbc:postgresql://localhost:5436/Order
+      username: ORDER
+      password: 12345
     fourth:
-      url: jdbc:postgresql://database-admin.c3u2osgmm56j.eu-north-1.rds.amazonaws.com:5438/ADMIN
-      username: postgres
-      password: Pexqip-vacga2-zusjiz
+      url: jdbc:postgresql://localhost:5438/Admin
+      username: ADMIN
+      password: 12345
   jpa:
     show-sql: true
     hibernate:

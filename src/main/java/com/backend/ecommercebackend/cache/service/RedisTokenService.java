@@ -10,9 +10,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Slf4j
 public class RedisTokenService {
-
   private static final String REFRESH_TOKEN_KEY_PREFIX = "refresh_token:";
-
   private final RedisTemplate<String, String> redisTemplate;
 
   public void storeRefreshToken(String email, String refreshToken, long expirationTime) {
@@ -25,7 +23,6 @@ public class RedisTokenService {
   }
 
   public String getRefreshToken(String email) {
-
     String redisKey = REFRESH_TOKEN_KEY_PREFIX + email;
     var refreshToken = redisTemplate.opsForValue().get(redisKey);
 

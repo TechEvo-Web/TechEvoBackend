@@ -2,6 +2,7 @@ package com.backend.ecommercebackend.controller;
 
 import com.backend.ecommercebackend.dto.request.CommentRequest;
 import com.backend.ecommercebackend.model.product.Comment;
+import com.backend.ecommercebackend.repository.product.CommentRepository;
 import com.backend.ecommercebackend.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,16 +18,22 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommentController {
     private final CommentService service;
+    private final CommentRepository commentRepository;
 
+    @GetMapping("/getAll")
+    public ResponseEntity<List<Comment>> getAll() {
+        return ResponseEntity.ok(service.getAllComments());
+    }
     @GetMapping("/{productId}")
     public ResponseEntity<List<Comment>> getCommentsByProductId(@PathVariable Long productId) {
         return ResponseEntity.ok(service.getAllCommentsByProductId(productId));
     }
 
+
     @PostMapping
     public ResponseEntity<Comment> createComment(@AuthenticationPrincipal UserDetails userDetails, @RequestBody CommentRequest request) {
         final var createdComment = service.addComment(userDetails,request);
-        final var location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/{commentId").build(createdComment.getCommentId());
+        final var location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/{commentId}").build(createdComment.getCommentId());
         return ResponseEntity.created(location).body(createdComment);
     }
 
