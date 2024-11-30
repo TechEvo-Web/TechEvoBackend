@@ -220,6 +220,7 @@ public class OrderServiceImpl implements OrderService {
 @Override
 public Map<String, Long> getOrdersGroupedByStatus() {
     // Her durum için ayrı sorgular
+    Long countLoginUser= (long) userRepository.findAll().size();
     Long countGozleyir = (long) orderRepository.findOrderIdsByStatusGozleyir().size();
     Long countImtina = (long) orderRepository.findOrderIdsByStatusImtina().size();
     Long countCatdirilma = (long) orderRepository.findOrderIdsByStatusCatdirilib().size();
@@ -229,7 +230,7 @@ public Map<String, Long> getOrdersGroupedByStatus() {
     result.put("Gözləyir", countGozleyir);
     result.put("İmtina", countImtina);
     result.put("Çatdırılıb", countCatdirilma);
-
+    result.put("loginUserCount", countLoginUser);
     return result;
 }
 
