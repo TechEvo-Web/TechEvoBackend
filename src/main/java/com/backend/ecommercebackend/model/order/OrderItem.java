@@ -17,5 +17,6 @@ public class OrderItem {
     int quantity;
     int price;
     Long productId;
+    String productName;
     String productUrl="http://localhost:8081/api/v1/product/";
 }

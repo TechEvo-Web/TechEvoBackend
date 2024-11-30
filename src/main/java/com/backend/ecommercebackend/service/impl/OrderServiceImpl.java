@@ -63,6 +63,7 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItem> savedOrderItems = new ArrayList<>();
         for (OrderItemRequest orderItemRequest : orderRequest.getOrderItems()) {
             OrderItem orderItem = new OrderItem();
+            orderItem.setProductName(productRepository.findById(orderItemRequest.getProductId()).get().getName());
             orderItem.setProductId(orderItemRequest.getProductId());
             orderItem.setQuantity(orderItemRequest.getQuantity());
             orderItem.setPrice(orderItemRequest.getPrice());
