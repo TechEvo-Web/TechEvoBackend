@@ -38,7 +38,6 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
-    private final RedisTokenService redisTokenService;
     private final JwtService jwtService;
     private final VisitCounterService visitCounterService;
     @Value("${spring.mail.username}")
@@ -220,14 +219,14 @@ public class OrderServiceImpl implements OrderService {
             orderRepository.save(order);
         }
 @Override
-public Map<String, Long> getAdminAnalytics() {
+public Map<String, Object> getAdminAnalytics() {
     Long loginUserCount= (long) userRepository.findAll().size();
     Long expectingOrderCount = (long) orderRepository.findOrderIdsByStatusGozleyir().size();
     Long rejectOrderCount = (long) orderRepository.findOrderIdsByStatusImtina().size();
     Long successOrderCount = (long) orderRepository.findOrderIdsByStatusCatdirilib().size();
-    Long visitCount=visitCounterService.getVisitCount();
+    List<Long> visitCount=visitCounterService.getWeeklyVisitCounts();
 
-    Map<String, Long> result = new HashMap<>();
+    Map<String, Object> result = new HashMap<>();
     result.put("expectingOrderCount", expectingOrderCount);
     result.put("rejectOrderCount", rejectOrderCount);
     result.put("successOrderCount", successOrderCount);

@@ -20,7 +20,6 @@ import com.backend.ecommercebackend.repository.admin.doortodoor.DoorToDoorStepRe
 import com.backend.ecommercebackend.repository.admin.support.SupportHeaderRepository;
 import com.backend.ecommercebackend.repository.admin.support.SupportRepository;
 import com.backend.ecommercebackend.repository.admin.support.SupportStepRepository;
-import com.backend.ecommercebackend.repository.admin.term.UserTermRepository;
 import com.backend.ecommercebackend.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -254,13 +253,21 @@ public class AdminController {
   }
 
   @PostMapping("/count-visits")
-  public void incrementVisitCount() {
+  @Operation(summary = "Istifadeci ziyaret sayini avtomatik artirmaq üçün endpoint")
+  public ResponseEntity<Void> incrementVisitCount() {
     visitService.incrementVisitCount();
+    return ResponseEntity.ok().build();
+  }
+
+  @GetMapping("/total-visits")
+  @Operation(summary = "Girish eden total istifadeci sayini almaq üçün endpoint (ELAVE, just in case)")
+  public ResponseEntity<Long> getAllUserVisits() {
+    return ResponseEntity.ok(visitService.getVisitCount());
   }
 
   @GetMapping("/getAnalytics")
   @Operation(summary = "Ümumi admin panelinin statistikalarini almaq üçün endpoint")
-  public ResponseEntity<Map<String,Long>> getAdminPanelAnalytics() {
+  public ResponseEntity<Map<String, Object>> getAdminPanelAnalytics() {
     return ResponseEntity.ok(orderService.getAdminAnalytics());
   }
 
