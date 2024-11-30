@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.List;
 
 public interface CommentService {
+    List<Comment>getAllComments();
     Comment addComment(UserDetails userDetails, CommentRequest commentRequest);
     void deleteComment(Long commentId);
     List<Comment> getAllCommentsByProductId(Long productId);
