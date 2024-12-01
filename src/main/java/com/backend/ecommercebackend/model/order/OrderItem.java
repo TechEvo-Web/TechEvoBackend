@@ -12,7 +12,7 @@ import lombok.experimental.FieldDefaults;
 public class OrderItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     Long id;
     int quantity;
     int price;

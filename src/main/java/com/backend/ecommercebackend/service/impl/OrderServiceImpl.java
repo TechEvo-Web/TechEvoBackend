@@ -217,8 +217,8 @@ public class OrderServiceImpl implements OrderService {
                     .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
 
             String newStatus = orderStatusRequest.getOrderStatus();
-            if (!newStatus.equals("Çatdırılıb") && !newStatus.equals("İmtina")) {
-                throw new IllegalArgumentException("Invalid status: " + newStatus + ". Only 'çatdırılıb' or 'cancel' are allowed.");
+            if (!newStatus.equals("Çatdırılıb") && !newStatus.equals("İmtina") && !newStatus.equals("Gözləyir")) {
+                throw new IllegalArgumentException("Invalid status: " + newStatus + ". Only 'Çatdırılıb' or 'İmtina' or 'Gözləyir' are allowed.");
             }
 
             order.setOrderStatus(newStatus);
@@ -256,6 +256,80 @@ public Map<String, Long> getOrdersGroupedByStatus() {
         result.put("Week4", weekCounts.getOrDefault(4, 0L));
 
         return result;
+    }
+
+    @Override
+    public void updateOrderStatusToImtina(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
+
+        order.setOrderStatus("İmtina");
+        orderRepository.save(order);
+
+
+    }
+    public Order updateOrderItem(Long orderId, Long itemId, OrderItem newItem) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+        order.getOrderItems().stream()
+                .filter(item -> item.getId().equals(itemId))
+                .forEach(item -> {
+                    item.setProductId(newItem.getProductId());
+                    item.setQuantity(newItem.getQuantity());
+                    item.setProductName(newItem.getProductName());
+                    item.setPrice(newItem.getPrice());
+                });
+        orderRepository.save(order);
+        OrderItem orderItem=orderItemRepository.findById(itemId).orElseThrow(() -> new RuntimeException("Item not found"));
+       orderItem.setQuantity(newItem.getQuantity());
+       orderItem.setProductId(newItem.getProductId());
+       orderItem.setProductName(newItem.getProductName());
+       orderItem.setPrice(newItem.getPrice());
+       orderItemRepository.save(orderItem);
+        return order;
+    }
+    public Order removeOrderItem(Long orderId, Long orderItemId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+        List<OrderItem> updatedItems = order.getOrderItems().stream()
+                .filter(item -> !item.getId().equals(orderItemId))
+                .toList();
+        order.setOrderItems(updatedItems);
+        orderRepository.save(order);
+        orderItemRepository.deleteById(orderItemId);
+        if (order.getOrderItems().isEmpty()) {
+            orderRepository.delete(order);
+        }
+        return order;
+    }
+    @Override
+    public Order addOrderItem(Long orderId, OrderItemRequest orderItemRequest) {
+        // Order'ı bul
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        // Product bilgilerini al
+        Product product = productRepository.findById(orderItemRequest.getProductId())
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        // OrderItem oluştur
+        OrderItem newItem = new OrderItem();
+        newItem.setQuantity(orderItemRequest.getQuantity());
+        newItem.setPrice(orderItemRequest.getPrice());
+        newItem.setProductId(orderItemRequest.getProductId());
+        newItem.setProductName(product.getName());
+        newItem.setProductUrl("http://localhost:8081/api/v1/product/" + orderItemRequest.getProductId());
+
+         orderItemRepository.save(newItem);
+
+         List<OrderItem> updatedItems = order.getOrderItems();
+        updatedItems.add(newItem);
+        order.setOrderItems(updatedItems);
+
+         int totalQuantity = updatedItems.stream().mapToInt(OrderItem::getQuantity).sum();
+        int totalPrice = updatedItems.stream().mapToInt(item -> item.getPrice() * item.getQuantity()).sum();
+        order.setTotalPrice(totalPrice);
+
+         orderRepository.save(order);
+        return order;
     }
 
 

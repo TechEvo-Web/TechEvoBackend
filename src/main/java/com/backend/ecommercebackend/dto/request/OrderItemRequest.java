@@ -10,5 +10,7 @@ public class OrderItemRequest {
     int quantity;
     int price;
     Long productId;
+    String productName;
+
 
 }

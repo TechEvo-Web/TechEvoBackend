@@ -12,6 +12,7 @@ import com.backend.ecommercebackend.model.admin.support.SupportHeader;
 import com.backend.ecommercebackend.model.admin.support.SupportStep;
 import com.backend.ecommercebackend.model.admin.term.UserTerm;
 import com.backend.ecommercebackend.model.order.Order;
+import com.backend.ecommercebackend.model.order.OrderItem;
 import com.backend.ecommercebackend.repository.admin.credit.CreditCardRepository;
 import com.backend.ecommercebackend.repository.admin.credit.Header1Repository;
 import com.backend.ecommercebackend.repository.admin.doortodoor.DoorHeaderRepository;
@@ -250,6 +251,10 @@ private  final  OrderService orderService;
     @GetMapping("/chart-data")
     public Map<String, Long>  getChartData(){
         return orderService.findMonthlyData();
+    }
+    @PostMapping("/{orderId}/items")
+    public ResponseEntity<Order> addItem(@PathVariable Long orderId, @RequestBody OrderItemRequest newItem) {
+        return ResponseEntity.ok(orderService.addOrderItem(orderId, newItem));
     }
 }
 
