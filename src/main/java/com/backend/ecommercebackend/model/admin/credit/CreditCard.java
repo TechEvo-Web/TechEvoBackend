@@ -14,5 +14,6 @@ public class CreditCard {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     int id;
     String cardImage;
+    String cardHeader;
     String cardDescription;
 }

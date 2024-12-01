@@ -36,7 +36,7 @@ public class DoorToDoorServiceImpl implements DoorToDoorService {
         } catch (IOException e) {
             throw new RuntimeException("Failed to store file: " + e.getMessage(), e);
         }
-
+        System.out.println(doorToDoorRequest.getBenefitName());
         DoorToDoor doorToDoor = new DoorToDoor();
         doorToDoor.setBenefitName(doorToDoorRequest.getBenefitName());
 

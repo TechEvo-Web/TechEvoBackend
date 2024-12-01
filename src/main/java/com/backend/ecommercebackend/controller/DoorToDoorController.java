@@ -35,8 +35,8 @@ public class DoorToDoorController {
     }
     @GetMapping("/header")
     @Operation(summary = "Headeri elde etmek ucun endpoint(Qapidan qapiya)")
-    List<DoorHeader>getHeader(){
-        return  doorHeaderRepository.findAll();
+    DoorHeader getHeader(){
+        return  doorHeaderRepository.findFirstByOrderByIdAsc();
     }
 
 }

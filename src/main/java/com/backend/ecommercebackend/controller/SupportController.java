@@ -40,8 +40,8 @@ public class SupportController {
 
     @GetMapping("/header")
     @Operation(summary = "Xidmetlerin Headerini elde etmek ucun endpoint")
-    List<SupportHeader>getHeader(){
-        return  supportHeaderRepository.findAll();
+    SupportHeader getHeader(){
+        return  supportHeaderRepository.findFirstByOrderByIdAsc();
     }
 
 }

@@ -2,7 +2,9 @@ package com.backend.ecommercebackend.controller;
 
 import com.backend.ecommercebackend.authentication.jwt.JwtService;
 import com.backend.ecommercebackend.dto.request.OrderRequest;
+import com.backend.ecommercebackend.dto.request.OrderStatusRequest;
 import com.backend.ecommercebackend.model.order.Order;
+import com.backend.ecommercebackend.model.order.OrderItem;
 import com.backend.ecommercebackend.model.product.Product;
 import com.backend.ecommercebackend.repository.order.OrderItemRepository;
 import com.backend.ecommercebackend.repository.order.OrderRepository;
@@ -42,6 +44,7 @@ public class OrderController {
     @Operation(summary = "İstifadəçi sifarişlərini orderİd silmək üçün endpoint")
     public ResponseEntity<Void> deleteOrderItems(@PathVariable Long orderId) {
         orderRepository.deleteById(orderId);
+
         return ResponseEntity.noContent().build();
     }
 
@@ -76,14 +79,31 @@ public class OrderController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping("/orderItem/delete/{orderItemId}")
+    @DeleteMapping("/{orderId}/items/{orderItemId}")
     @Operation(summary = "İstifadəçi sifarişlərini orderİtemİd ilə silmək üçün endpoint")
-    public ResponseEntity<Void> deleteOrderItem(@PathVariable Long orderItemId) {
-        orderItemRepository.deleteById(orderItemId);
-
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Order> removeItem(@PathVariable Long orderId, @PathVariable Long orderItemId) {
+        return ResponseEntity.ok(orderService.removeOrderItem(orderId, orderItemId));
     }
 
+    @PutMapping("/status/{orderId}")
+    @Operation(summary = "İstifadəçinin orderinin statusunu Imtina etmək üçün endpoint")
+    public ResponseEntity<String> updateOrderStatustoImtina(
+            @PathVariable Long orderId) {
+        try {
+            orderService.updateOrderStatusToImtina(orderId);
+            return ResponseEntity.ok("Order status updated successfully.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(500).body("An unexpected error occurred.");
+        }
+
+    }
+
+    @PutMapping("/{orderId}/items/{itemId}")
+    public ResponseEntity<Order> updateItem(@PathVariable Long orderId, @PathVariable Long itemId, @RequestBody OrderItem newItem) {
+        return ResponseEntity.ok(orderService.updateOrderItem(orderId, itemId, newItem));
+    }
 }
 
 

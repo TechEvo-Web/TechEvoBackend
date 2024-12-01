@@ -33,4 +33,6 @@ public class Order {
     int day;
     String month;
     int year;
+    int weekPeriod;
+    int monthValue;
 }
