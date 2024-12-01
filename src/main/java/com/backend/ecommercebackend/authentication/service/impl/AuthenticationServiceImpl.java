@@ -143,19 +143,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
 
-        User user = authMapper.RegisterDtoToEntity(request, passwordEncoder);
-        user.setRole(Role.ADMIN);
-        user.setCreatedAt(LocalDateTime.now());
-        user.setUpdatedAt(LocalDateTime.now());
+        User admin = authMapper.RegisterDtoToEntity(request, passwordEncoder);
+        admin.setRole(Role.ADMIN);
+        admin.setCreatedAt(LocalDateTime.now());
+        admin.setUpdatedAt(LocalDateTime.now());
 
-        repository.save(user);
+        repository.save(admin);
 
 
         emailService.deleteStoredEmail(request.getEmail());
 
 
-        String accessToken = jwtService.generateAccessToken(user.getEmail());
-        String refreshToken = jwtService.generateRefreshToken(user.getEmail());
+        String accessToken = jwtService.generateAccessToken(admin.getEmail());
+        String refreshToken = jwtService.generateRefreshToken(admin.getEmail());
 
         return AuthResponse.builder()
                 .accessToken(accessToken)
