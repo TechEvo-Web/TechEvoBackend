@@ -24,8 +24,8 @@ public class CreditCardController {
     private final Header2Repository header2Repository;
 
     @GetMapping
-    public List<CreditCard> getCreditCard(){
-        return creditCardRepository.findAll();
+    public CreditCard getCreditCard(){
+        return creditCardRepository.findFirstByOrderByIdAsc();
     }
     @GetMapping("/header1")
     @Operation(summary = "Header 1(Rahat alisveris) elde etmek ucun endpoint(Credit)")
