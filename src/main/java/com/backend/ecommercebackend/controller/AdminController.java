@@ -1,5 +1,9 @@
 package com.backend.ecommercebackend.controller;
 
+import com.backend.ecommercebackend.authentication.dto.request.AuthRequest;
+import com.backend.ecommercebackend.authentication.dto.request.RegisterRequest;
+import com.backend.ecommercebackend.authentication.dto.response.AuthResponse;
+import com.backend.ecommercebackend.authentication.service.impl.AuthenticationServiceImpl;
 import com.backend.ecommercebackend.cache.service.VisitCounterService;
 import com.backend.ecommercebackend.dto.request.*;
 import com.backend.ecommercebackend.model.admin.credit.CreditCard;
@@ -22,6 +26,7 @@ import com.backend.ecommercebackend.repository.admin.support.SupportRepository;
 import com.backend.ecommercebackend.repository.admin.support.SupportStepRepository;
 import com.backend.ecommercebackend.service.*;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,6 +58,20 @@ public class AdminController {
   private final Header1Repository header1Repository;
   private final OrderService orderService;
   private final VisitCounterService visitService;
+  private final AuthenticationServiceImpl authenticationService;
+
+
+  @PostMapping("/register")
+  @Operation(summary = "Adminin register olunmağı üçün istifadə olunan endpoint. Data normal json data olaraq gonderilecek.")
+  public ResponseEntity<AuthResponse> registerAdmin(@Valid @RequestBody RegisterRequest request){
+    return ResponseEntity.ok(authenticationService.registerAdmin(request));
+  }
+
+  @PostMapping("/login")
+  @Operation(summary = "Admin Register olunduqdan sonra login üçün endpoint")
+  public ResponseEntity<AuthResponse> login (@Valid @RequestBody AuthRequest request){
+    return ResponseEntity.ok(authenticationService.authenticate(request));
+  }
 
   @DeleteMapping("/support/{id}")
   @Operation(summary = "Xidmetleri idye gore silmek ucun endpoint")

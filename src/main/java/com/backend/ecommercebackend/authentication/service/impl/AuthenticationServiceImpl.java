@@ -17,6 +17,7 @@ import com.backend.ecommercebackend.service.FileStorageService;
 import com.backend.ecommercebackend.service.impl.EmailServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -64,7 +65,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         emailService.deleteStoredEmail(request.getEmail());
 
-        String accessToken = jwtService.generateAccessToken(user.getEmail());
+        String accessToken = jwtService.generateAccessToken(user.getEmail(), user.getRole().name());
         String refreshToken=jwtService.generateRefreshToken(user.getEmail());
 
         return AuthResponse.builder()
@@ -80,7 +81,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         request.getEmail(),
                         request.getPassword()));
         User user = repository.findByEmail(request.getEmail()).orElseThrow(()-> new ApplicationException(Exceptions.USER_NOT_FOUND));
-        String accessToken = jwtService.generateAccessToken(user.getEmail());
+        String accessToken = jwtService.generateAccessToken(user.getEmail(), user.getRole().name());
         String refreshToken=jwtService.generateRefreshToken(user.getEmail());
 
         return AuthResponse.builder()
@@ -113,7 +114,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (userEmail != null) {
             var user = this.userDetailsService.loadUserByUsername(userEmail);
             if (jwtService.validateToken(user, refreshToken)) {
-                String accessToken = jwtService.generateAccessToken(userEmail);
+                String accessToken = jwtService.generateAccessToken(userEmail, user.getAuthorities().toString());
                 return AuthResponse.builder()
                         .refreshToken(refreshToken)
                         .accessToken(accessToken).build();
@@ -124,4 +125,42 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new ApplicationException(Exceptions.INVALID_TOKEN_EXCEPTION);
         }
     }
+
+    @Override
+    public AuthResponse registerAdmin(RegisterRequest request) {
+
+        if (!request.getConfirmPassword().equals(request.getPassword())) {
+            throw new ApplicationException(Exceptions.PASSWORD_MISMATCH_EXCEPTION);
+        }
+
+        if (request.getAcceptTerms().equals(Boolean.FALSE)) {
+            throw new ApplicationException(Exceptions.TERMS_ACCEPTANCE_EXCEPTION);
+        }
+
+        Optional<User> existingUser = repository.findByEmail(request.getEmail());
+        if (existingUser.isPresent()) {
+            throw new ApplicationException(Exceptions.USER_ALREADY_EXIST);
+        }
+
+
+        User admin = authMapper.RegisterDtoToEntity(request, passwordEncoder);
+        admin.setRole(Role.ADMIN);
+        admin.setCreatedAt(LocalDateTime.now());
+        admin.setUpdatedAt(LocalDateTime.now());
+
+        repository.save(admin);
+
+
+        emailService.deleteStoredEmail(request.getEmail());
+
+
+        String accessToken = jwtService.generateAccessToken(admin.getEmail(),admin.getRole().name());
+        String refreshToken = jwtService.generateRefreshToken(admin.getEmail());
+
+        return AuthResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
 }
+
