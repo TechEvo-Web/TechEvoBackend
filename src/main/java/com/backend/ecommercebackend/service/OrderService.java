@@ -14,4 +14,5 @@ public interface OrderService {
     List<Order> getOrdersByToken(String token);
     void updateOrderStatus(Long orderId, OrderStatusRequest orderStatusRequest);
     Map<String, Object> getAdminAnalytics();
+    List<Order> getOrders();
 }
