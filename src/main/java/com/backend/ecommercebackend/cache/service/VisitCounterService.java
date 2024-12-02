@@ -2,8 +2,8 @@ package com.backend.ecommercebackend.cache.service;
 
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -32,23 +32,24 @@ public class VisitCounterService {
     return count != null ? Long.parseLong(count) : 0L;
   }
 
-  public List<Long> getWeeklyVisitCounts() {
-    List<Long> weeklyCounts = new ArrayList<>();
+  public Map<String, Long> getWeeklyVisitCounts() {
+    Map<String, Long> weeklyCounts = new LinkedHashMap<>();
     for (int week = 1; week <= 4; week++) {
       String weeklyKey = WEEKLY_VISIT_COUNT_KEY_PREFIX + week;
       String count = redisTemplate.opsForValue().get(weeklyKey);
-      weeklyCounts.add(count != null ? Long.parseLong(count) : 0L);
+      weeklyCounts.put("week-" + week, count != null ? Long.parseLong(count) : 0L);
     }
 
     String week5Count = redisTemplate.opsForValue().get(WEEKLY_VISIT_COUNT_KEY_PREFIX + 5);
     if (week5Count != null) {
       Long week5 = Long.parseLong(week5Count);
-      weeklyCounts.set(3, weeklyCounts.get(3) + week5);
+      weeklyCounts.put("week-4", weeklyCounts.get("week-4") + week5);
       redisTemplate.delete(WEEKLY_VISIT_COUNT_KEY_PREFIX + 5);
     }
 
     return weeklyCounts;
   }
+
 
   private int getCurrentWeekOfMonth() {
     LocalDate today = LocalDate.now();

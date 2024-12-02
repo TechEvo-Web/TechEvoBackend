@@ -243,7 +243,7 @@ public class OrderServiceImpl implements OrderService {
     Long expectingOrderCount = (long) orderRepository.findOrderIdsByStatusGozleyir().size();
     Long rejectOrderCount = (long) orderRepository.findOrderIdsByStatusImtina().size();
     Long successOrderCount = (long) orderRepository.findOrderIdsByStatusCatdirilib().size();
-    List<Long> visitCount = visitCounterService.getWeeklyVisitCounts();
+    Map<String, Long> visitCount = visitCounterService.getWeeklyVisitCounts();
 
     Map<String, Object> result = new HashMap<>();
     result.put("expectingOrderCount", expectingOrderCount);
