@@ -65,7 +65,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         emailService.deleteStoredEmail(request.getEmail());
 
-        String accessToken = jwtService.generateAccessToken(user.getEmail());
+        String accessToken = jwtService.generateAccessToken(user.getEmail(), user.getRole().name());
         String refreshToken=jwtService.generateRefreshToken(user.getEmail());
 
         return AuthResponse.builder()
@@ -81,7 +81,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                         request.getEmail(),
                         request.getPassword()));
         User user = repository.findByEmail(request.getEmail()).orElseThrow(()-> new ApplicationException(Exceptions.USER_NOT_FOUND));
-        String accessToken = jwtService.generateAccessToken(user.getEmail());
+        String accessToken = jwtService.generateAccessToken(user.getEmail(), user.getRole().name());
         String refreshToken=jwtService.generateRefreshToken(user.getEmail());
 
         return AuthResponse.builder()
@@ -114,7 +114,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (userEmail != null) {
             var user = this.userDetailsService.loadUserByUsername(userEmail);
             if (jwtService.validateToken(user, refreshToken)) {
-                String accessToken = jwtService.generateAccessToken(userEmail);
+                String accessToken = jwtService.generateAccessToken(userEmail, user.getAuthorities().toString());
                 return AuthResponse.builder()
                         .refreshToken(refreshToken)
                         .accessToken(accessToken).build();
@@ -154,7 +154,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         emailService.deleteStoredEmail(request.getEmail());
 
 
-        String accessToken = jwtService.generateAccessToken(admin.getEmail());
+        String accessToken = jwtService.generateAccessToken(admin.getEmail(),admin.getRole().name());
         String refreshToken = jwtService.generateRefreshToken(admin.getEmail());
 
         return AuthResponse.builder()
