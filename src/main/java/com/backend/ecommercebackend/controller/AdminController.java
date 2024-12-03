@@ -16,6 +16,7 @@ import com.backend.ecommercebackend.model.admin.support.Support;
 import com.backend.ecommercebackend.model.admin.support.SupportHeader;
 import com.backend.ecommercebackend.model.admin.support.SupportStep;
 import com.backend.ecommercebackend.model.admin.term.UserTerm;
+import com.backend.ecommercebackend.model.order.Order;
 import com.backend.ecommercebackend.repository.admin.credit.CreditCardRepository;
 import com.backend.ecommercebackend.repository.admin.credit.Header1Repository;
 import com.backend.ecommercebackend.repository.admin.doortodoor.DoorHeaderRepository;
@@ -269,6 +270,10 @@ public class AdminController {
     } catch (RuntimeException e) {
       return ResponseEntity.status(500).body("An unexpected error occurred.");
     }
+  }
+  @PostMapping("/{orderId}/items")
+  public ResponseEntity<Order> addItem(@PathVariable Long orderId, @RequestBody OrderItemRequest newItem) {
+    return ResponseEntity.ok(orderService.addOrderItem(orderId, newItem));
   }
 
   @PostMapping("/count-visits")

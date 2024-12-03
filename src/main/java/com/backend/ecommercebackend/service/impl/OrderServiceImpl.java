@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -253,7 +254,97 @@ public class OrderServiceImpl implements OrderService {
     result.put("visitCount", visitCount);
     return result;
   }
+  @Override
+  public void updateOrderStatusToImtina(Long orderId) {
+    Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
 
+    order.setOrderStatus("İmtina");
+    orderRepository.save(order);
+
+
+  }
+  public Order updateOrderItem(Long orderId, Long itemId, OrderItem newItem) {
+    Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+    order.getOrderItems().stream()
+            .filter(item -> item.getId().equals(itemId))
+            .forEach(item -> {
+              item.setProductId(newItem.getProductId());
+              item.setQuantity(newItem.getQuantity());
+              item.setProductName(newItem.getProductName());
+              item.setPrice(newItem.getPrice());
+            });
+    orderRepository.save(order);
+    OrderItem orderItem=orderItemRepository.findById(itemId).orElseThrow(() -> new RuntimeException("Item not found"));
+    orderItem.setQuantity(newItem.getQuantity());
+    orderItem.setProductId(newItem.getProductId());
+    orderItem.setProductName(newItem.getProductName());
+    orderItem.setPrice(newItem.getPrice());
+    orderItemRepository.save(orderItem);
+    return order;
+  }
+  public Order removeOrderItem(Long orderId, Long orderItemId) {
+    Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+    List<OrderItem> updatedItems = order.getOrderItems().stream()
+            .filter(item -> !item.getId().equals(orderItemId))
+            .toList();
+    order.setOrderItems(updatedItems);
+    orderRepository.save(order);
+    orderItemRepository.deleteById(orderItemId);
+    if (order.getOrderItems().isEmpty()) {
+      orderRepository.delete(order);
+    }
+    return order;
+  }
+  @Override
+  public Order addOrderItem(Long orderId, OrderItemRequest orderItemRequest) {
+    // Order'ı bul
+    Order order = orderRepository.findById(orderId)
+            .orElseThrow(() -> new RuntimeException("Order not found"));
+
+    // Product bilgilerini al
+    Product product = productRepository.findById(orderItemRequest.getProductId())
+            .orElseThrow(() -> new RuntimeException("Product not found"));
+
+    // OrderItem oluştur
+    OrderItem newItem = new OrderItem();
+    newItem.setQuantity(orderItemRequest.getQuantity());
+    newItem.setPrice(orderItemRequest.getPrice());
+    newItem.setProductId(orderItemRequest.getProductId());
+    newItem.setProductName(product.getName());
+    newItem.setProductUrl("http://localhost:8081/api/v1/product/" + orderItemRequest.getProductId());
+
+    orderItemRepository.save(newItem);
+
+    List<OrderItem> updatedItems = order.getOrderItems();
+    updatedItems.add(newItem);
+    order.setOrderItems(updatedItems);
+
+    int totalQuantity = updatedItems.stream().mapToInt(OrderItem::getQuantity).sum();
+    int totalPrice = updatedItems.stream().mapToInt(item -> item.getPrice() * item.getQuantity()).sum();
+    order.setTotalPrice(totalPrice);
+
+    orderRepository.save(order);
+    return order;
+  }
+  @Override
+  public Map<String, Long> findMonthlyData() {
+    LocalDate now = LocalDate.now();
+    List<Order> orders = orderRepository.findOrdersByStatusCatdirilib();
+    List<Order> filteredOrders = orders.stream()
+            .filter(o -> o.getYear() == now.getYear() && o.getMonthValue() == now.getMonthValue())
+            .toList();
+    Map<Integer, Long> weekCounts = filteredOrders.stream()
+            .collect(Collectors.groupingBy(Order::getWeekPeriod, Collectors.counting()));
+
+    Map<String, Long> result = new HashMap<>();
+    result.put("Week1", weekCounts.getOrDefault(1, 0L));
+    result.put("Week2", weekCounts.getOrDefault(2, 0L));
+    result.put("Week3", weekCounts.getOrDefault(3, 0L));
+    result.put("Week4", weekCounts.getOrDefault(4, 0L));
+
+    return result;
+  }
 }
 
 
