@@ -44,11 +44,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public AuthResponse register(RegisterRequest request) {
 
-        if(!request.getConfirmPassword().equals(request.getPassword())){
+        if (!request.getConfirmPassword().equals(request.getPassword())) {
             throw new ApplicationException(Exceptions.PASSWORD_MISMATCH_EXCEPTION);
         }
 
-        if(request.getAcceptTerms().equals(Boolean.FALSE)){
+        if (request.getAcceptTerms().equals(Boolean.FALSE)) {
             throw new ApplicationException(Exceptions.TERMS_ACCEPTANCE_EXCEPTION);
         }
 
@@ -57,7 +57,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new ApplicationException(Exceptions.USER_ALREADY_EXIST);
         }
 
-        User user = authMapper.RegisterDtoToEntity(request,passwordEncoder);
+        User user = authMapper.RegisterDtoToEntity(request, passwordEncoder);
         user.setRole(Role.USER);
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
@@ -66,7 +66,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         emailService.deleteStoredEmail(request.getEmail());
 
         String accessToken = jwtService.generateAccessToken(user.getEmail(), user.getRole().name());
-        String refreshToken=jwtService.generateRefreshToken(user.getEmail());
+        String refreshToken = jwtService.generateRefreshToken(user.getEmail());
 
         return AuthResponse.builder()
                 .accessToken(accessToken)
@@ -80,9 +80,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
                         request.getPassword()));
-        User user = repository.findByEmail(request.getEmail()).orElseThrow(()-> new ApplicationException(Exceptions.USER_NOT_FOUND));
+        User user = repository.findByEmail(request.getEmail()).orElseThrow(() -> new ApplicationException(Exceptions.USER_NOT_FOUND));
         String accessToken = jwtService.generateAccessToken(user.getEmail(), user.getRole().name());
-        String refreshToken=jwtService.generateRefreshToken(user.getEmail());
+        String refreshToken = jwtService.generateRefreshToken(user.getEmail());
 
         return AuthResponse.builder()
                 .accessToken(accessToken)
@@ -94,12 +94,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public void logout(LogoutRequest request) {
         var token = request.getRefreshToken();
         String email = request.getEmail();
-            if (redisTokenService.validateRefreshToken(email, token)) {
-                redisTokenService.deleteRefreshToken(email);
-            } else {
-                throw new ApplicationException(Exceptions.INVALID_TOKEN_EXCEPTION);
-            }
+        if (redisTokenService.validateRefreshToken(email, token)) {
+            redisTokenService.deleteRefreshToken(email);
+        } else {
+            throw new ApplicationException(Exceptions.INVALID_TOKEN_EXCEPTION);
         }
+    }
 
     @Override
     public AuthResponse refreshAuthToken(HttpServletRequest request) throws IOException {
@@ -147,14 +147,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         admin.setRole(Role.ADMIN);
         admin.setCreatedAt(LocalDateTime.now());
         admin.setUpdatedAt(LocalDateTime.now());
-
         repository.save(admin);
-
-
         emailService.deleteStoredEmail(request.getEmail());
 
 
-        String accessToken = jwtService.generateAccessToken(admin.getEmail(),admin.getRole().name());
+        String accessToken = jwtService.generateAccessToken(admin.getEmail(), admin.getRole().name());
         String refreshToken = jwtService.generateRefreshToken(admin.getEmail());
 
         return AuthResponse.builder()

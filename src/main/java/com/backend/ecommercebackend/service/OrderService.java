@@ -11,14 +11,15 @@ import java.util.List;
 import java.util.Map;
 
 public interface OrderService {
+    List<Order> getOrders();
     Order processOrderItems(OrderRequest orderRequest,String token);
     Product getProductIdFromOrderItemId(Long orderItemId);
     List<Order> getOrdersByToken(String token);
-    public void updateOrderStatus(Long orderId, OrderStatusRequest orderStatusRequest);
-    Map<String, Long> getOrdersGroupedByStatus();
+    void updateOrderStatus(Long orderId, OrderStatusRequest orderStatusRequest);
     Map<String, Long> findMonthlyData();
-    public void updateOrderStatusToImtina(Long orderId);
+    void updateOrderStatusToImtina(Long orderId);
     Order updateOrderItem(Long orderId, Long itemId, OrderItem newItem);
     Order removeOrderItem(Long orderId, Long orderItemId);
+    Map<String, Object> getAdminAnalytics();
     Order addOrderItem(Long orderId, OrderItemRequest newItem);
 }

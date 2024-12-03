@@ -11,6 +11,9 @@ services:
       - '5437:5432'
     volumes:
       - securityData:/var/lib/postgresql/data
+    networks:
+      - ecommerce-evo
+
   product_service:
     container_name: product
     image: postgres
@@ -22,6 +25,9 @@ services:
      - '5433:5432'
     volumes:
      - productDataEvo:/var/lib/postgresql/data
+    networks:
+      - ecommerce-evo
+
   order_service:
     container_name: order
     image: postgres:alpine
@@ -30,9 +36,12 @@ services:
       POSTGRES_PASSWORD: 12345
       POSTGRES_DB: Order
     ports:
-      - '5436:5432'
+      - '5434:5432'
     volumes:
       - orderData:/var/lib/postgresql/data
+    networks:
+      - ecommerce-evo
+
   admin_service:
     container_name: admin
     image: postgres
@@ -41,9 +50,11 @@ services:
       POSTGRES_PASSWORD: 12345
       POSTGRES_DB: Admin
     ports:
-      - '5438:5432'
+      - '5435:5432'
     volumes:
       - adminData:/var/lib/postgresql/data
+    networks:
+     - ecommerce-evo
 
   redis:
     image: docker.io/bitnami/redis:7.2
@@ -54,7 +65,8 @@ services:
       - '6380:6379'
     volumes:
       - 'redis_data:/bitnami/redis/data'
-
+    networks:
+     - ecommerce-evo
 
 volumes:
   securityData: {}
@@ -62,3 +74,9 @@ volumes:
   productDataEvo: {}
   orderData: {}
   adminData: {}
+
+networks:
+  ecommerce-evo:
+   driver: bridge
+
+
