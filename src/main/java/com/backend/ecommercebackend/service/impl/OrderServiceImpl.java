@@ -52,8 +52,12 @@ public class OrderServiceImpl implements OrderService {
     LocalDate now = LocalDate.now();
     String[] months = {"Yanvar", "Fevral", "Mart", "Aprel", "May", "İyun", "İyul", "Avqust", "Sentyabr", "Oktyabr", "Noyabr", "Dekabr"};
     String month = months[now.getMonthValue() - 1];
-
-
+int monthValue=now.getMonthValue();
+    int week=0;
+    if (now.getDayOfMonth()<=7){week=1; }
+    if (now.getDayOfMonth()<=14 &&now.getDayOfMonth()>7){week=2; }
+    if (now.getDayOfMonth()<=21 &&now.getDayOfMonth()>14){week=3; }
+    if (now.getDayOfMonth()>21 ){week=4; }
     Order addedOrder = OrderMapper.INSTANCE.toOrder(orderRequest);
     Address address = OrderMapper.INSTANCE.toAddress(orderRequest.getAddress());
     addedOrder.setAddress(address);
@@ -62,7 +66,8 @@ public class OrderServiceImpl implements OrderService {
     addedOrder.setYear(now.getYear());
     addedOrder.setUserEmail(email);
     addedOrder.setOrderStatus("Gözləyir");
-
+addedOrder.setWeekPeriod(week);
+addedOrder.setMonthValue(monthValue);
         List<OrderItem> savedOrderItems = new ArrayList<>();
         for (OrderItemRequest orderItemRequest : orderRequest.getOrderItems()) {
             OrderItem orderItem = new OrderItem();
