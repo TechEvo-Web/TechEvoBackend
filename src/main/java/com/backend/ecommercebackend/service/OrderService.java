@@ -16,10 +16,9 @@ public interface OrderService {
     Product getProductIdFromOrderItemId(Long orderItemId);
     List<Order> getOrdersByToken(String token);
     void updateOrderStatus(Long orderId, OrderStatusRequest orderStatusRequest);
-    Map<String, Long> findMonthlyData();
+//    Map<String, Long> findMonthlyData();
     void updateOrderStatusToImtina(Long orderId);
     Order updateOrderItem(Long orderId, Long itemId, OrderItem newItem);
     Order removeOrderItem(Long orderId, Long orderItemId);
-    Map<String, Object> getAdminAnalytics();
     Order addOrderItem(Long orderId, OrderItemRequest newItem);
 }

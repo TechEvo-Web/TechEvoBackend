@@ -44,256 +44,264 @@ import java.util.Optional;
 
 public class AdminController {
 
-  private final SupportService supportService;
-  private final SupportRepository supportRepository;
-  private final SupportStepRepository supportStepRepository;
-  private final UserTermService userTermService;
-  private final DoorToDoorStepService doorToDoorStepService;
-  private final DoorToDoorStepRepository doorToDoorStepRepository;
-  private final DoorToDoorService doorToDoorService;
-  private final DoorToDoorRepository doorToDoorRepository;
-  private final CreditCardService creditCardService;
-  private final CreditCardRepository creditCardRepository;
-  private final DoorHeaderRepository doorHeaderRepository;
-  private final SupportHeaderRepository supportHeaderRepository;
-  private final Header1Repository header1Repository;
-  private final OrderService orderService;
-  private final VisitCounterService visitService;
-  private final AuthenticationServiceImpl authenticationService;
+    private final SupportService supportService;
+    private final SupportRepository supportRepository;
+    private final SupportStepRepository supportStepRepository;
+    private final UserTermService userTermService;
+    private final DoorToDoorStepService doorToDoorStepService;
+    private final DoorToDoorStepRepository doorToDoorStepRepository;
+    private final DoorToDoorService doorToDoorService;
+    private final DoorToDoorRepository doorToDoorRepository;
+    private final CreditCardService creditCardService;
+    private final CreditCardRepository creditCardRepository;
+    private final DoorHeaderRepository doorHeaderRepository;
+    private final SupportHeaderRepository supportHeaderRepository;
+    private final Header1Repository header1Repository;
+    private final OrderService orderService;
+    private final VisitCounterService visitService;
+    private final AuthenticationServiceImpl authenticationService;
+    private final AdminService adminService;
 
 
-  @PostMapping("/register")
-  @Operation(summary = "Adminin register olunmağı üçün istifadə olunan endpoint. Data normal json data olaraq gonderilecek.")
-  public ResponseEntity<AuthResponse> registerAdmin(@Valid @RequestBody RegisterRequest request){
-    return ResponseEntity.ok(authenticationService.registerAdmin(request));
-  }
-
-  @PostMapping("/login")
-  @Operation(summary = "Admin Register olunduqdan sonra login üçün endpoint")
-  public ResponseEntity<AuthResponse> login (@Valid @RequestBody AuthRequest request){
-    return ResponseEntity.ok(authenticationService.authenticate(request));
-  }
-
-  @DeleteMapping("/support/{id}")
-  @Operation(summary = "Xidmetleri idye gore silmek ucun endpoint")
-  public ResponseEntity<Support> deleteSupport(@PathVariable int id) {
-    supportRepository.deleteById(id);
-    return ResponseEntity.noContent().build();
-  }
-
-  @DeleteMapping("/supportStep/{id}")
-  @Operation(summary = "Xidmetler merhelelerini idye gore silmek ucun endpoint")
-  public ResponseEntity<SupportStep> deleteSupportStep(@PathVariable int id) {
-    supportStepRepository.deleteById(id);
-    return ResponseEntity.noContent().build();
-  }
-
-  @DeleteMapping("/credit/{id}")
-  @Operation(summary = "Xidmetler merhelelerini idye gore silmek ucun endpoint")
-  public ResponseEntity<SupportStep> deleteCreditCard(@PathVariable int id) {
-    creditCardRepository.deleteById(id);
-    return ResponseEntity.noContent().build();
-  }
-
-  @DeleteMapping("/doorStep/{id}")
-  @Operation(summary = "Xidmetler merhelelerini idye gore silmek ucun endpoint (Qapidan qapiya)")
-  public ResponseEntity<DoorToDoorStep> deleteDoorToDoorStep(@PathVariable int id) {
-    doorToDoorStepRepository.deleteById(id);
-    return ResponseEntity.noContent().build();
-  }
-
-  @DeleteMapping("/door/{id}")
-  @Operation(summary = "Faydalari idye gore silmek ucun endpoint")
-  public ResponseEntity<Support> deleteDoorToDoor(@PathVariable int id) {
-    doorToDoorRepository.deleteById(id);
-    return ResponseEntity.noContent().build();
-  }
-
-  @PostMapping("/support")
-  @Operation(summary = "Xidmetleri elave etmek ucun endpoint")
-  public ResponseEntity<Support> addSupport(@RequestBody SupportRequest supportRequest) {
-    Support createdSupport = supportService.addSupport(supportRequest);
-    return ResponseEntity.status(HttpStatus.CREATED).body(createdSupport);
-  }
-
-  @PostMapping("/supportStep")
-  @Operation(summary = "Xidmet merhelelerini elave etmek ucun endpoint")
-  public ResponseEntity<?> addSupportSteps(@RequestBody SupportStepRequest supportStepRequest) {
-    if (supportStepRepository.existsByStepOrder(supportStepRequest.getStepOrder())) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bu sıra doludur");
+    @PostMapping("/register")
+    @Operation(summary = "Adminin register olunmağı üçün istifadə olunan endpoint. Data normal json data olaraq gonderilecek.")
+    public ResponseEntity<AuthResponse> registerAdmin(@Valid @RequestBody RegisterRequest request) {
+        return ResponseEntity.ok(authenticationService.registerAdmin(request));
     }
 
-    SupportStep createdSupportStep = supportService.addSupportStep(supportStepRequest);
-
-    return ResponseEntity.status(HttpStatus.CREATED).body(createdSupportStep);
-  }
-
-  @PostMapping("/term")
-  @Operation(summary = "Terms/Policy elave edib deyismek ucun")
-
-  public ResponseEntity<UserTerm> addTerm(@RequestBody UserTermRequest userTermRequest) {
-    UserTerm userTerm = userTermService.addTerm(userTermRequest);
-    return ResponseEntity.status(HttpStatus.CREATED).body(userTerm);
-  }
-
-  @PostMapping("/doorHeader")
-  @Operation(summary = "Catdirilma Header elave edib deyismek ucun(Qapidan qapiya)")
-  public ResponseEntity<DoorHeader> addDoorHeader(@RequestBody DoorHeaderRequest doorHeaderRequest) {
-    doorHeaderRepository.deleteAll();
-
-    DoorHeader doorHeader = doorToDoorService.addHeader(doorHeaderRequest);
-    return ResponseEntity.status(HttpStatus.CREATED).body(doorHeader);
-  }
-
-  @PostMapping("/supportHeader")
-  @Operation(summary = "Xidmet sehifesine Header elave edib deyismek ucun")
-  public ResponseEntity<SupportHeader> addDoorHeader(@RequestBody SupportHeaderRequest supportHeaderRequest) {
-    supportHeaderRepository.deleteAll();
-
-    SupportHeader supportHeader = supportService.addHeader(supportHeaderRequest);
-    return ResponseEntity.status(HttpStatus.CREATED).body(supportHeader);
-  }
-
-  @PostMapping("/cardHeader1")
-  @Operation(summary = "Xidmet sehifesine Header elave edib deyismek ucun")
-  public ResponseEntity<Header1> addHeader1(@RequestBody Header1Request header1Request) {
-    header1Repository.deleteAll();
-
-    Header1 header1 = creditCardService.addHeader1(header1Request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(header1);
-  }
-
-  @PostMapping("/cardHeader2")
-  @Operation(summary = "Xidmet sehifesine Header 2 elave edib deyismek ucun")
-  public ResponseEntity<Header2> addHeader2(@RequestBody Header2Request header2Request) {
-    header1Repository.deleteAll();
-
-    Header2 header2 = creditCardService.addHeader2(header2Request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(header2);
-  }
-
-  @PostMapping("/doorStep")
-  @Operation(summary = "Xidmetleri merhelelerini etmek ucun endpoint(Qapidan qapiya)")
-  public ResponseEntity<?> addDoorStep(@RequestBody DoorToDoorStepRequest doorToDoorStepRequest) {
-    if (doorToDoorStepRepository.existsByStepOrder(doorToDoorStepRequest.getStepOrder())) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bu sıra doludur");
+    @PostMapping("/login")
+    @Operation(summary = "Admin Register olunduqdan sonra login üçün endpoint")
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
+        return ResponseEntity.ok(authenticationService.authenticate(request));
     }
 
-    DoorToDoorStep createdDoorToDoorStep = doorToDoorStepService.addDoorToDoorStep(doorToDoorStepRequest);
-    return ResponseEntity.status(HttpStatus.CREATED).body(createdDoorToDoorStep);
-  }
+    @DeleteMapping("/support/{id}")
+    @Operation(summary = "Xidmetleri idye gore silmek ucun endpoint")
+    public ResponseEntity<Support> deleteSupport(@PathVariable int id) {
+        supportRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
 
-  @PostMapping("/door")
-  @Operation(summary = "Faydalari elave etmek ucun endpoint")
+    @DeleteMapping("/supportStep/{id}")
+    @Operation(summary = "Xidmetler merhelelerini idye gore silmek ucun endpoint")
+    public ResponseEntity<SupportStep> deleteSupportStep(@PathVariable int id) {
+        supportStepRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
 
-  public DoorToDoor addDoor(@RequestPart("doorToDoorRequest") DoorToDoorRequest doorToDoorRequest,
-                            @RequestPart("file") MultipartFile multipartFile) {
-    return doorToDoorService.addDoorToDoor(doorToDoorRequest, multipartFile);
-  }
+    @DeleteMapping("/credit/{id}")
+    @Operation(summary = "Xidmetler merhelelerini idye gore silmek ucun endpoint")
+    public ResponseEntity<SupportStep> deleteCreditCard(@PathVariable int id) {
+        creditCardRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
 
-  @PostMapping("/credit")
-  @Operation(summary = "Kredit kartlarini elave etmek ucun endpoint")
+    @DeleteMapping("/doorStep/{id}")
+    @Operation(summary = "Xidmetler merhelelerini idye gore silmek ucun endpoint (Qapidan qapiya)")
+    public ResponseEntity<DoorToDoorStep> deleteDoorToDoorStep(@PathVariable int id) {
+        doorToDoorStepRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
 
-  public CreditCard addCredit(@RequestPart("creditCardRequest") CreditCardRequest creditCardRequest,
+    @DeleteMapping("/door/{id}")
+    @Operation(summary = "Faydalari idye gore silmek ucun endpoint")
+    public ResponseEntity<Support> deleteDoorToDoor(@PathVariable int id) {
+        doorToDoorRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/support")
+    @Operation(summary = "Xidmetleri elave etmek ucun endpoint")
+    public ResponseEntity<Support> addSupport(@RequestBody SupportRequest supportRequest) {
+        Support createdSupport = supportService.addSupport(supportRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdSupport);
+    }
+
+    @PostMapping("/supportStep")
+    @Operation(summary = "Xidmet merhelelerini elave etmek ucun endpoint")
+    public ResponseEntity<?> addSupportSteps(@RequestBody SupportStepRequest supportStepRequest) {
+        if (supportStepRepository.existsByStepOrder(supportStepRequest.getStepOrder())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bu sıra doludur");
+        }
+
+        SupportStep createdSupportStep = supportService.addSupportStep(supportStepRequest);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdSupportStep);
+    }
+
+    @PostMapping("/term")
+    @Operation(summary = "Terms/Policy elave edib deyismek ucun")
+
+    public ResponseEntity<UserTerm> addTerm(@RequestBody UserTermRequest userTermRequest) {
+        UserTerm userTerm = userTermService.addTerm(userTermRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userTerm);
+    }
+
+    @PostMapping("/doorHeader")
+    @Operation(summary = "Catdirilma Header elave edib deyismek ucun(Qapidan qapiya)")
+    public ResponseEntity<DoorHeader> addDoorHeader(@RequestBody DoorHeaderRequest doorHeaderRequest) {
+        doorHeaderRepository.deleteAll();
+
+        DoorHeader doorHeader = doorToDoorService.addHeader(doorHeaderRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(doorHeader);
+    }
+
+    @PostMapping("/supportHeader")
+    @Operation(summary = "Xidmet sehifesine Header elave edib deyismek ucun")
+    public ResponseEntity<SupportHeader> addDoorHeader(@RequestBody SupportHeaderRequest supportHeaderRequest) {
+        supportHeaderRepository.deleteAll();
+
+        SupportHeader supportHeader = supportService.addHeader(supportHeaderRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(supportHeader);
+    }
+
+    @PostMapping("/cardHeader1")
+    @Operation(summary = "Xidmet sehifesine Header elave edib deyismek ucun")
+    public ResponseEntity<Header1> addHeader1(@RequestBody Header1Request header1Request) {
+        header1Repository.deleteAll();
+
+        Header1 header1 = creditCardService.addHeader1(header1Request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(header1);
+    }
+
+    @PostMapping("/cardHeader2")
+    @Operation(summary = "Xidmet sehifesine Header 2 elave edib deyismek ucun")
+    public ResponseEntity<Header2> addHeader2(@RequestBody Header2Request header2Request) {
+        header1Repository.deleteAll();
+
+        Header2 header2 = creditCardService.addHeader2(header2Request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(header2);
+    }
+
+    @PostMapping("/doorStep")
+    @Operation(summary = "Xidmetleri merhelelerini etmek ucun endpoint(Qapidan qapiya)")
+    public ResponseEntity<?> addDoorStep(@RequestBody DoorToDoorStepRequest doorToDoorStepRequest) {
+        if (doorToDoorStepRepository.existsByStepOrder(doorToDoorStepRequest.getStepOrder())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bu sıra doludur");
+        }
+
+        DoorToDoorStep createdDoorToDoorStep = doorToDoorStepService.addDoorToDoorStep(doorToDoorStepRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdDoorToDoorStep);
+    }
+
+    @PostMapping("/door")
+    @Operation(summary = "Faydalari elave etmek ucun endpoint")
+
+    public DoorToDoor addDoor(@RequestPart("doorToDoorRequest") DoorToDoorRequest doorToDoorRequest,
                               @RequestPart("file") MultipartFile multipartFile) {
-    return creditCardService.addCreditCard(creditCardRequest, multipartFile);
-  }
-
-  @PutMapping("/support/{id}")
-  @Operation(summary = "Xidmetleri idye gore update etmek ucun endpoint")
-  public ResponseEntity<Support> updateSupport(@PathVariable int id, @RequestBody SupportRequest supportRequest) {
-    Support updatedSupport = supportService.updateSupport(id, supportRequest);
-    return ResponseEntity.ok(updatedSupport);
-  }
-
-  @PutMapping("/supportStep/{id}")
-  @Operation(summary = "Xidmet merhelelerini idye gore update etmek ucun endpoint")
-  public ResponseEntity<?> updateSupportStep(@PathVariable int id, @RequestBody SupportStepRequest supportStepRequest) {
-    Optional<SupportStep> existingSupportStep = supportStepRepository.findById(id);
-    if (existingSupportStep.isEmpty()) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Xidmet merhelesi tapilmadi");
+        return doorToDoorService.addDoorToDoor(doorToDoorRequest, multipartFile);
     }
 
-    SupportStep currentSupportStep = existingSupportStep.get();
-    if (currentSupportStep.getStepOrder() != supportStepRequest.getStepOrder() &&
-        supportStepRepository.existsByStepOrder(supportStepRequest.getStepOrder())) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bu sıra doludur");
+    @PostMapping("/credit")
+    @Operation(summary = "Kredit kartlarini elave etmek ucun endpoint")
+
+    public CreditCard addCredit(@RequestPart("creditCardRequest") CreditCardRequest creditCardRequest,
+                                @RequestPart("file") MultipartFile multipartFile) {
+        return creditCardService.addCreditCard(creditCardRequest, multipartFile);
     }
 
-    SupportStep updatedSupportStep = supportService.updateSupportStep(id, supportStepRequest);
-
-    return ResponseEntity.status(HttpStatus.OK).body(updatedSupportStep);
-  }
-
-  @PutMapping("/doorStep/{id}")
-  @Operation(summary = "Xidmet merhelelerini idye gore update etmek ucun endpoint (Qapidan qapiya)")
-  public ResponseEntity<?> updateDoorToDoorStep(
-      @PathVariable int id,
-      @RequestBody DoorToDoorStepRequest doorToDoorStepRequest) {
-    try {
-      DoorToDoorStep updatedStep = doorToDoorStepService.updateDoorToDoorStep(id, doorToDoorStepRequest);
-      return ResponseEntity.ok(updatedStep);
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-    } catch (RuntimeException e) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    @PutMapping("/support/{id}")
+    @Operation(summary = "Xidmetleri idye gore update etmek ucun endpoint")
+    public ResponseEntity<Support> updateSupport(@PathVariable int id, @RequestBody SupportRequest supportRequest) {
+        Support updatedSupport = supportService.updateSupport(id, supportRequest);
+        return ResponseEntity.ok(updatedSupport);
     }
-  }
 
-  @PutMapping("/door/{id}")
-  @Operation(summary = "Faydalari idye gore update etmek ucun endpoint")
-  public DoorToDoor updateDoor(
-      @PathVariable int id,
-      @RequestPart("doorToDoorRequest") DoorToDoorRequest doorToDoorRequest,
-      @RequestPart(value = "file", required = false) MultipartFile multipartFile) throws IOException {
-    return doorToDoorService.updateDoorToDoor(id, doorToDoorRequest, multipartFile);
-  }
+    @PutMapping("/supportStep/{id}")
+    @Operation(summary = "Xidmet merhelelerini idye gore update etmek ucun endpoint")
+    public ResponseEntity<?> updateSupportStep(@PathVariable int id, @RequestBody SupportStepRequest supportStepRequest) {
+        Optional<SupportStep> existingSupportStep = supportStepRepository.findById(id);
+        if (existingSupportStep.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Xidmet merhelesi tapilmadi");
+        }
 
-  @PutMapping("/credit/{id}")
-  @Operation(summary = "Kredit kartlarini idye gore update etmek ucun endpoint")
-  public CreditCard updateCreditCard(
-      @PathVariable int id,
-      @RequestPart("creditCardRequest") CreditCardRequest creditCardRequest,
-      @RequestPart(value = "file", required = false) MultipartFile multipartFile) throws IOException {
-    return creditCardService.updateCreditCard(id, creditCardRequest, multipartFile);
-  }
+        SupportStep currentSupportStep = existingSupportStep.get();
+        if (currentSupportStep.getStepOrder() != supportStepRequest.getStepOrder() &&
+                supportStepRepository.existsByStepOrder(supportStepRequest.getStepOrder())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bu sıra doludur");
+        }
 
-  @PutMapping("/order/{orderId}")
-  @Operation(summary = "İstifadəçinin sifarişlərinin statusunu update etmək üçün endpoint")
-  public ResponseEntity<String> updateOrderStatus(
-      @PathVariable Long orderId, @RequestBody OrderStatusRequest orderStatusRequest) {
-    try {
-      orderService.updateOrderStatus(orderId, orderStatusRequest);
-      return ResponseEntity.ok("Order status updated successfully.");
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.badRequest().body(e.getMessage());
-    } catch (RuntimeException e) {
-      return ResponseEntity.status(500).body("An unexpected error occurred.");
+        SupportStep updatedSupportStep = supportService.updateSupportStep(id, supportStepRequest);
+
+        return ResponseEntity.status(HttpStatus.OK).body(updatedSupportStep);
     }
-  }
-  @PostMapping("/{orderId}/items")
-  public ResponseEntity<Order> addItem(@PathVariable Long orderId, @RequestBody OrderItemRequest newItem) {
-    return ResponseEntity.ok(orderService.addOrderItem(orderId, newItem));
-  }
 
-  @PostMapping("/count-visits")
-  @Operation(summary = "Istifadeci ziyaret sayini avtomatik artirmaq üçün endpoint")
-  public ResponseEntity<Void> incrementVisitCount() {
-    visitService.incrementVisitCount();
-    return ResponseEntity.ok().build();
-  }
+    @PutMapping("/doorStep/{id}")
+    @Operation(summary = "Xidmet merhelelerini idye gore update etmek ucun endpoint (Qapidan qapiya)")
+    public ResponseEntity<?> updateDoorToDoorStep(
+            @PathVariable int id,
+            @RequestBody DoorToDoorStepRequest doorToDoorStepRequest) {
+        try {
+            DoorToDoorStep updatedStep = doorToDoorStepService.updateDoorToDoorStep(id, doorToDoorStepRequest);
+            return ResponseEntity.ok(updatedStep);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
 
-  @GetMapping("/total-visits")
-  @Operation(summary = "Girish eden total istifadeci sayini almaq üçün endpoint (ELAVE, just in case)")
-  public ResponseEntity<Long> getAllUserVisits() {
-    return ResponseEntity.ok(visitService.getVisitCount());
-  }
+    @PutMapping("/door/{id}")
+    @Operation(summary = "Faydalari idye gore update etmek ucun endpoint")
+    public DoorToDoor updateDoor(
+            @PathVariable int id,
+            @RequestPart("doorToDoorRequest") DoorToDoorRequest doorToDoorRequest,
+            @RequestPart(value = "file", required = false) MultipartFile multipartFile) throws IOException {
+        return doorToDoorService.updateDoorToDoor(id, doorToDoorRequest, multipartFile);
+    }
 
-  @GetMapping("/getAnalytics")
-  @Operation(summary = "Ümumi admin panelinin statistikalarini almaq üçün endpoint")
-  public ResponseEntity<Map<String, Object>> getAdminPanelAnalytics() {
-    return ResponseEntity.ok(orderService.getAdminAnalytics());
-  }
+    @PutMapping("/credit/{id}")
+    @Operation(summary = "Kredit kartlarini idye gore update etmek ucun endpoint")
+    public CreditCard updateCreditCard(
+            @PathVariable int id,
+            @RequestPart("creditCardRequest") CreditCardRequest creditCardRequest,
+            @RequestPart(value = "file", required = false) MultipartFile multipartFile) throws IOException {
+        return creditCardService.updateCreditCard(id, creditCardRequest, multipartFile);
+    }
+
+    @PutMapping("/order/{orderId}")
+    @Operation(summary = "İstifadəçinin sifarişlərinin statusunu update etmək üçün endpoint")
+    public ResponseEntity<String> updateOrderStatus(
+            @PathVariable Long orderId, @RequestBody OrderStatusRequest orderStatusRequest) {
+        try {
+            orderService.updateOrderStatus(orderId, orderStatusRequest);
+            return ResponseEntity.ok("Order status updated successfully.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(500).body("An unexpected error occurred.");
+        }
+    }
+
+    @PostMapping("/{orderId}/items")
+    public ResponseEntity<Order> addItem(@PathVariable Long orderId, @RequestBody OrderItemRequest newItem) {
+        return ResponseEntity.ok(orderService.addOrderItem(orderId, newItem));
+    }
+
+    @PostMapping("/count-visits")
+    @Operation(summary = "Istifadeci ziyaret sayini avtomatik artirmaq üçün endpoint")
+    public ResponseEntity<Void> incrementVisitCount() {
+        visitService.incrementVisitCount();
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/total-visits")
+    @Operation(summary = "Girish eden total istifadeci sayini almaq üçün endpoint (ELAVE, just in case)")
+    public ResponseEntity<Long> getAllUserVisits() {
+        return ResponseEntity.ok(visitService.getVisitCount());
+    }
+
+    @GetMapping("/getAnalytics")
+    @Operation(summary = "Ümumi admin panelinin analitikalarini almaq üçün endpoint")
+    public ResponseEntity<Map<String, Map<String, Object>>> getAdminPanelAnalytics() {
+        return ResponseEntity.ok(adminService.getAdminAnalytics());
+    }
+
+    @GetMapping("/getStatistics")
+    @Operation(summary = "Ümumi admin panelinin statistikalarini almaq üçün endpoint")
+    public ResponseEntity<Map<String,Object>> getAdminStatistics() {
+        return ResponseEntity.ok(adminService.getAllStatistics());
+    }
 
 }
 
