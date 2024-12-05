@@ -19,5 +19,5 @@ public class OrderRequest {
     @Column(columnDefinition = "jsonb", nullable = false)
     List<OrderItemRequest> orderItems;
     AddressRequest address;
-
+    UserDataRequest userData;
 }

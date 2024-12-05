@@ -9,10 +9,7 @@ import com.backend.ecommercebackend.dto.request.OrderStatusRequest;
 import com.backend.ecommercebackend.enums.Exceptions;
 import com.backend.ecommercebackend.exception.ApplicationException;
 import com.backend.ecommercebackend.mapper.OrderMapper;
-import com.backend.ecommercebackend.model.order.Address;
-import com.backend.ecommercebackend.model.order.Order;
-import com.backend.ecommercebackend.model.order.OrderItem;
-import com.backend.ecommercebackend.model.order.OrderStatus;
+import com.backend.ecommercebackend.model.order.*;
 import com.backend.ecommercebackend.model.product.Product;
 import com.backend.ecommercebackend.model.user.User;
 import com.backend.ecommercebackend.repository.order.OrderItemRepository;
@@ -70,10 +67,16 @@ public class OrderServiceImpl implements OrderService {
         if (now.getDayOfMonth() > 21) {
             week = 4;
         }
+        UserData userData=new UserData();
+        userData.setPhoneNumber(orderRequest.getUserData().getPhoneNumber());
+        userData.setAdditionalInfo(orderRequest.getUserData().getAdditionalInfo());
+        userData.setName(userRepository.findByEmail(email).get().getFirstName());
+        userData.setSurname(userRepository.findByEmail(email).get().getLastName());
         Order addedOrder = OrderMapper.INSTANCE.toOrder(orderRequest);
         Address address = OrderMapper.INSTANCE.toAddress(orderRequest.getAddress());
-        addedOrder.setAddress(address);
+         addedOrder.setAddress(address);
         addedOrder.setUserEmail(email);
+        addedOrder.setUserData(userData);
         addedOrder.setOrderStatus(OrderStatus.Gözləyir);
         List<OrderItem> savedOrderItems = new ArrayList<>();
         for (OrderItemRequest orderItemRequest : orderRequest.getOrderItems()) {
