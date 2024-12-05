@@ -101,6 +101,8 @@ public class OrderController {
     }
 
     @PutMapping("/{orderId}/items/{itemId}")
+    @Operation(summary = "İstifadəçinin sifarisini deyismek üçün endpoint")
+
     public ResponseEntity<Order> updateItem(@PathVariable Long orderId, @PathVariable Long itemId, @RequestBody OrderItem newItem) {
         return ResponseEntity.ok(orderService.updateOrderItem(orderId, itemId, newItem));
     }

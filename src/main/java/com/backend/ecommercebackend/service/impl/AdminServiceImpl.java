@@ -68,8 +68,8 @@ public class AdminServiceImpl implements AdminService {
     public Map<String, Object> getAllStatistics() {
         Map<String, Object> result = new HashMap<>();
         Long loginUserCount = (long) userRepository.findAll().size();
-        Long expectingOrderCount = (long) orderRepository.findOrdersByOrderStatus(OrderStatus.Pending).size();
-        Long successOrderCount = (long) orderRepository.findOrdersByOrderStatus(OrderStatus.Delivered).size();
+        Long expectingOrderCount = (long) orderRepository.findOrdersByOrderStatus(OrderStatus.Gözləyir).size();
+        Long successOrderCount = (long) orderRepository.findOrdersByOrderStatus(OrderStatus.Çatdırılıb).size();
         Long visitCount = visitCounterService.getVisitCount();
 
         result.put("expectingOrderCount", expectingOrderCount);

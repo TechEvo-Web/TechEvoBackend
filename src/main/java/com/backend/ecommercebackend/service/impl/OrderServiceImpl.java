@@ -74,7 +74,7 @@ public class OrderServiceImpl implements OrderService {
         Address address = OrderMapper.INSTANCE.toAddress(orderRequest.getAddress());
         addedOrder.setAddress(address);
         addedOrder.setUserEmail(email);
-        addedOrder.setOrderStatus(OrderStatus.Pending);
+        addedOrder.setOrderStatus(OrderStatus.Gözləyir);
         List<OrderItem> savedOrderItems = new ArrayList<>();
         for (OrderItemRequest orderItemRequest : orderRequest.getOrderItems()) {
             OrderItem orderItem = new OrderItem();
@@ -255,7 +255,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
 
-        order.setOrderStatus(OrderStatus.Canceled);
+        order.setOrderStatus(OrderStatus.İmtina);
         orderRepository.save(order);
 
 
