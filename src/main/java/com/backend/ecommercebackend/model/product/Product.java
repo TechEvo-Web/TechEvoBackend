@@ -58,8 +58,11 @@ public class Product {
     @Column(nullable = false)
     String look;
 
+    @Column(nullable = false)
+    Boolean isStock = true;
+
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb", nullable = false)
-    Map<String,Object> specifications=new HashMap<>();
+    Map<String, Object> specifications = new HashMap<>();
 
 }

@@ -23,5 +23,6 @@ public class ProductRequest {
     String usingPurpose;
     String whereUse;
     String look;
+    Boolean isStock;
     Map<String,Object> specifications;
 }

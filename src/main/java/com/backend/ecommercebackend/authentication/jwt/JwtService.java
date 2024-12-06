@@ -30,8 +30,9 @@ public class JwtService {
 
     private final RedisTokenService redisTokenService;
 
-    public String generateAccessToken(String email) {
+    public String generateAccessToken(String email, String role) {
         Map<String, Object> claims = new HashMap<>();
+        claims.put("role", role);
         return createToken(claims, email,accessTokenExpiration);
     }
 
@@ -55,6 +56,11 @@ public class JwtService {
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    public String extractUserRole(String token) {
+        Claims claims = extractAllClaim(token);
+        return claims.get("role", String.class);
     }
 
     public Date extractExpiration(String token) {
@@ -82,8 +88,6 @@ public class JwtService {
         String username= extractUsername(token);
         return (username.equals(user.getUsername()) && !isTokenExpired(token));
     }
-
-
 
 
     private Key getSigninKey() {

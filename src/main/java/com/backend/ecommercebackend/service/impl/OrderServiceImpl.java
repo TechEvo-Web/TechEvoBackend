@@ -2,15 +2,13 @@ package com.backend.ecommercebackend.service.impl;
 
 
 import com.backend.ecommercebackend.authentication.jwt.JwtService;
-import com.backend.ecommercebackend.cache.service.RedisTokenService;
-import com.backend.ecommercebackend.cache.service.VisitCounterService;
 import com.backend.ecommercebackend.dto.request.OrderItemRequest;
 import com.backend.ecommercebackend.dto.request.OrderRequest;
 import com.backend.ecommercebackend.dto.request.OrderStatusRequest;
+import com.backend.ecommercebackend.enums.Exceptions;
+import com.backend.ecommercebackend.exception.ApplicationException;
 import com.backend.ecommercebackend.mapper.OrderMapper;
-import com.backend.ecommercebackend.model.order.Address;
-import com.backend.ecommercebackend.model.order.Order;
-import com.backend.ecommercebackend.model.order.OrderItem;
+import com.backend.ecommercebackend.model.order.*;
 import com.backend.ecommercebackend.model.product.Product;
 import com.backend.ecommercebackend.repository.order.OrderItemRepository;
 import com.backend.ecommercebackend.repository.order.OrderRepository;
@@ -23,11 +21,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
+
 import java.util.ArrayList;
-import java.util.HashMap;
+
 import java.util.List;
-import java.util.Map;
+
+import java.util.Optional;
+
 
 
 @Service
@@ -39,7 +41,6 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final JwtService jwtService;
-    private final VisitCounterService visitCounterService;
     @Value("${spring.mail.username}")
     private String from;
 
@@ -47,20 +48,17 @@ public class OrderServiceImpl implements OrderService {
     public Order processOrderItems(OrderRequest orderRequest, String token) {
         String email = jwtService.extractUsername(token);
         LocalDate now = LocalDate.now();
-        String[] months = {"Yanvar", "Fevral", "Mart", "Aprel", "May", "İyun", "İyul", "Avqust", "Sentyabr", "Oktyabr", "Noyabr", "Dekabr"};
-        String month = months[now.getMonthValue() - 1];
-
-
-
+        UserData userData=new UserData();
+        userData.setPhoneNumber(orderRequest.getUserData().getPhoneNumber());
+        userData.setAdditionalInfo(orderRequest.getUserData().getAdditionalInfo());
+        userData.setName(userRepository.findByEmail(email).get().getFirstName());
+        userData.setSurname(userRepository.findByEmail(email).get().getLastName());
         Order addedOrder = OrderMapper.INSTANCE.toOrder(orderRequest);
         Address address = OrderMapper.INSTANCE.toAddress(orderRequest.getAddress());
-        addedOrder.setAddress(address);
-        addedOrder.setDay(now.getDayOfMonth());
-        addedOrder.setMonth(month);
-        addedOrder.setYear(now.getYear());
+         addedOrder.setAddress(address);
         addedOrder.setUserEmail(email);
-        addedOrder.setOrderStatus("Gözləyir");
-
+        addedOrder.setUserData(userData);
+        addedOrder.setOrderStatus(OrderStatus.Pending);
         List<OrderItem> savedOrderItems = new ArrayList<>();
         for (OrderItemRequest orderItemRequest : orderRequest.getOrderItems()) {
             OrderItem orderItem = new OrderItem();
@@ -205,35 +203,109 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
-        @Override
-        public void updateOrderStatus(Long orderId, OrderStatusRequest orderStatusRequest) {
-            Order order = orderRepository.findById(orderId)
-                    .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
-
-            String newStatus = orderStatusRequest.getOrderStatus();
-            if (!newStatus.equals("Çatdırılıb") && !newStatus.equals("İmtina")) {
-                throw new IllegalArgumentException("Invalid status: " + newStatus + ". Only 'çatdırılıb' or 'cancel' are allowed.");
+    @Override
+    public List<Order> getOrders() {
+        List<Order> orders = orderRepository.findAll();
+        for (Order order : orders) {
+            for (OrderItem orderItem : order.getOrderItems()) {
+                Optional<Product> productOpt = productRepository.findById(orderItem.getProductId());
+                if (productOpt.isPresent()) {
+                    orderItem.setProductName(productOpt.get().getName());
+                } else {
+                    throw new ApplicationException(Exceptions.NOT_FOUND_EXCEPTION);
+                }
             }
-
-            order.setOrderStatus(newStatus);
-            orderRepository.save(order);
         }
-@Override
-public Map<String, Object> getAdminAnalytics() {
-    Long loginUserCount= (long) userRepository.findAll().size();
-    Long expectingOrderCount = (long) orderRepository.findOrderIdsByStatusGozleyir().size();
-    Long rejectOrderCount = (long) orderRepository.findOrderIdsByStatusImtina().size();
-    Long successOrderCount = (long) orderRepository.findOrderIdsByStatusCatdirilib().size();
-    List<Long> visitCount=visitCounterService.getWeeklyVisitCounts();
+        return orders;
+    }
 
-    Map<String, Object> result = new HashMap<>();
-    result.put("expectingOrderCount", expectingOrderCount);
-    result.put("rejectOrderCount", rejectOrderCount);
-    result.put("successOrderCount", successOrderCount);
-    result.put("loginUserCount", loginUserCount);
-    result.put("visitCount", visitCount);
-    return result;
-}
+
+    @Override
+    public void updateOrderStatus(Long orderId, OrderStatusRequest orderStatusRequest) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
+
+        OrderStatus newStatus = orderStatusRequest.getOrderStatus();
+        order.setOrderStatus(newStatus);
+        orderRepository.save(order);
+    }
+
+    @Override
+    public void updateOrderStatusToImtina(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
+
+        order.setOrderStatus(OrderStatus.Canceled);
+        orderRepository.save(order);
+
+
+    }
+
+    public Order updateOrderItem(Long orderId, Long itemId, OrderItem newItem) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+        order.getOrderItems().stream()
+                .filter(item -> item.getId().equals(itemId))
+                .forEach(item -> {
+                    item.setProductId(newItem.getProductId());
+                    item.setQuantity(newItem.getQuantity());
+                    item.setProductName(newItem.getProductName());
+                    item.setPrice(newItem.getPrice());
+                });
+        orderRepository.save(order);
+        OrderItem orderItem = orderItemRepository.findById(itemId).orElseThrow(() -> new RuntimeException("Item not found"));
+        orderItem.setQuantity(newItem.getQuantity());
+        orderItem.setProductId(newItem.getProductId());
+        orderItem.setProductName(newItem.getProductName());
+        orderItem.setPrice(newItem.getPrice());
+        orderItemRepository.save(orderItem);
+        return order;
+    }
+
+    public Order removeOrderItem(Long orderId, Long orderItemId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new RuntimeException("Order not found"));
+        List<OrderItem> updatedItems = order.getOrderItems().stream()
+                .filter(item -> !item.getId().equals(orderItemId))
+                .toList();
+        order.setOrderItems(updatedItems);
+        orderRepository.save(order);
+        orderItemRepository.deleteById(orderItemId);
+        if (order.getOrderItems().isEmpty()) {
+            orderRepository.delete(order);
+        }
+        return order;
+    }
+
+    @Override
+    public Order addOrderItem(Long orderId, OrderItemRequest orderItemRequest) {
+        // Order'ı bul
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        // Product bilgilerini al
+        Product product = productRepository.findById(orderItemRequest.getProductId())
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        // OrderItem oluştur
+        OrderItem newItem = new OrderItem();
+        newItem.setQuantity(orderItemRequest.getQuantity());
+        newItem.setPrice(orderItemRequest.getPrice());
+        newItem.setProductId(orderItemRequest.getProductId());
+        newItem.setProductName(product.getName());
+        newItem.setProductUrl("http://localhost:8081/api/v1/product/" + orderItemRequest.getProductId());
+
+        orderItemRepository.save(newItem);
+
+        List<OrderItem> updatedItems = order.getOrderItems();
+        updatedItems.add(newItem);
+        order.setOrderItems(updatedItems);
+
+        int totalQuantity = updatedItems.stream().mapToInt(OrderItem::getQuantity).sum();
+        int totalPrice = updatedItems.stream().mapToInt(item -> item.getPrice() * item.getQuantity()).sum();
+        order.setTotalPrice(totalPrice);
+
+        orderRepository.save(order);
+        return order;
+    }
 
 }
 

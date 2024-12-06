@@ -24,18 +24,18 @@ public class CreditCardController {
     private final Header2Repository header2Repository;
 
     @GetMapping
-    public List<CreditCard> getCreditCard(){
-        return creditCardRepository.findAll();
+    public CreditCard getCreditCard(){
+        return creditCardRepository.findFirstByOrderByIdAsc();
     }
     @GetMapping("/header1")
     @Operation(summary = "Header 1(Rahat alisveris) elde etmek ucun endpoint(Credit)")
-    List<Header1>getHeader1(){
-        return  header1Repository.findAll();
+    Header1 getHeader1(){
+        return  header1Repository.findFirstByOrderByIdAsc();
     }
 
     @GetMapping("/header2")
     @Operation(summary = "Headeri 2(Daxili kredit) elde etmek ucun endpoint(Credit)")
-    List<Header2>getHeader2(){
-        return  header2Repository.findAll();
+    Header2 getHeader2(){
+        return  header2Repository.findFirstByOrderByIdAsc();
     }
 }

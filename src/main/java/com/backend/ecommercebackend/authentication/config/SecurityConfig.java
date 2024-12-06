@@ -79,14 +79,16 @@ public class SecurityConfig {
                          exception.accessDeniedHandler(accessDeniedHandler)
                                  .authenticationEntryPoint(authenticationEntryPoint)
                  )
-                   .authorizeHttpRequests( auth ->
-                    auth
-                            .requestMatchers("/api/v1/auth/**","/api/v1/product/**","/api/v1/admin/**","/api/v1/support","/api/v1/order/**","/api/v1/user/allUsers","/api/v1/support/steps","/api/v1/admin/terms","/api/v1/product/comment/getAll").permitAll()
-                            .requestMatchers("/api/v1/auth/**","/api/v1/product/**","/api/v1/admin/**","/api/v1/support","/api/v1/creditcard","/api/v1/order/**","/api/v1/profile/**","/api/v1/user/allUsers","/api/v1/support/steps","/api/v1/admin/terms","/api/v1/door/**","/api/v1/order/getAllOrders","/api/v1/admin/order/{orderId}/status","/api/v1/admin/order/**").permitAll()
-                            .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                            .requestMatchers("/api/v1/product/comment/**").authenticated()
-                            .anyRequest().authenticated()
-                )
+                 .authorizeHttpRequests(auth ->
+                         auth
+                                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                                 .requestMatchers("/api/v1/auth/**", "/api/v1/product/**", "/api/v1/support", "/api/v1/order/**", "/api/v1/user/allUsers", "/api/v1/support/steps", "/api/v1/admin/terms").permitAll()
+                                 .requestMatchers("/api/v1/support/**","/api/v1/creditcard/**","api/v1/door/**","/api/v1/admin/**").permitAll()
+                                 .requestMatchers("/api/v1/product/comment/**").authenticated()
+                                 .requestMatchers("/api/v1/admin/register","/api/v1/admin/login").permitAll()
+//                                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                                 .anyRequest().authenticated()
+                 )
 
                  .oauth2Login(oauth2 -> oauth2
                          .loginPage("/login")

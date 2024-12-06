@@ -65,7 +65,7 @@ public class CustomOauth2UserService implements OAuth2UserService<OAuth2UserRequ
 
             User userEntity = existingUser.get();
             userEntity.setGoogleId(googleId);
-            String accessToken = jwtService.generateAccessToken(userEntity.getEmail());
+            String accessToken = jwtService.generateAccessToken(userEntity.getEmail(), userEntity.getRole().name());
             String refreshToken = jwtService.generateRefreshToken(userEntity.getEmail());
             return AuthResponse.builder()
                     .accessToken(accessToken)
@@ -88,7 +88,7 @@ public class CustomOauth2UserService implements OAuth2UserService<OAuth2UserRequ
             userRepository.save(newUser);
 
 
-            String accessToken = jwtService.generateAccessToken(newUser.getEmail());
+            String accessToken = jwtService.generateAccessToken(newUser.getEmail(), newUser.getRole().name());
             String refreshToken = jwtService.generateRefreshToken(newUser.getEmail());
 
 

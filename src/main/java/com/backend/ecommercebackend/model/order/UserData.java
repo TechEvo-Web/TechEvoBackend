@@ -1,4 +1,4 @@
-package com.backend.ecommercebackend.model.admin.credit;
+package com.backend.ecommercebackend.model.order;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -9,11 +9,12 @@ import lombok.experimental.FieldDefaults;
 @Entity
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CreditCard {
+public class UserData {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    int id;
-    String cardImage;
-    String cardHeader;
-    String cardDescription;
+    Long id;
+    String phoneNumber;
+    String name;
+    String surname;
+    String additionalInfo;
 }
