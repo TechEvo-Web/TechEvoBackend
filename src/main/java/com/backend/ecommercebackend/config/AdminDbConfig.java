@@ -38,7 +38,7 @@ public class AdminDbConfig {
     @Value("${spring.datasource.fourth.password}")
     private String fourthDbPassword;
 
-    @Value("${spring.jpa.hibernate.ddl-auto}")
+    @Value("${spring.jpa.first.hibernate.ddl-auto}")
     private String fourthDbDdlAuto;
 
 

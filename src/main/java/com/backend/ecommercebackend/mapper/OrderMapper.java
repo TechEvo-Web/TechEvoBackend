@@ -19,7 +19,9 @@ public interface OrderMapper {
     @Mapping(source = "deliveryType", target = "deliveryType")
     @Mapping(source = "totalPrice", target = "totalPrice")
     Order toOrder(OrderRequest orderRequest);
-UserData toUserData(UserDataRequest userDataRequest);
+
+    UserData toUserData(UserDataRequest userDataRequest);
+
     Address toAddress(AddressRequest addressRequest);
 }
 

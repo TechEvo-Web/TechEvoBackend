@@ -39,7 +39,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @CreationTimestamp
+//    @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     LocalDateTime createdAt;

@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -20,4 +22,5 @@ public class OrderRequest {
     List<OrderItemRequest> orderItems;
     AddressRequest address;
     UserDataRequest userData;
+    LocalDateTime createdAt;
 }

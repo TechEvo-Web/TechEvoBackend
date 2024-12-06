@@ -1,8 +1,6 @@
 package com.backend.ecommercebackend.service.impl;
 
 import com.backend.ecommercebackend.cache.service.VisitCounterService;
-import com.backend.ecommercebackend.enums.Exceptions;
-import com.backend.ecommercebackend.exception.ApplicationException;
 import com.backend.ecommercebackend.model.order.Order;
 import com.backend.ecommercebackend.model.order.OrderStatus;
 import com.backend.ecommercebackend.model.user.User;
@@ -13,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.temporal.TemporalAdjusters;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,27 +33,27 @@ public class AdminServiceImpl implements AdminService {
             long userCount = 0;
             long orderCount = 0;
             int weekDays = 7;
-//            System.out.println(day + " day deyeri");
+            int startDayOfWeek = weekDays * (i - 1) + 1;
+            int lastDayOfWeek = weekDays * i;
             Map<String, Object> analyticValue = new HashMap<>();
-            for (int day = weekDays * (i - 1) + 1; day <= weekDays * i; day++) {
                 for (User user : users) {
                     LocalDateTime userCreatedTime = user.getCreatedAt();
-                    if (userCreatedTime.getDayOfMonth() == day && userCreatedTime.getMonthValue() == now.getMonthValue() && userCreatedTime.getYear() == now.getYear()) {
+                    if (startDayOfWeek<=userCreatedTime.getDayOfMonth() && lastDayOfWeek>userCreatedTime.getDayOfMonth() && userCreatedTime.getMonthValue() == now.getMonthValue() && userCreatedTime.getYear() == now.getYear()) {
                         userCount++;
                     }
                 }
                 for (Order order : orders) {
                     LocalDateTime orderCreatedTime = order.getCreatedAt();
-                    if (orderCreatedTime.getDayOfMonth() == day && orderCreatedTime.getMonthValue() == now.getMonthValue() && orderCreatedTime.getYear() == now.getYear()) {
+                    if (startDayOfWeek<=orderCreatedTime.getDayOfMonth() && lastDayOfWeek>orderCreatedTime.getDayOfMonth() && orderCreatedTime.getMonthValue() == now.getMonthValue() && orderCreatedTime.getYear() == now.getYear()) {
                         orderCount++;
                     }
                 }
-            }
+//            }
             analyticValue.put("loginUserCount", userCount);
             analyticValue.put("orderCount", orderCount);
             analyticValue.put("visitCount", visitCounterService.getWeeklyVisitCounts(i).get(0));
             analytics.put("week" + i, analyticValue);
-            System.out.println("week"+i + " userCount deyeri" + userCount);
+            System.out.println("week" + i + " userCount deyeri" + userCount);
 
         }
 
@@ -68,8 +65,8 @@ public class AdminServiceImpl implements AdminService {
     public Map<String, Object> getAllStatistics() {
         Map<String, Object> result = new HashMap<>();
         Long loginUserCount = (long) userRepository.findAll().size();
-        Long expectingOrderCount = (long) orderRepository.findOrdersByOrderStatus(OrderStatus.Gözləyir).size();
-        Long successOrderCount = (long) orderRepository.findOrdersByOrderStatus(OrderStatus.Çatdırılıb).size();
+        Long expectingOrderCount = (long) orderRepository.findOrdersByOrderStatus(OrderStatus.Pending).size();
+        Long successOrderCount = (long) orderRepository.findOrdersByOrderStatus(OrderStatus.Delivered).size();
         Long visitCount = visitCounterService.getVisitCount();
 
         result.put("expectingOrderCount", expectingOrderCount);

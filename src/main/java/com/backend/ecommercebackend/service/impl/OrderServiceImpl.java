@@ -2,7 +2,6 @@ package com.backend.ecommercebackend.service.impl;
 
 
 import com.backend.ecommercebackend.authentication.jwt.JwtService;
-import com.backend.ecommercebackend.cache.service.VisitCounterService;
 import com.backend.ecommercebackend.dto.request.OrderItemRequest;
 import com.backend.ecommercebackend.dto.request.OrderRequest;
 import com.backend.ecommercebackend.dto.request.OrderStatusRequest;
@@ -11,7 +10,6 @@ import com.backend.ecommercebackend.exception.ApplicationException;
 import com.backend.ecommercebackend.mapper.OrderMapper;
 import com.backend.ecommercebackend.model.order.*;
 import com.backend.ecommercebackend.model.product.Product;
-import com.backend.ecommercebackend.model.user.User;
 import com.backend.ecommercebackend.repository.order.OrderItemRepository;
 import com.backend.ecommercebackend.repository.order.OrderRepository;
 import com.backend.ecommercebackend.repository.product.ProductRepository;
@@ -43,7 +41,6 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final JwtService jwtService;
-    private final VisitCounterService visitCounterService;
     @Value("${spring.mail.username}")
     private String from;
 
@@ -51,22 +48,6 @@ public class OrderServiceImpl implements OrderService {
     public Order processOrderItems(OrderRequest orderRequest, String token) {
         String email = jwtService.extractUsername(token);
         LocalDate now = LocalDate.now();
-        String[] months = {"Yanvar", "Fevral", "Mart", "Aprel", "May", "İyun", "İyul", "Avqust", "Sentyabr", "Oktyabr", "Noyabr", "Dekabr"};
-        String month = months[now.getMonthValue() - 1];
-        int monthValue = now.getMonthValue();
-        int week = 0;
-        if (now.getDayOfMonth() <= 7) {
-            week = 1;
-        }
-        if (now.getDayOfMonth() <= 14 && now.getDayOfMonth() > 7) {
-            week = 2;
-        }
-        if (now.getDayOfMonth() <= 21 && now.getDayOfMonth() > 14) {
-            week = 3;
-        }
-        if (now.getDayOfMonth() > 21) {
-            week = 4;
-        }
         UserData userData=new UserData();
         userData.setPhoneNumber(orderRequest.getUserData().getPhoneNumber());
         userData.setAdditionalInfo(orderRequest.getUserData().getAdditionalInfo());
@@ -77,7 +58,7 @@ public class OrderServiceImpl implements OrderService {
          addedOrder.setAddress(address);
         addedOrder.setUserEmail(email);
         addedOrder.setUserData(userData);
-        addedOrder.setOrderStatus(OrderStatus.Gözləyir);
+        addedOrder.setOrderStatus(OrderStatus.Pending);
         List<OrderItem> savedOrderItems = new ArrayList<>();
         for (OrderItemRequest orderItemRequest : orderRequest.getOrderItems()) {
             OrderItem orderItem = new OrderItem();
@@ -245,10 +226,6 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
 
         OrderStatus newStatus = orderStatusRequest.getOrderStatus();
-//        if (!newStatus.equals("Çatdırılıb") && !newStatus.equals("İmtina")) {
-//            throw new IllegalArgumentException("Invalid status: " + newStatus + ". Only 'çatdırılıb' or 'cancel' are allowed.");
-//        }
-
         order.setOrderStatus(newStatus);
         orderRepository.save(order);
     }
@@ -258,7 +235,7 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
 
-        order.setOrderStatus(OrderStatus.İmtina);
+        order.setOrderStatus(OrderStatus.Canceled);
         orderRepository.save(order);
 
 
@@ -329,25 +306,7 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
         return order;
     }
-//
-//    @Override
-//    public Map<String, Long> findMonthlyData() {
-//        LocalDate now = LocalDate.now();
-//        List<Order> orders = orderRepository.findOrdersByStatusCatdirilib();
-//        List<Order> filteredOrders = orders.stream()
-//                .filter(o -> o.getYear() == now.getYear() && o.getMonthValue() == now.getMonthValue())
-//                .toList();
-//        Map<Integer, Long> weekCounts = filteredOrders.stream()
-//                .collect(Collectors.groupingBy(Order::getWeekPeriod, Collectors.counting()));
-//
-//        Map<String, Long> result = new HashMap<>();
-//        result.put("Week1", weekCounts.getOrDefault(1, 0L));
-//        result.put("Week2", weekCounts.getOrDefault(2, 0L));
-//        result.put("Week3", weekCounts.getOrDefault(3, 0L));
-//        result.put("Week4", weekCounts.getOrDefault(4, 0L));
-//
-//        return result;
-//    }
+
 }
 
 

@@ -38,7 +38,7 @@ public class UserDbConfig {
   @Value("${spring.datasource.first.password}")
   private String firstDbPassword;
 
-  @Value("${spring.jpa.hibernate.ddl-auto}")
+  @Value("${spring.jpa.first.hibernate.ddl-auto}")
   private String firstDbDdlAuto;
 
 

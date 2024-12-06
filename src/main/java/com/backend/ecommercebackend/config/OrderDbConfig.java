@@ -38,7 +38,7 @@ public class OrderDbConfig {
     @Value("${spring.datasource.third.password}")
     private String thirdDbPassword;
 
-    @Value("${spring.jpa.hibernate.ddl-auto}")
+    @Value("${spring.jpa.second.hibernate.ddl-auto}")
     private String thirdDbDdlAuto;
 
 
