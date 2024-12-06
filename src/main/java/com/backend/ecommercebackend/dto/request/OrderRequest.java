@@ -22,5 +22,4 @@ public class OrderRequest {
     List<OrderItemRequest> orderItems;
     AddressRequest address;
     UserDataRequest userData;
-    LocalDateTime createdAt;
 }

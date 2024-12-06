@@ -34,7 +34,7 @@ public class Order {
     String userEmail;
     @Enumerated(EnumType.STRING)
     OrderStatus orderStatus;
-//    @CreationTimestamp
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     LocalDateTime createdAt;
