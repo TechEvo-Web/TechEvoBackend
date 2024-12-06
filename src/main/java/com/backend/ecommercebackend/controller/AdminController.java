@@ -36,6 +36,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -263,17 +264,26 @@ public class AdminController {
 
     @PutMapping("/order/{orderId}")
     @Operation(summary = "İstifadəçinin sifarişlərinin statusunu update etmək üçün endpoint")
-    public ResponseEntity<String> updateOrderStatus(
-            @PathVariable Long orderId, @RequestBody OrderStatusRequest orderStatusRequest) {
+    public ResponseEntity<Map<String, Object>> updateOrderStatus(
+            @PathVariable Long orderId,
+            @RequestBody OrderStatusRequest orderStatusRequest) {
+        Map<String, Object> response = new HashMap<>();
         try {
             orderService.updateOrderStatus(orderId, orderStatusRequest);
-            return ResponseEntity.ok("Order status updated successfully.");
+            response.put("status", "success");
+            response.put("message", "Order status updated successfully.");
+            return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            response.put("status", "error");
+            response.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(500).body("An unexpected error occurred.");
+            response.put("status", "error");
+            response.put("message", "An unexpected error occurred.");
+            return ResponseEntity.status(500).body(response);
         }
     }
+
 
     @PostMapping("/{orderId}/items")
     @Operation(summary = "Ordera elave order item elave etmek üçün endpoint")
