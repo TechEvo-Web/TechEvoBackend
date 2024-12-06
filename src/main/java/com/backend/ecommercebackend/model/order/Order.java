@@ -28,6 +28,9 @@ public class Order {
     @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
     @JoinColumn(name = "address_Id")
     Address address;
+    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @JoinColumn(name = "userData_Id")
+    UserData userData;
     String userEmail;
     @Enumerated(EnumType.STRING)
     OrderStatus orderStatus;

@@ -19,6 +19,7 @@ import com.backend.ecommercebackend.model.admin.term.UserTerm;
 import com.backend.ecommercebackend.model.order.Order;
 import com.backend.ecommercebackend.repository.admin.credit.CreditCardRepository;
 import com.backend.ecommercebackend.repository.admin.credit.Header1Repository;
+import com.backend.ecommercebackend.repository.admin.credit.Header2Repository;
 import com.backend.ecommercebackend.repository.admin.doortodoor.DoorHeaderRepository;
 import com.backend.ecommercebackend.repository.admin.doortodoor.DoorToDoorRepository;
 import com.backend.ecommercebackend.repository.admin.doortodoor.DoorToDoorStepRepository;
@@ -61,6 +62,7 @@ public class AdminController {
     private final VisitCounterService visitService;
     private final AuthenticationServiceImpl authenticationService;
     private final AdminService adminService;
+    private final Header2Repository header2Repository;
 
 
     @PostMapping("/register")
@@ -274,6 +276,8 @@ public class AdminController {
     }
 
     @PostMapping("/{orderId}/items")
+    @Operation(summary = "Ordera elave order item elave etmek üçün endpoint")
+
     public ResponseEntity<Order> addItem(@PathVariable Long orderId, @RequestBody OrderItemRequest newItem) {
         return ResponseEntity.ok(orderService.addOrderItem(orderId, newItem));
     }
@@ -301,6 +305,53 @@ public class AdminController {
     @Operation(summary = "Ümumi admin panelinin statistikalarini almaq üçün endpoint")
     public ResponseEntity<Map<String,Object>> getAdminStatistics() {
         return ResponseEntity.ok(adminService.getAllStatistics());
+    }
+    @DeleteMapping("/door/header/delete")
+    @Operation(summary = "Qapidan qapiya catdirilma basligini silmek üçün endpoint")
+
+    public ResponseEntity<DoorHeader> deleteDoorHeader() {
+        DoorHeader dh = doorHeaderRepository.findFirstByOrderByIdAsc();
+        if (dh == null) {
+            return ResponseEntity.notFound().build();
+        }
+        doorHeaderRepository.delete(dh);
+
+        return ResponseEntity.ok(dh);
+    }
+    @DeleteMapping("/credit/header1/delete")
+    @Operation(summary = "Rahat alis veris secimleri basligini silmek üçün endpoint")
+
+    public ResponseEntity<Header1> deleteCreditHeader1() {
+        Header1 dh = header1Repository.findFirstByOrderByIdAsc();
+        if (dh == null) {
+            return ResponseEntity.notFound().build();
+        }
+        header1Repository.delete(dh);
+
+        return ResponseEntity.ok(dh);
+    }
+    @DeleteMapping("/credit/header2/delete")
+    @Operation(summary = "Daxili kredit basligini silmek üçün endpoint")
+
+    public ResponseEntity<Header2> deleteCreditHeader2() {
+        Header2 dh = header2Repository.findFirstByOrderByIdAsc();
+        if (dh == null) {
+            return ResponseEntity.notFound().build();
+        }
+        header2Repository.delete(dh);
+
+        return ResponseEntity.ok(dh);
+    }
+    @DeleteMapping("/support/header/delete")
+    @Operation(summary = "Xidmetler sehifesinin basligini silmek üçün endpoint")
+    public ResponseEntity<SupportHeader> deleteSupportHeader() {
+        SupportHeader dh = supportHeaderRepository.findFirstByOrderByIdAsc();
+        if (dh == null) {
+            return ResponseEntity.notFound().build();
+        }
+        supportHeaderRepository.delete(dh);
+
+        return ResponseEntity.ok(dh);
     }
 
 }
