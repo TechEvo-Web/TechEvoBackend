@@ -24,5 +24,6 @@ public class ProductRequest {
     String whereUse;
     String look;
     Boolean isStock;
+    int stockQuantity;
     Map<String,Object> specifications;
 }

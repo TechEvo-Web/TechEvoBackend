@@ -18,7 +18,7 @@ public interface OrderService {
     void updateOrderStatus(Long orderId, OrderStatusRequest orderStatusRequest);
 //    Map<String, Long> findMonthlyData();
     void updateOrderStatusToImtina(Long orderId);
-    Order updateOrderItem(Long orderId, Long itemId, OrderItem newItem);
+    Order updateOrderItem(Long orderId, Long itemId, OrderItemRequest newItem);
     Order removeOrderItem(Long orderId, Long orderItemId);
     Order addOrderItem(Long orderId, OrderItemRequest newItem);
 }

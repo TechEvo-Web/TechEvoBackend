@@ -1,6 +1,7 @@
 package com.backend.ecommercebackend.controller;
 
 import com.backend.ecommercebackend.authentication.jwt.JwtService;
+import com.backend.ecommercebackend.dto.request.OrderItemRequest;
 import com.backend.ecommercebackend.dto.request.OrderRequest;
 import com.backend.ecommercebackend.dto.request.OrderStatusRequest;
 import com.backend.ecommercebackend.model.order.Order;
@@ -103,7 +104,7 @@ public class OrderController {
     @PutMapping("/{orderId}/items/{itemId}")
     @Operation(summary = "İstifadəçinin sifarisini deyismek üçün endpoint")
 
-    public ResponseEntity<Order> updateItem(@PathVariable Long orderId, @PathVariable Long itemId, @RequestBody OrderItem newItem) {
+    public ResponseEntity<Order> updateItem(@PathVariable Long orderId, @PathVariable Long itemId, @RequestBody OrderItemRequest newItem) {
         return ResponseEntity.ok(orderService.updateOrderItem(orderId, itemId, newItem));
     }
 }

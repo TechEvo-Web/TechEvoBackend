@@ -61,6 +61,9 @@ public class Product {
     @Column(nullable = false)
     Boolean isStock = true;
 
+    @Column(nullable = false)
+    int stockQuantity;
+
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb", nullable = false)
     Map<String, Object> specifications = new HashMap<>();
