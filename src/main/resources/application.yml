@@ -3,10 +3,10 @@ spring:
     name: EcommerceBackend
   data:
     redis:
-      host: redis
-      port: 6379
-#      host: localhost
-#      port: 6380
+      #host: redis
+      #port: 6380
+      host: localhost
+      port: 6380
       password: ecommerce-redis-p@ss
       timeout: 60000
       client-type: lettuce
@@ -20,25 +20,25 @@ spring:
 
   datasource:
     first:
-      url: jdbc:postgresql://security_service:5432/User
-#      url: jdbc:postgresql://localhost:5437/User
+#      url: jdbc:postgresql://security_service:5432/User
+      url: jdbc:postgresql://localhost:5437/User
       username: SECURITY
       password: SECURITY
     second:
-      url: jdbc:postgresql://product_service:5432/EvoProduct
-#      url: jdbc:postgresql://localhost:5433/EvoProduct
+#      url: jdbc:postgresql://product_service:5432/EvoProduct
+      url: jdbc:postgresql://localhost:5433/EvoProduct
 
       username: ROOT
       password: 1234
     third:
-      url: jdbc:postgresql://order_service:5432/Order
-#      url: jdbc:postgresql://localhost:5434/Order
+#      url: jdbc:postgresql://order_service:5432/Order
+      url: jdbc:postgresql://localhost:5434/Order
 
       username: ORDER
       password: 12345
     fourth:
-      url: jdbc:postgresql://admin_service:5432/Admin
-#      url: jdbc:postgresql://localhost:5435/Admin
+#      url: jdbc:postgresql://admin_service:5432/Admin
+      url: jdbc:postgresql://localhost:5435/Admin
       username: ADMIN
       password: 12345
   jpa:
@@ -48,7 +48,7 @@ spring:
       ddl-auto: update
     second:
       hibernate:
-        ddl-auto: create-drop
+        ddl-auto: update
 
 
 
