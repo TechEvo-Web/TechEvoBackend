@@ -28,6 +28,7 @@ public class BlogPostController {
         return ResponseEntity.ok(service.getAllBlogPosts());
     }
 
+
     @GetMapping("/getAllByCategoryName")
     @Operation(summary = "Bloqları kateqoriya adı ilə almaq üçün endpoint")
     public ResponseEntity<List<BlogPost>> getBlogPostsByCategory(@RequestParam String categoryName) {
