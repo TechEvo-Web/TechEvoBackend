@@ -18,60 +18,57 @@ import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
 
-
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(
-        basePackages = "com.backend.ecommercebackend.repository.order",
-        entityManagerFactoryRef = "thirdEntityManagerFactory",
-        transactionManagerRef = "thirdTransactionManager"
+        basePackages = "com.backend.ecommercebackend.repository.blog",
+        entityManagerFactoryRef = "fifthEntityManagerFactory",
+        transactionManagerRef = "fifthTransactionManager"
 )
+public class BlogPostDbConfig {
+    @Value("${spring.datasource.fifth.url}")
+    private String fifthDbUrl;
 
-public class OrderDbConfig {
+    @Value("${spring.datasource.fifth.username}")
+    private String fifthDbUsername;
 
-    @Value("${spring.datasource.third.url}")
-    private String thirdDbUrl;
-
-    @Value("${spring.datasource.third.username}")
-    private String thirdDbUsername;
-
-    @Value("${spring.datasource.third.password}")
-    private String thirdDbPassword;
+    @Value("${spring.datasource.fifth.password}")
+    private String fifthDbPassword;
 
     @Value("${spring.jpa.second.hibernate.ddl-auto}")
-    private String thirdDbDdlAuto;
+    private String fifthDbDdlAuto;
 
 
-    @Bean(name = "thirdDataSource")
-    public DataSource thirdDataSource() {
+    @Bean(name = "fifthDataSource")
+    public DataSource fifthDataSource() {
         DataSourceBuilder<?> builder = DataSourceBuilder.create();
-        builder.url(thirdDbUrl);
-        builder.username(thirdDbUsername);
-        builder.password(thirdDbPassword);
+        builder.url(fifthDbUrl);
+        builder.username(fifthDbUsername);
+        builder.password(fifthDbPassword);
         return builder.build();
     }
 
 
-    @Bean(name = "thirdEntityManagerFactory")
-    public LocalContainerEntityManagerFactoryBean thirdEntityManagerFactory(
+    @Bean(name = "fifthEntityManagerFactory")
+    public LocalContainerEntityManagerFactoryBean fifthEntityManagerFactory(
             EntityManagerFactoryBuilder builder) {
         return builder
-                .dataSource(thirdDataSource())
-                .packages("com.backend.ecommercebackend.model.order")
-                .persistenceUnit("third")
+                .dataSource(fifthDataSource())
+                .packages("com.backend.ecommercebackend.model.blog")
+                .persistenceUnit("fifth")
                 .properties(hibernateProperties())
                 .build();
     }
 
-    @Bean(name = "thirdTransactionManager")
-    public PlatformTransactionManager thirdTransactionManager(
-            @Qualifier("thirdEntityManagerFactory") EntityManagerFactory thirdEntityManagerFactory) {
-        return new JpaTransactionManager(thirdEntityManagerFactory);
+    @Bean(name = "fifthTransactionManager")
+    public PlatformTransactionManager fifthTransactionManager(
+            @Qualifier("fifthEntityManagerFactory") EntityManagerFactory fifthEntityManagerFactory) {
+        return new JpaTransactionManager(fifthEntityManagerFactory);
     }
 
     private Map<String, Object> hibernateProperties() {
         Map<String, Object> properties = new HashMap<>();
-        properties.put("hibernate.hbm2ddl.auto", thirdDbDdlAuto);
+        properties.put("hibernate.hbm2ddl.auto", fifthDbDdlAuto);
         return properties;
     }
 }

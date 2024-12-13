@@ -5,6 +5,8 @@ import com.backend.ecommercebackend.model.product.Product;
 import com.backend.ecommercebackend.repository.product.ProductRepository;
 import com.backend.ecommercebackend.service.SelectiveProductService;
 import java.util.List;
+import java.util.Objects;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,10 +22,11 @@ public class SelectiveProductServiceImpl implements SelectiveProductService {
     String usingPurpose = request.getUsingPurpose();
     String whereUse = request.getWhereUse();
     String look = request.getLook();
+
     return productRepository.findAll().stream()
-            .filter(product -> usingPurpose != null && usingPurpose.trim().equalsIgnoreCase(product.getUsingPurpose().trim()))
-            .filter(product -> whereUse != null && whereUse.trim().equalsIgnoreCase(product.getWhereUse().trim()))
-            .filter(product -> look != null && look.trim().equalsIgnoreCase(product.getLook().trim()))
+            .filter(product -> usingPurpose == null || usingPurpose.trim().equalsIgnoreCase(product.getUsingPurpose().trim()))
+            .filter(product -> whereUse == null || whereUse.trim().equalsIgnoreCase(product.getWhereUse().trim()))
+            .filter(product -> "Not Important".equalsIgnoreCase(look) || (look != null && look.trim().equalsIgnoreCase(product.getLook().trim())))
             .toList();
   }
 }

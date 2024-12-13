@@ -6,8 +6,7 @@ import lombok.experimental.FieldDefaults;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CreditCardRequest {
-    String cardHeader;
-    String cardDescription;
-
+public class UserDataRequest {
+    String phoneNumber;
+    String additionalInfo;
 }

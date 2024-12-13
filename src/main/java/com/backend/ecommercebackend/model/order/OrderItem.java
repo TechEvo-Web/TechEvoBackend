@@ -12,11 +12,12 @@ import lombok.experimental.FieldDefaults;
 public class OrderItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     Long id;
     int quantity;
     int price;
     Long productId;
     String productName;
     String productUrl="http://localhost:8081/api/v1/product/";
+    int stockQuantity;
 }

@@ -3,6 +3,8 @@ spring:
     name: EcommerceBackend
   data:
     redis:
+      #host: redis
+      #port: 6380
       host: localhost
       port: 6380
       password: ecommerce-redis-p@ss
@@ -10,32 +12,50 @@ spring:
       client-type: lettuce
 
   servlet:
-   multipart:
-    enabled: true
-    max-file-size: 10MB
-    max-request-size: 10MB
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+
 
   datasource:
     first:
+#      url: jdbc:postgresql://security_service:5432/User
       url: jdbc:postgresql://localhost:5437/User
       username: SECURITY
       password: SECURITY
     second:
+#      url: jdbc:postgresql://product_service:5432/EvoProduct
       url: jdbc:postgresql://localhost:5433/EvoProduct
+
       username: ROOT
       password: 1234
     third:
-      url: jdbc:postgresql://localhost:5436/Order
+#      url: jdbc:postgresql://order_service:5432/Order
+      url: jdbc:postgresql://localhost:5434/Order
+
       username: ORDER
       password: 12345
     fourth:
-      url: jdbc:postgresql://localhost:5438/Admin
+#      url: jdbc:postgresql://admin_service:5432/Admin
+      url: jdbc:postgresql://localhost:5435/Admin
       username: ADMIN
+      password: 12345
+    fifth:
+      #      url: jdbc:postgresql://product_service:5432/BlogPost
+      url: jdbc:postgresql://localhost:5436/BlogPost
+      username: BLOGPOST
       password: 12345
   jpa:
     show-sql: true
-    hibernate:
+    first:
+     hibernate:
       ddl-auto: update
+    second:
+      hibernate:
+        ddl-auto: update
+
+
 
   mail:
     host: smtp.gmail.com
@@ -47,6 +67,7 @@ spring:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
       mail.debug: true
+
 
       security:
         oauth2:
@@ -61,7 +82,7 @@ refresh-token:
   expiration: 2592000000
 
 access-token:
-  expiration: 120000
+  expiration: 600000
 
 verification-code:
   expiration: 300000

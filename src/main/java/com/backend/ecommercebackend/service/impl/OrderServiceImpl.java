@@ -2,15 +2,13 @@ package com.backend.ecommercebackend.service.impl;
 
 
 import com.backend.ecommercebackend.authentication.jwt.JwtService;
-import com.backend.ecommercebackend.cache.service.RedisTokenService;
-import com.backend.ecommercebackend.cache.service.VisitCounterService;
 import com.backend.ecommercebackend.dto.request.OrderItemRequest;
 import com.backend.ecommercebackend.dto.request.OrderRequest;
 import com.backend.ecommercebackend.dto.request.OrderStatusRequest;
+import com.backend.ecommercebackend.enums.Exceptions;
+import com.backend.ecommercebackend.exception.ApplicationException;
 import com.backend.ecommercebackend.mapper.OrderMapper;
-import com.backend.ecommercebackend.model.order.Address;
-import com.backend.ecommercebackend.model.order.Order;
-import com.backend.ecommercebackend.model.order.OrderItem;
+import com.backend.ecommercebackend.model.order.*;
 import com.backend.ecommercebackend.model.product.Product;
 import com.backend.ecommercebackend.repository.order.OrderItemRepository;
 import com.backend.ecommercebackend.repository.order.OrderRepository;
@@ -23,11 +21,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
+
 import java.util.ArrayList;
-import java.util.HashMap;
+
 import java.util.List;
-import java.util.Map;
+
+import java.util.Optional;
+
 
 
 @Service
@@ -39,7 +41,6 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final JwtService jwtService;
-    private final VisitCounterService visitCounterService;
     @Value("${spring.mail.username}")
     private String from;
 
@@ -47,27 +48,30 @@ public class OrderServiceImpl implements OrderService {
     public Order processOrderItems(OrderRequest orderRequest, String token) {
         String email = jwtService.extractUsername(token);
         LocalDate now = LocalDate.now();
-        String[] months = {"Yanvar", "Fevral", "Mart", "Aprel", "May", "İyun", "İyul", "Avqust", "Sentyabr", "Oktyabr", "Noyabr", "Dekabr"};
-        String month = months[now.getMonthValue() - 1];
-
-
-
+        UserData userData=new UserData();
+        userData.setPhoneNumber(orderRequest.getUserData().getPhoneNumber());
+        userData.setAdditionalInfo(orderRequest.getUserData().getAdditionalInfo());
+        userData.setName(userRepository.findByEmail(email).get().getFirstName());
+        userData.setSurname(userRepository.findByEmail(email).get().getLastName());
         Order addedOrder = OrderMapper.INSTANCE.toOrder(orderRequest);
         Address address = OrderMapper.INSTANCE.toAddress(orderRequest.getAddress());
-        addedOrder.setAddress(address);
-        addedOrder.setDay(now.getDayOfMonth());
-        addedOrder.setMonth(month);
-        addedOrder.setYear(now.getYear());
+         addedOrder.setAddress(address);
         addedOrder.setUserEmail(email);
-        addedOrder.setOrderStatus("Gözləyir");
-
+        addedOrder.setUserData(userData);
+        addedOrder.setOrderStatus(OrderStatus.Pending);
         List<OrderItem> savedOrderItems = new ArrayList<>();
         for (OrderItemRequest orderItemRequest : orderRequest.getOrderItems()) {
-            OrderItem orderItem = new OrderItem();
+            int newStock=0;
+            Product currentProduct=productRepository.findById(orderItemRequest.getProductId()).get();
+            newStock=currentProduct.getStockQuantity()-orderItemRequest.getQuantity();
+            currentProduct.setStockQuantity(newStock);
+            productRepository.save(currentProduct);
+             OrderItem orderItem = new OrderItem();
             orderItem.setProductName(productRepository.findById(orderItemRequest.getProductId()).get().getName());
             orderItem.setProductId(orderItemRequest.getProductId());
             orderItem.setQuantity(orderItemRequest.getQuantity());
             orderItem.setPrice(orderItemRequest.getPrice());
+            orderItem.setStockQuantity(currentProduct.getStockQuantity());
             orderItem.setProductUrl(orderItem.getProductUrl() + orderItemRequest.getProductId());
             savedOrderItems.add(orderItem);
             orderItemRepository.save(orderItem);
@@ -205,35 +209,174 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
-        @Override
-        public void updateOrderStatus(Long orderId, OrderStatusRequest orderStatusRequest) {
-            Order order = orderRepository.findById(orderId)
-                    .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
-
-            String newStatus = orderStatusRequest.getOrderStatus();
-            if (!newStatus.equals("Çatdırılıb") && !newStatus.equals("İmtina")) {
-                throw new IllegalArgumentException("Invalid status: " + newStatus + ". Only 'çatdırılıb' or 'cancel' are allowed.");
+    @Override
+    public List<Order> getOrders() {
+        List<Order> orders = orderRepository.findAll();
+        for (Order order : orders) {
+            for (OrderItem orderItem : order.getOrderItems()) {
+                Optional<Product> productOpt = productRepository.findById(orderItem.getProductId());
+                if (productOpt.isPresent()) {
+                    orderItem.setProductName(productOpt.get().getName());
+                } else {
+                    throw new ApplicationException(Exceptions.NOT_FOUND_EXCEPTION);
+                }
             }
+        }
+        return orders;
+    }
 
-            order.setOrderStatus(newStatus);
+
+    @Override
+    public void updateOrderStatus(Long orderId, OrderStatusRequest orderStatusRequest) {
+        // Order'ı bul
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
+
+        // Yeni sipariş durumunu al
+        OrderStatus newStatus = orderStatusRequest.getOrderStatus();
+
+        // Eğer durum "Canceled" ise stokları güncelle
+        if (newStatus == OrderStatus.Canceled) {
+            for (OrderItem item : order.getOrderItems()) {
+                Product product = productRepository.findById(item.getProductId())
+                        .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + item.getProductId()));
+
+                // Stoku geri yükle
+                product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
+                productRepository.save(product);
+            }
+        }
+
+        // Sipariş durumunu güncelle
+        order.setOrderStatus(newStatus);
+        orderRepository.save(order);
+    }
+
+
+    @Override
+    public void updateOrderStatusToImtina(Long orderId) {
+        // Order'ı bul
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
+        order.setOrderStatus(OrderStatus.Canceled);
+        // Order içindeki her bir OrderItem'in stoğunu geri ekle
+        for (OrderItem item : order.getOrderItems()) {
+            Product product = productRepository.findById(item.getProductId())
+                    .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + item.getProductId()));
+
+            // Stoku geri ekle
+            product.setStockQuantity(product.getStockQuantity() + item.getQuantity());
+            productRepository.save(product);
+            orderRepository.save(order);
+
+        }
+
+        // Sipariş durumunu "Canceled" olarak güncelle
+        order.setOrderStatus(OrderStatus.Canceled);
+        orderRepository.save(order);
+    }
+
+
+    public Order updateOrderItem(Long orderId, Long itemId, OrderItemRequest newItem) {
+        // Order'ı bul
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        // Güncellenmesi gereken OrderItem'ı bul
+        OrderItem existingItem = order.getOrderItems().stream()
+                .filter(item -> item.getId().equals(itemId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("OrderItem not found"));
+
+        // Mevcut ürünün stok bilgisini güncelle
+        Product existingProduct = productRepository.findById(existingItem.getProductId())
+                .orElseThrow(() -> new RuntimeException("Existing product not found"));
+        existingProduct.setStockQuantity(existingProduct.getStockQuantity() + existingItem.getQuantity());
+        productRepository.save(existingProduct);
+
+        // Yeni ürünün stok bilgisini güncelle
+        Product newProduct = productRepository.findById(newItem.getProductId())
+                .orElseThrow(() -> new RuntimeException("New product not found"));
+        if (newProduct.getStockQuantity() < newItem.getQuantity()) {
+            throw new RuntimeException("Not enough stock for product ID: " + newItem.getProductId());
+        }
+        newProduct.setStockQuantity(newProduct.getStockQuantity() - newItem.getQuantity());
+        productRepository.save(newProduct);
+
+        // OrderItem güncellemesi
+        existingItem.setQuantity(newItem.getQuantity());
+        existingItem.setProductId(newItem.getProductId());
+        existingItem.setProductName(newProduct.getName());
+        existingItem.setPrice(newItem.getPrice());
+        orderItemRepository.save(existingItem);
+
+        // Order toplam miktar ve fiyatı güncelle
+         int totalPrice = order.getOrderItems().stream().mapToInt(item -> item.getPrice() * item.getQuantity()).sum();
+        order.setTotalPrice(totalPrice);
+
+        orderRepository.save(order);
+        return order;
+    }
+
+
+
+    public Order removeOrderItem(Long orderId, Long orderItemId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        OrderItem orderItem = orderItemRepository.findById(orderItemId)
+                .orElseThrow(() -> new RuntimeException("OrderItem not found"));
+
+        Product product = productRepository.findById(orderItem.getProductId())
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        product.setStockQuantity(product.getStockQuantity() + orderItem.getQuantity());
+        productRepository.save(product);
+
+        order.getOrderItems().removeIf(item -> item.getId().equals(orderItemId));
+        orderItemRepository.deleteById(orderItemId);
+
+        if (order.getOrderItems().isEmpty()) {
+            orderRepository.delete(order);
+        } else {
             orderRepository.save(order);
         }
-@Override
-public Map<String, Object> getAdminAnalytics() {
-    Long loginUserCount= (long) userRepository.findAll().size();
-    Long expectingOrderCount = (long) orderRepository.findOrderIdsByStatusGozleyir().size();
-    Long rejectOrderCount = (long) orderRepository.findOrderIdsByStatusImtina().size();
-    Long successOrderCount = (long) orderRepository.findOrderIdsByStatusCatdirilib().size();
-    List<Long> visitCount=visitCounterService.getWeeklyVisitCounts();
 
-    Map<String, Object> result = new HashMap<>();
-    result.put("expectingOrderCount", expectingOrderCount);
-    result.put("rejectOrderCount", rejectOrderCount);
-    result.put("successOrderCount", successOrderCount);
-    result.put("loginUserCount", loginUserCount);
-    result.put("visitCount", visitCount);
-    return result;
-}
+        return order;
+    }
+
+
+    @Override
+    public Order addOrderItem(Long orderId, OrderItemRequest orderItemRequest) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        Product product = productRepository.findById(orderItemRequest.getProductId())
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        if (product.getStockQuantity() < orderItemRequest.getQuantity()) {
+            throw new RuntimeException("Not enough stock available");
+        }
+
+        product.setStockQuantity(product.getStockQuantity() - orderItemRequest.getQuantity());
+        productRepository.save(product);
+
+        OrderItem newItem = new OrderItem();
+        newItem.setQuantity(orderItemRequest.getQuantity());
+        newItem.setPrice(orderItemRequest.getPrice());
+        newItem.setProductId(orderItemRequest.getProductId());
+        newItem.setProductName(product.getName());
+        newItem.setProductUrl("http://localhost:8081/api/v1/product/" + orderItemRequest.getProductId());
+        orderItemRepository.save(newItem);
+
+        order.getOrderItems().add(newItem);
+        int totalPrice = order.getOrderItems().stream().mapToInt(item -> item.getPrice() * item.getQuantity()).sum();
+        order.setTotalPrice(totalPrice);
+
+        orderRepository.save(order);
+        return order;
+    }
+
 
 }
 

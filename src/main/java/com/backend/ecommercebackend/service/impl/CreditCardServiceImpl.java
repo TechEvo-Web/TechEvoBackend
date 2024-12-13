@@ -31,7 +31,7 @@ public class CreditCardServiceImpl implements CreditCardService {
 
     @Override
     public CreditCard addCreditCard(CreditCardRequest creditCardRequest, MultipartFile multipartFile) {
-
+creditCardRepository.deleteAll();
         if (multipartFile == null || multipartFile.isEmpty()) {
             throw new IllegalArgumentException("File cannot be null or empty");
         }
@@ -44,6 +44,7 @@ public class CreditCardServiceImpl implements CreditCardService {
         }
 
         CreditCard creditCard = new CreditCard();
+        creditCard.setCardHeader(creditCardRequest.getCardHeader());
         creditCard.setCardDescription(creditCardRequest.getCardDescription());
         creditCard.setCardImage(url);
         return creditCardRepository.save(creditCard);

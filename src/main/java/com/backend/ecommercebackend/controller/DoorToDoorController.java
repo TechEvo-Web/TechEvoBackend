@@ -9,6 +9,7 @@ import com.backend.ecommercebackend.repository.admin.doortodoor.DoorToDoorStepRe
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,8 +36,9 @@ public class DoorToDoorController {
     }
     @GetMapping("/header")
     @Operation(summary = "Headeri elde etmek ucun endpoint(Qapidan qapiya)")
-    List<DoorHeader>getHeader(){
-        return  doorHeaderRepository.findAll();
+    DoorHeader getHeader(){
+        return  doorHeaderRepository.findFirstByOrderByIdAsc();
     }
+
 
 }
