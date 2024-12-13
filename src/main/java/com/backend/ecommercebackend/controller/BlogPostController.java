@@ -23,25 +23,25 @@ public class BlogPostController {
     private final BlogPostService service;
 
     @GetMapping("/getAll")
-    @Operation(summary = "Get all blog posts")
+    @Operation(summary = "Bütün bloqları almaq üçün endpoint")
     public ResponseEntity<List<BlogPost>> getAllBlogPosts() {
         return ResponseEntity.ok(service.getAllBlogPosts());
     }
 
     @GetMapping("/getAllByCategoryName")
-    @Operation(summary = "Get blog posts by category name")
+    @Operation(summary = "Bloqları kateqoriya adı ilə almaq üçün endpoint")
     public ResponseEntity<List<BlogPost>> getBlogPostsByCategory(@RequestParam String categoryName) {
         return ResponseEntity.ok(service.getBlogPostsByCategoryName(categoryName));
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Get a blog post by id")
+    @Operation(summary = "Hər hansı bloqu id ilə almaq üçün endpoint")
     public ResponseEntity<BlogPost> getBlogPostById(@PathVariable Long id) {
         return ResponseEntity.ok(service.getBlogPostById(id));
     }
 
     @PostMapping
-    @Operation(summary = "Create a new blog post")
+    @Operation(summary = "Yeni məhsul əlavə etmək üçün endpoint, description = Məlumatlar form-data olaraq göndəriləcək.Şəkil əlavə etmək mütləqdir. Subtitle uzunluq max 500, Description uzunluq max 10000")
     public ResponseEntity<BlogPost> createBlogPost(@RequestPart(name = "request") BlogPostRequest request, @RequestParam("imageFile") List<MultipartFile> imageFiles) {
         final var createdBlogPost = service.addBlogPost(request, imageFiles);
         final var location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/{id}").build(createdBlogPost.getId());
@@ -49,7 +49,7 @@ public class BlogPostController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Update a blog post by id")
+    @Operation(summary = "Bloqları id ilə güncəlləmək üçün endpoint")
     public ResponseEntity<BlogPost> updateBlogPost(@PathVariable Long id, @RequestPart(name = "request", required = false) BlogPostRequest request, @RequestParam(value = "imageFile", required = false) List<MultipartFile> imageFiles) throws IOException {
         final var updatedBlogPost = service.updateBlogPost(id, request, imageFiles);
         final var location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/{id}").build(updatedBlogPost.getId());
@@ -57,7 +57,7 @@ public class BlogPostController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Delete a blog post by id")
+    @Operation(summary = "Bloqu id ilə silmək üçün endpoint")
     public ResponseEntity<Void> deleteBlogPost(@PathVariable Long id) {
         service.deleteBlogPost(id);
         return ResponseEntity.noContent().build();

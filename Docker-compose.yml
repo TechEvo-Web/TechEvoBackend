@@ -28,6 +28,20 @@ services:
     networks:
       - ecommerce-evo
 
+  blogpost_service:
+    container_name: blogpost
+    image: postgres
+    environment:
+      POSTGRES_USER: BLOGPOST
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: BlogPost
+    ports:
+      - '5436:5432'
+    volumes:
+      - blogpostData:/var/lib/postgresql/data
+    networks:
+      - ecommerce-evo
+
   order_service:
     container_name: order
     image: postgres:alpine
@@ -72,6 +86,7 @@ volumes:
   securityData: {}
   redis_data: {}
   productDataEvo: {}
+  blogpostData: {}
   orderData: {}
   adminData: {}
 

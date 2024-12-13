@@ -41,6 +41,11 @@ spring:
       url: jdbc:postgresql://localhost:5435/Admin
       username: ADMIN
       password: 12345
+    fifth:
+      #      url: jdbc:postgresql://product_service:5432/BlogPost
+      url: jdbc:postgresql://localhost:5436/BlogPost
+      username: BLOGPOST
+      password: 12345
   jpa:
     show-sql: true
     first:

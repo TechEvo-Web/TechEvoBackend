@@ -8,9 +8,9 @@ import java.io.IOException;
 import java.util.List;
 
 public interface BlogPostService {
-    BlogPost addBlogPost(BlogPostRequest request, List<MultipartFile> imageFiles);
+    BlogPost addBlogPost(BlogPostRequest request, List<MultipartFile> imageFile);
 
-    BlogPost updateBlogPost(Long id, BlogPostRequest request, List<MultipartFile> imageFiles) throws IOException;
+    BlogPost updateBlogPost(Long id, BlogPostRequest request, List<MultipartFile> imageFile) throws IOException;
 
     BlogPost getBlogPostById(Long id);
 

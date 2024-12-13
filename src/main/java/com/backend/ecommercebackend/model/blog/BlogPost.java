@@ -24,10 +24,10 @@ public class BlogPost {
     @Column(nullable = false)
     String title;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 500)
     String subTitle;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 10000)
     String description;
 
     @Column(nullable = false)

@@ -26,7 +26,6 @@ public class BlogPostServiceImpl implements BlogPostService {
     private final BlogPostRepository repository;
     private final FileStorageService fileStorageService;
 
-
     @Override
     public BlogPost addBlogPost(BlogPostRequest request, List<MultipartFile> imageFiles) {
         BlogPost blogPost = mapper.blogPostRequestToEntity(request);
