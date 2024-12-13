@@ -41,7 +41,7 @@ public class BlogPostController {
     }
 
     @PostMapping
-    @Operation(summary = "Yeni məhsul əlavə etmək üçün endpoint, description = Məlumatlar form-data olaraq göndəriləcək.Şəkil əlavə etmək mütləqdir. Subtitle uzunluq max 500, Description uzunluq max 10000")
+    @Operation(summary = "Yeni bloq əlavə etmək üçün endpoint, description = Məlumatlar form-data olaraq göndəriləcək.Şəkil əlavə etmək mütləqdir. Subtitle uzunluq max 500, Description uzunluq max 10000")
     public ResponseEntity<BlogPost> createBlogPost(@RequestPart(name = "request") BlogPostRequest request, @RequestParam("imageFile") List<MultipartFile> imageFiles) {
         final var createdBlogPost = service.addBlogPost(request, imageFiles);
         final var location = ServletUriComponentsBuilder.fromCurrentContextPath().path("/{id}").build(createdBlogPost.getId());
