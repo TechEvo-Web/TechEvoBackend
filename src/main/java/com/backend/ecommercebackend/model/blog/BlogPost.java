@@ -7,6 +7,7 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -35,6 +36,9 @@ public class BlogPost {
 
     @Column(nullable = false)
     String author;
+
+    @Column(nullable = false)
+    LocalDate publishedDate;
 
     @Column(columnDefinition = "jsonb", nullable = false)
     @JdbcTypeCode(SqlTypes.JSON)

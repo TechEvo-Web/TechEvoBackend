@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -15,4 +17,5 @@ public class BlogPostRequest {
     String description;
     String categoryName;
     String author;
+    LocalDate publishedDate;
 }
