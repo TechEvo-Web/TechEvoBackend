@@ -9,6 +9,7 @@ import com.backend.ecommercebackend.model.order.OrderItem;
 import com.backend.ecommercebackend.model.product.Product;
 import com.backend.ecommercebackend.repository.order.OrderItemRepository;
 import com.backend.ecommercebackend.repository.order.OrderRepository;
+import com.backend.ecommercebackend.repository.product.ProductRepository;
 import com.backend.ecommercebackend.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/order")
@@ -26,6 +28,7 @@ public class OrderController {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final JwtService jwtService;
+    private final ProductRepository productRepository;
 
     @GetMapping("/getAllOrders")
     @Operation(summary = "Butun sifarisleri elde etmek üçün endpoint")
@@ -38,6 +41,7 @@ public class OrderController {
     public ResponseEntity<Order> addOrderItems(@RequestBody OrderRequest orderRequest, @RequestHeader("Authorization") String token) {
         token = token.substring(7);
         Order createdOrder = orderService.processOrderItems(orderRequest, token);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
     }
 

@@ -39,6 +39,7 @@ public class DoorToDoorServiceImpl implements DoorToDoorService {
         System.out.println(doorToDoorRequest.getBenefitName());
         DoorToDoor doorToDoor = new DoorToDoor();
         doorToDoor.setBenefitName(doorToDoorRequest.getBenefitName());
+        System.out.println(doorToDoorRequest.getBenefitName());
 
         doorToDoor.setBenefitImage(url);
         return doorToDoorRepository.save(doorToDoor);
@@ -58,7 +59,6 @@ public class DoorToDoorServiceImpl implements DoorToDoorService {
         }
 
         existingDoorToDoor.setBenefitName(doorToDoorRequest.getBenefitName());
-
         return doorToDoorRepository.save(existingDoorToDoor);
     }
 @Override

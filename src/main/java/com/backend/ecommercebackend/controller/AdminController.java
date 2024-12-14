@@ -192,6 +192,7 @@ public class AdminController {
 
     public DoorToDoor addDoor(@RequestPart("doorToDoorRequest") DoorToDoorRequest doorToDoorRequest,
                               @RequestPart("file") MultipartFile multipartFile) {
+        System.out.println(doorToDoorRequest);
         return doorToDoorService.addDoorToDoor(doorToDoorRequest, multipartFile);
     }
 

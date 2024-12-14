@@ -18,6 +18,7 @@ import com.backend.ecommercebackend.service.OrderService;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -46,6 +47,15 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order processOrderItems(OrderRequest orderRequest, String token) {
+
+        for (OrderItemRequest orderItem : orderRequest.getOrderItems()) {
+            int stockChecker=orderItem.getQuantity();
+            Optional<Product> myProduct=productRepository.findById(orderItem.getProductId());
+            if (stockChecker>myProduct.get().getStockQuantity()){
+                throw new IllegalArgumentException("Not enough stock for product: " + myProduct.get().getName());
+
+            }
+        }
         String email = jwtService.extractUsername(token);
         LocalDate now = LocalDate.now();
         UserData userData=new UserData();
