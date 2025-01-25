@@ -12,7 +12,7 @@ import java.util.Map;
 
 public interface OrderService {
     List<Order> getOrders();
-    Order processOrderItems(OrderRequest orderRequest,String token);
+    Order processOrderItems(OrderRequest orderRequest);
     Product getProductIdFromOrderItemId(Long orderItemId);
     List<Order> getOrdersByToken(String token);
     void updateOrderStatus(Long orderId, OrderStatusRequest orderStatusRequest);

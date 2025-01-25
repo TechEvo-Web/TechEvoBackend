@@ -21,5 +21,6 @@ public class OrderRequest {
     @Column(columnDefinition = "jsonb", nullable = false)
     List<OrderItemRequest> orderItems;
     AddressRequest address;
+    String email;
     UserDataRequest userData;
 }

@@ -46,7 +46,7 @@ public class OrderServiceImpl implements OrderService {
     private String from;
 
     @Override
-    public Order processOrderItems(OrderRequest orderRequest, String token) {
+    public Order processOrderItems(OrderRequest orderRequest) {
 
         for (OrderItemRequest orderItem : orderRequest.getOrderItems()) {
             int stockChecker=orderItem.getQuantity();
@@ -56,14 +56,14 @@ public class OrderServiceImpl implements OrderService {
 
             }
         }
-        String email = jwtService.extractUsername(token);
+        String email=orderRequest.getEmail();
         LocalDate now = LocalDate.now();
         UserData userData=new UserData();
         userData.setPhoneNumber(orderRequest.getUserData().getPhoneNumber());
         userData.setAdditionalInfo(orderRequest.getUserData().getAdditionalInfo());
-        userData.setName(userRepository.findByEmail(email).get().getFirstName());
-        userData.setSurname(userRepository.findByEmail(email).get().getLastName());
-        Order addedOrder = OrderMapper.INSTANCE.toOrder(orderRequest);
+        userData.setName(orderRequest.getUserData().getName());
+        userData.setSurname(orderRequest.getUserData().getSurname());
+          Order addedOrder = OrderMapper.INSTANCE.toOrder(orderRequest);
         Address address = OrderMapper.INSTANCE.toAddress(orderRequest.getAddress());
          addedOrder.setAddress(address);
         addedOrder.setUserEmail(email);
@@ -108,26 +108,26 @@ public class OrderServiceImpl implements OrderService {
                 "</table>" + "<h2 style='font-size: 18px; color: #333; margin-top: 20px;'>Sifariş edilən məhsullar</h2>";
 
 
-        String userHtmlContent = "<html><body style='font-family: Arial, sans-serif; background-color: #f8f8f8; padding: 20px;'>" +
-                "<div style='background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);'>" +
-                "<h1 style='text-align: center; color: #1976D2;'>🎉 Salam, hörmətli müştəri! 🎉</h1>" +
-                "<p style='font-size: 16px; color: #555; text-align: center;'>Bizi seçdiyiniz üçün təşəkkür edirik! 🙏 Sifarişinizi aldıq və ən qısa müddətdə əməkdaşlarımız sizinlə əlaqə saxlayacaq. 😊</p>" +
-                "<p style='font-size: 16px; color: #555; text-align: center;'>Sifariş nömrəniz: <strong style='color: #d32f2f;'>" + addedOrder.getOrderId() + "</strong></p>" +
-                "<div style='margin-top: 20px;'>" +
-                "<p style='font-size: 16px; color: #555;'><strong>💸 Ümumi Qiymət:</strong> <span style='color: #d32f2f;'>" + addedOrder.getTotalPrice() + " AZN</span></p>" +
-                "<p style='font-size: 16px; color: #555;'><strong>🚚 Çatdırılma Seçimi:</strong> " + addedOrder.getDeliveryType() + "</p>" +
+            String userHtmlContent = "<html><body style='font-family: Arial, sans-serif; background-color: #f8f8f8; padding: 20px;'>" +
+                    "<div style='background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);'>" +
+                    "<h1 style='text-align: center; color: #1976D2;'>🎉 Salam, hörmətli müştəri! 🎉</h1>" +
+                    "<p style='font-size: 16px; color: #555; text-align: center;'>Bizi seçdiyiniz üçün təşəkkür edirik! 🙏 Sifarişinizi aldıq və ən qısa müddətdə əməkdaşlarımız sizinlə əlaqə saxlayacaq. 😊</p>" +
+                    "<p style='font-size: 16px; color: #555; text-align: center;'>Sifariş nömrəniz: <strong style='color: #d32f2f;'>" + addedOrder.getOrderId() + "</strong></p>" +
+                    "<div style='margin-top: 20px;'>" +
+                    "<p style='font-size: 16px; color: #555;'><strong>💸 Ümumi Qiymət:</strong> <span style='color: #d32f2f;'>" + addedOrder.getTotalPrice() + " AZN</span></p>" +
+                    "<p style='font-size: 16px; color: #555;'><strong>🚚 Çatdırılma Seçimi:</strong> " + addedOrder.getDeliveryType() + "</p>" +
 
-                "</div>" +
+                    "</div>" +
 
-                "<h2 style='font-size: 18px; color: #1976D2; margin-top: 30px;'>🏠 Ünvan Bilgiləri</h2>" +
-                "<div style='background-color: #f9f9f9; padding: 10px; border: 1px solid #ddd; border-radius: 8px; margin-top: 10px;'>" +
-                "<p style='font-size: 16px;'><strong>📍 Bölgə:</strong> " + addedOrder.getAddress().getArea() + "</p>" +
-                "<p style='font-size: 16px;'><strong>🏙️ Şəhər:</strong> " + addedOrder.getAddress().getCity() + "</p>" +
-                "<p style='font-size: 16px;'><strong>🛣️ Küçə:</strong> " + addedOrder.getAddress().getStreet() + "</p>" +
-                "<p style='font-size: 16px;'><strong>🏢 Bina:</strong> " + addedOrder.getAddress().getBuilding() + "</p>" +
-                "</div>" +
+                    "<h2 style='font-size: 18px; color: #1976D2; margin-top: 30px;'>🏠 Ünvan Bilgiləri</h2>" +
+                    "<div style='background-color: #f9f9f9; padding: 10px; border: 1px solid #ddd; border-radius: 8px; margin-top: 10px;'>" +
+                    "<p style='font-size: 16px;'><strong>📍 Bölgə:</strong> " + addedOrder.getAddress().getArea() + "</p>" +
+                    "<p style='font-size: 16px;'><strong>🏙️ Şəhər:</strong> " + addedOrder.getAddress().getCity() + "</p>" +
+                    "<p style='font-size: 16px;'><strong>🛣️ Küçə:</strong> " + addedOrder.getAddress().getStreet() + "</p>" +
+                    "<p style='font-size: 16px;'><strong>🏢 Bina:</strong> " + addedOrder.getAddress().getBuilding() + "</p>" +
+                    "</div>" +
 
-                "<h2 style='font-size: 18px; color: #1976D2; margin-top: 30px;'>🛍️ Sifariş Edilən Məhsullar</h2>";
+                    "<h2 style='font-size: 18px; color: #1976D2; margin-top: 30px;'>🛍️ Sifariş Edilən Məhsullar</h2>";
 
         for (OrderItem oi : savedOrderItems) {
             Product product = productRepository.findById(oi.getProductId()).orElse(null);

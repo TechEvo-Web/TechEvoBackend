@@ -38,9 +38,8 @@ public class OrderController {
 
     @PostMapping
     @Operation(summary = "İstifadəçinin sifarişlərini əlavə etmək üçün endpoint")
-    public ResponseEntity<Order> addOrderItems(@RequestBody OrderRequest orderRequest, @RequestHeader("Authorization") String token) {
-        token = token.substring(7);
-        Order createdOrder = orderService.processOrderItems(orderRequest, token);
+    public ResponseEntity<Order> addOrderItems(@RequestBody OrderRequest orderRequest) {
+         Order createdOrder = orderService.processOrderItems(orderRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(createdOrder);
     }
